@@ -16,6 +16,4 @@ public class Message {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) // 기본키 생성을 DB에 위임
     private Long messageId;
-
-
 }
