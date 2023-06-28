@@ -1,19 +1,44 @@
 package com.pickupluck.ecogging.domain.message.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import jakarta.persistence.*;
+import lombok.*;
+import org.antlr.v4.runtime.misc.NotNull;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
 @Entity
+@NoArgsConstructor
+@AllArgsConstructor
+@RequiredArgsConstructor
 public class Message {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) // 기본키 생성을 DB에 위임
-    private Long messageId;
+    private Long msgId;
+
+    @Column(nullable = false)
+    private String msgContent;
+
+    @Column(nullable = false)
+    private String  msgDate;
+
+    @Column(nullable = false)
+    private int msgRead;
+
+    /* User Entity 필요 */
+    @ManyToOne(fetch = FetchType.LAZY) // 지연 업데이트
+    @JoinColumn(name = "receiver_id") // User 테이블과 JOIN 해서 아이디 가져오기
+    @OnDelete(action = OnDeleteAction.NO_ACTION) // User 제거되면 이것도 제거
+    private User receiver;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "sender_id")
+    @OnDelete(action = OnDeleteAction.NO_ACTION)
+    private User sender;
+
+    @Column(nullable = false)
+    private boolean deletedByRcv;
+
+    @Column(nullable = false)
+    private boolean deletedBySnd;
+
 }
