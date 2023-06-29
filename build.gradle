@@ -42,6 +42,8 @@ dependencies {
 	annotationProcessor "jakarta.persistence:jakarta.persistence-api"
 	// QueryDSL 설정 끝
 
+	// https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-validation
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
 
 }
 
