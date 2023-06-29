@@ -1,6 +1,5 @@
 package com.pickupluck.ecogging.domain.plogging.dto;
 
-import jakarta.persistence.Column;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,4 +21,21 @@ public class EventDTO {
     private Integer views;
     private Integer save;
     private Integer userId;
+    private Integer fileId;
+
+    @Override
+    public String toString() {
+        return "EventDTO{" +
+                "eventId=" + eventId +
+                ", eventTitle='" + eventTitle + '\'' +
+                ", eventContent='" + eventContent + '\'' +
+                ", eventDay=" + eventDay +
+                ", createdAt=" + createdAt +
+                ", activate=" + activate +
+                ", views=" + views +
+                ", save=" + save +
+                ", userId=" + userId +
+                ", fileId=" + fileId +
+                '}';
+    }
 }

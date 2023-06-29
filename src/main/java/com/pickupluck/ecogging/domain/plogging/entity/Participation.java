@@ -1,18 +1,14 @@
 package com.pickupluck.ecogging.domain.plogging.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.util.Date;
 
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
 public class Participation {
     @Id @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Integer participationId ;
@@ -28,9 +24,23 @@ public class Participation {
     @Column
     private Boolean confirm;
 
-
     @Override
     public String toString() {
-        return String.format("[%d,%d,%d,%d,%d,%b]", participationId,userId,accompanyId,eventId,type,confirm);
+        return "Participation{" +
+                "participationId=" + participationId +
+                ", userId=" + userId +
+                ", accompanyId=" + accompanyId +
+                ", eventId=" + eventId +
+                ", type=" + type +
+                ", confirm=" + confirm +
+                '}';
+    }
+
+    public Participation(Integer userId, Integer accompanyId, Integer eventId, Integer type, Boolean confirm) {
+        this.userId = userId;
+        this.accompanyId = accompanyId;
+        this.eventId = eventId;
+        this.type = type;
+        this.confirm = confirm;
     }
 }

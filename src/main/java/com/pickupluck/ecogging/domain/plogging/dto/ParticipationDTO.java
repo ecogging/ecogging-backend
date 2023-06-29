@@ -17,4 +17,16 @@ public class ParticipationDTO {
     private Integer eventId;
     private Integer type;
     private Boolean confirm;
+
+    @Override
+    public String toString() {
+        return "ParticipationDTO{" +
+                "participationId=" + participationId +
+                ", userId=" + userId +
+                ", accompanyId=" + accompanyId +
+                ", eventId=" + eventId +
+                ", type=" + type +
+                ", confirm=" + confirm +
+                '}';
+    }
 }
