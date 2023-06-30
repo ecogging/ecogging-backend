@@ -1,6 +1,7 @@
 package com.pickupluck.ecogging.domain.user.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 import lombok.Builder;
@@ -19,7 +20,7 @@ public class User extends BaseEntity {
     @Column(name = "user_id")
     private Long id;
 
-    @NotNull
+    @NotBlank
     @Column(unique = true)
     private String email;
 
@@ -32,20 +33,20 @@ public class User extends BaseEntity {
     private String tel;
 
     @Column(name = "noti_yn")
-    private Boolean isNotificationAllowed;
+    private String notiYn;
 
     @Enumerated(EnumType.STRING)
     private LoginType loginType;
 
     @Builder
     public User(String email, String name, String password, String nickname,
-                String tel, Boolean isNotificationAllowed, LoginType loginType) {
+                String tel, String notiYn, LoginType loginType) {
         this.email = email;
         this.name = name;
         this.password = password;
         this.nickname = nickname;
         this.tel = tel;
-        this.isNotificationAllowed = isNotificationAllowed;
+        this.notiYn = notiYn;
         this.loginType = loginType;
     }
 }
