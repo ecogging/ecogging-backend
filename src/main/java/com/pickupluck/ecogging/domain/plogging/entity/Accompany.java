@@ -4,9 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import jakarta.persistence.*;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import com.pickupluck.ecogging.domain.BaseEntity;
 import com.pickupluck.ecogging.domain.user.entity.User;
@@ -14,6 +12,8 @@ import com.pickupluck.ecogging.domain.user.entity.User;
 @Entity
 @Getter
 @NoArgsConstructor
+@EqualsAndHashCode(of="id")
+@ToString(exclude = "writer")
 public class Accompany extends BaseEntity {
 
     @Id
