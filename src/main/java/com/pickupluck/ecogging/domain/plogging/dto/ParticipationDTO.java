@@ -1,7 +1,5 @@
 package com.pickupluck.ecogging.domain.plogging.dto;
 
-import jakarta.persistence.Column;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -9,7 +7,6 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
 public class ParticipationDTO {
     private Integer participationId ;
     private Integer userId;
@@ -28,5 +25,13 @@ public class ParticipationDTO {
                 ", type=" + type +
                 ", confirm=" + confirm +
                 '}';
+    }
+
+    public ParticipationDTO(Integer userId, Integer accompanyId, Integer eventId, Integer type, Boolean confirm) {
+        this.userId = userId;
+        this.accompanyId = accompanyId;
+        this.eventId = eventId;
+        this.type = type;
+        this.confirm = confirm;
     }
 }

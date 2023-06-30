@@ -73,6 +73,27 @@ public class EventServiceImpl implements EventService{
         return oevent.get();
     }
 
+//    @Override
+//    public Map<String, Object> getEvent(Integer eventId, HttpServletRequest request) throws Exception {
+//        Map<String, Object> map = new HashMap<>();
+//        Optional<Event> oevent = eventRepository.findById(eventId);
+//        if(oevent.isEmpty()) throw new Exception("이벤트 아이디 오류");
+//        Event event = oevent.get();
+//        map.put("event", modelMappper.map(event,EventDTO.class));
+//        // map.put("scrap", event.getS)
+//
+//        Integer id = (Integer) request.getAttribute("id");
+//        Boolean scrap = false;
+//        if(id!=null && id.equals("")) {
+//            List<Scrap> scrapList = event.getScrap();
+//            for(Scrap scrap : scrapList) {
+//                if(scrap.get)
+//            }
+//        }
+//
+//        return map;
+//    }
+
     @Override
     public Integer createFile(MultipartFile file) throws Exception {
 //        if (file == null || file.isEmpty()) {

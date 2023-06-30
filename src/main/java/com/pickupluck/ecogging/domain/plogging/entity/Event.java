@@ -2,13 +2,11 @@ package com.pickupluck.ecogging.domain.plogging.entity;
 
 import com.pickupluck.ecogging.domain.BaseEntity;
 import jakarta.persistence.*;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -34,10 +32,13 @@ public class Event extends BaseEntity {
     private Integer userId;
     @Column
     private Integer fileId;
+    @Column
+    private  String location;
+    @Column
+    private  String explanation;
 
     @Override
     public String toString() {
-
         return "Event{" +
                 "eventId=" + eventId +
                 ", title='" + title + '\'' +
@@ -48,20 +49,23 @@ public class Event extends BaseEntity {
                 ", save=" + save +
                 ", userId=" + userId +
                 ", fileId=" + fileId +
+                ", location='" + location + '\'' +
+                ", explanation='" + explanation + '\'' +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
                 '}';
     }
 
-    @Builder
-    public Event(String title, String content, LocalDate meetingDate, LocalDateTime createdAt,
-                 Boolean active, Integer views, Integer save, Integer userId, Integer fileId) {
+    public Event(String title, String content, LocalDate meetingDate, Boolean active, Integer views, Integer save, Integer userId, Integer fileId, String location, String explanation) {
         this.title = title;
         this.content = content;
         this.meetingDate = meetingDate;
-        this.createdAt = createdAt;
         this.active = active;
         this.views = views;
         this.save = save;
         this.userId = userId;
         this.fileId = fileId;
+        this.location = location;
+        this.explanation = explanation;
     }
 }
