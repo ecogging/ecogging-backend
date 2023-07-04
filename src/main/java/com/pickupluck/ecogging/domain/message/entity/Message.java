@@ -9,8 +9,8 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
-@AllArgsConstructor
 @NoArgsConstructor
+@EqualsAndHashCode(of="id", callSuper = false)
 public class Message extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) // 기본키 생성을 DB에 위임
@@ -20,7 +20,7 @@ public class Message extends BaseEntity {
     @Column(nullable = false)
     private String content;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "is_read")
     private Integer read;
 
     @ManyToOne(fetch = FetchType.LAZY) // 지연 업데이트
@@ -39,4 +39,14 @@ public class Message extends BaseEntity {
     @Column(nullable = false, name = "deleted_by_sender")
     private Boolean deletedBySnd;
 
+    @Builder
+    public Message(Long id, String content, Integer read, User receiver, User sender, Boolean deletedByRcv, Boolean deletedBySnd) {
+        this.id = id;
+        this.content = content;
+        this.read = read;
+        this.receiver = receiver;
+        this.sender = sender;
+        this.deletedByRcv = deletedByRcv;
+        this.deletedBySnd = deletedBySnd;
+    }
 }
