@@ -10,7 +10,7 @@ import com.pickupluck.ecogging.domain.BaseEntity;
 @Getter
 @ToString
 @NoArgsConstructor
-@EqualsAndHashCode(of="id")
+@EqualsAndHashCode(of="id", callSuper = false)
 public class User extends BaseEntity {
 
     @Id

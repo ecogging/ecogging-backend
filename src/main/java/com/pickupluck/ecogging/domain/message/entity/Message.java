@@ -9,9 +9,8 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
-@NoArgsConstructor
 @AllArgsConstructor
-@RequiredArgsConstructor
+@NoArgsConstructor
 public class Message extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) // 기본키 생성을 DB에 위임

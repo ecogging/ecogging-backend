@@ -12,7 +12,7 @@ import com.pickupluck.ecogging.domain.user.entity.User;
 @Entity
 @Getter
 @NoArgsConstructor
-@EqualsAndHashCode(of="id")
+@EqualsAndHashCode(of="id", callSuper = false)
 @ToString(exclude = "writer")
 public class Accompany extends BaseEntity {
 
