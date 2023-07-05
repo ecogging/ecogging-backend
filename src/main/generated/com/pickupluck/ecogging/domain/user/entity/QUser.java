@@ -28,13 +28,13 @@ public class QUser extends EntityPathBase<User> {
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
-    public final BooleanPath isNotificationAllowed = createBoolean("isNotificationAllowed");
-
     public final EnumPath<LoginType> loginType = createEnum("loginType", LoginType.class);
 
     public final StringPath name = createString("name");
 
     public final StringPath nickname = createString("nickname");
+
+    public final StringPath notiYn = createString("notiYn");
 
     public final StringPath password = createString("password");
 

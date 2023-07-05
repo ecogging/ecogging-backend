@@ -48,7 +48,7 @@ public class EventServiceImpl implements EventService{
 
     @Override
     public List<EventDTO> getEventList(Integer page, PageInfo pageInfo) throws Exception {
-        PageRequest pageRequest = PageRequest.of(page-1, 5, Sort.by(Sort.Direction.DESC, "eventId"));
+        PageRequest pageRequest = PageRequest.of(page-1, 16, Sort.by(Sort.Direction.DESC, "eventId"));
         Page<Event> pages = eventRepository.findAll(pageRequest);
 
         pageInfo.setAllPage(pages.getTotalPages());

@@ -6,15 +6,17 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
 @NoArgsConstructor
 public class EventDTO extends BaseEntity {
     private Integer eventId ;
-    private String eventTitle;
-    private String eventContent;
-    private LocalDate eventDay;
+    private String title;
+    private String content;
+    private LocalDate meetingDate;
+    private LocalDate endDate;
     private Boolean activate;
     private Integer views;
     private Integer save;
@@ -23,6 +25,6 @@ public class EventDTO extends BaseEntity {
     private Integer fileId;
     private  String location;
     private  String explanation;
-
+    private LocalDateTime createdAt;
 
 }
