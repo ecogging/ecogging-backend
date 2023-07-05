@@ -37,12 +37,16 @@ public class Accompany extends BaseEntity {
 
     private Boolean save;
 
+    private String location;
+
+    private String locationDetail;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User writer;
 
     @Builder
-    public Accompany(String title, String content, LocalDate meetingDate, LocalTime meetingTime, Integer numOfPeople, Boolean active, Integer views, Boolean save, User writer) {
+    public Accompany(String title, String content, LocalDate meetingDate, LocalTime meetingTime, Integer numOfPeople, Boolean active, Integer views, Boolean save, User writer, String location, String locationDetail) {
         this.title = title;
         this.content = content;
         this.meetingDate = meetingDate;
@@ -52,5 +56,7 @@ public class Accompany extends BaseEntity {
         this.views = views;
         this.save = save;
         this.writer = writer;
+        this.location = location;
+        this.locationDetail = locationDetail;
     }
 }
