@@ -25,11 +25,9 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class EventServiceImpl implements EventService{
 
-    @Autowired
-    private EventRepository eventRepository;
+    private final EventRepository eventRepository;
 
-    @Autowired
-    private ModelMapper modelMappper;
+    private final ModelMapper modelMappper;
 
     private final String uploadDir = "D:/MJS/front-work/upload/";
 
