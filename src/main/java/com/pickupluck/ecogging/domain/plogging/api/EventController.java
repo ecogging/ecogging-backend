@@ -5,7 +5,7 @@ import com.pickupluck.ecogging.domain.plogging.entity.Event;
 import com.pickupluck.ecogging.domain.plogging.service.EventService;
 import com.pickupluck.ecogging.util.PageInfo;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,10 +16,10 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-public class EventApi {
+@RequiredArgsConstructor
+public class EventController {
 
-    @Autowired
-    private EventService eventService;
+    private final EventService eventService;
 
     @GetMapping("/eventList/{page}")
     public ResponseEntity<Map<String,Object>> eventList(@PathVariable Integer page) {
