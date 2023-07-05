@@ -74,4 +74,4 @@ secrets.yml
 .gradletasknamecache
 
 # for QueryDsl QEntity
-src/main/generated/
+/src/main/generated/
