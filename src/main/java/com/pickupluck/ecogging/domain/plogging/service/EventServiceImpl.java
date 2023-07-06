@@ -1,5 +1,6 @@
 package com.pickupluck.ecogging.domain.plogging.service;
 
+import com.pickupluck.ecogging.domain.file.repository.FileRepository;
 import com.pickupluck.ecogging.domain.plogging.dto.EventDTO;
 import com.pickupluck.ecogging.domain.plogging.entity.Event;
 import com.pickupluck.ecogging.domain.plogging.repository.EventRepository;
@@ -28,16 +29,32 @@ public class EventServiceImpl implements EventService{
 
     private final ModelMapper modelMappper;
 
+    private final FileRepository fileRepository;
+
     private final String uploadDir = "D:/MJS/front-work/upload/";
 
     @Override
     public void writeEvent(EventDTO eventDTO, MultipartFile file) throws Exception {
         if(file!=null && !file.isEmpty()) {
+            String path="D:/MJS/front-work/upload/";
             String originName = file.getOriginalFilename();
             Long size = file.getSize();
-            String fullPath = "D:/MJS/front-work/upload/";
-            File dfile = new File(fullPath+originName);
-            file.transferTo(dfile);
+            String fullPath = path+originName;
+
+            com.pickupluck.ecogging.domain.file.entity.File fil = new com.pickupluck.ecogging.domain.file.entity.File();
+            fil.setOriginName(originName);
+            fil.setSize(size);
+            fil.setFullPath(fullPath);
+            fileRepository.save(fil);
+
+            Long fileId = fileRepository.save(fil).getId();
+            eventDTO.setFileId(fileId);
+            File dfile = new File(fullPath);
+            try {
+                file.transferTo(dfile);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
         Event event = modelMappper.map(eventDTO, Event.class);
         eventRepository.save(event);
@@ -46,8 +63,7 @@ public class EventServiceImpl implements EventService{
     @Override
     public List<EventDTO> getEventList(Integer page, PageInfo pageInfo) throws Exception {
         PageRequest pageRequest = PageRequest.of(page-1, 2, Sort.by(Sort.Direction.DESC, "eventId"));
-        Page<Event> pages = eventRepository.findAll(pageRequest);
-
+        Page<Event> pages = eventRepository.findBySaveFalse(pageRequest);
         pageInfo.setAllPage(pages.getTotalPages());
         pageInfo.setCurPage(page);
         int startPage = (page-1)/10*10+1;

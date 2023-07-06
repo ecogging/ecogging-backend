@@ -73,7 +73,7 @@ public class EventController {
         public  ResponseEntity<Boolean> eventDelete(@PathVariable Integer eventId) {
             try {
                 eventService.removeEvent(eventId);
-                return  new ResponseEntity<Boolean>(true, HttpStatus.OK);
+                return new ResponseEntity<Boolean>(true, HttpStatus.OK);
             } catch (Exception e) {
                 e.printStackTrace();
                 return new ResponseEntity<Boolean>(HttpStatus.BAD_REQUEST);

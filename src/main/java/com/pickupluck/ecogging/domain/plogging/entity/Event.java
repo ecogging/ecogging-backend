@@ -33,11 +33,17 @@ public class Event extends BaseEntity {
     @Column
     private Integer userId;
     @Column
-    private Integer fileId;
+    private Long fileId;
     @Column
     private  String location;
     @Column
     private  String explanation;
+    @Column
+    private  Boolean save;
+
+//    @ManyToOne
+//    @JoinColumn(name = "fileId")
+//    private File file;
 
     @Override
     public String toString() {
@@ -54,13 +60,14 @@ public class Event extends BaseEntity {
                 ", fileId=" + fileId +
                 ", location='" + location + '\'' +
                 ", explanation='" + explanation + '\'' +
+                ", save=" + save +
                 ", createdAt=" + createdAt +
                 ", updatedAt=" + updatedAt +
                 '}';
     }
 
     public Event(String title, String content, LocalDate meetingDate, LocalDate endDate, String corpName, Boolean active,
-                 Integer views, Integer userId, Integer fileId, String location, String explanation) {
+                 Integer views, Integer userId, Long fileId, String location, String explanation, Boolean save) {
         this.title = title;
         this.content = content;
         this.meetingDate = meetingDate;
@@ -72,5 +79,6 @@ public class Event extends BaseEntity {
         this.fileId = fileId;
         this.location = location;
         this.explanation = explanation;
+        this.save = save;
     }
 }

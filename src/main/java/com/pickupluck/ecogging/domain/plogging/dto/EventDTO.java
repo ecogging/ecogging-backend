@@ -19,12 +19,11 @@ public class EventDTO extends BaseEntity {
     private LocalDate endDate;
     private Boolean activate;
     private Integer views;
-    private Integer save;
     private String corpName;
     private Integer userId;
-    private Integer fileId;
-    private  String location;
-    private  String explanation;
+    private Long fileId;
+    private String location;
+    private String explanation;
     private LocalDateTime createdAt;
-
+    private Boolean save;
 }

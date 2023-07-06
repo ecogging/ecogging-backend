@@ -36,11 +36,13 @@ public class QEvent extends EntityPathBase<Event> {
 
     public final StringPath explanation = createString("explanation");
 
-    public final NumberPath<Integer> fileId = createNumber("fileId", Integer.class);
+    public final NumberPath<Long> fileId = createNumber("fileId", Long.class);
 
     public final StringPath location = createString("location");
 
     public final DatePath<java.time.LocalDate> meetingDate = createDate("meetingDate", java.time.LocalDate.class);
+
+    public final BooleanPath save = createBoolean("save");
 
     public final StringPath title = createString("title");
 
