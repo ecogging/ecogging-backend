@@ -15,6 +15,11 @@ public class PostResponseDto {
         this.content=entity.getContent();
         this.author=entity.getAuthor();
     }
+
+    @Override
+    public String toString() {
+        return "Posts [id=+"+id+",title="+title+",content="+content+",author="+author;
+    }
 }
 
 // 조회 시 사용할 Dto
