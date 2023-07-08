@@ -1,4 +1,4 @@
-package com.pickupluck.ecogging.domain.posts;
+package com.pickupluck.ecogging.domain;
 
 import com.pickupluck.ecogging.domain.posts.PostResponseDto;
 import com.pickupluck.ecogging.domain.posts.PostsService;
