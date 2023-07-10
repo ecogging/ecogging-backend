@@ -6,6 +6,9 @@ import lombok.*;
 
 import com.pickupluck.ecogging.domain.BaseEntity;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Getter
 @ToString
@@ -35,6 +38,9 @@ public class User extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     private LoginType loginType;
+
+    @OneToMany(mappedBy = "user")
+    private List<Authority> authorities = new ArrayList<>();
 
     @Builder
     public User(String email, String name, String password, String nickname,
