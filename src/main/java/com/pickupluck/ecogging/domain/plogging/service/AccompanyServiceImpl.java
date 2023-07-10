@@ -1,11 +1,5 @@
 package com.pickupluck.ecogging.domain.plogging.service;
 
-<<<<<<< HEAD
-import com.pickupluck.ecogging.domain.plogging.repository.AccompanyRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-
-=======
 import com.pickupluck.ecogging.domain.plogging.dto.AccompanyDTO;
 import com.pickupluck.ecogging.domain.plogging.entity.Accompany;
 import com.pickupluck.ecogging.domain.plogging.repository.AccompanyRepository;
@@ -21,15 +15,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
->>>>>>> accomp-connect
+
 @Service
 @RequiredArgsConstructor
 public class AccompanyServiceImpl implements AccompanyService {
 
     private final AccompanyRepository accompanyRepository;
-<<<<<<< HEAD
-=======
     private final ModelMapper modelMapper;
+
     @Override
     public Map<String, Object> getAccompanyList(Integer page, String orderby) throws Exception {
         PageRequest pageRequest = PageRequest.of(page-1,6, Sort.by(Sort.Direction.DESC, orderby));
@@ -54,5 +47,4 @@ public class AccompanyServiceImpl implements AccompanyService {
         accompanyRepository.save(accompany);
     }
 
->>>>>>> accomp-connect
 }
