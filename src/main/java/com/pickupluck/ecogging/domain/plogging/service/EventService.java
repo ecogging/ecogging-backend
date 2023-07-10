@@ -13,9 +13,8 @@ public interface EventService {
     List<EventDTO> getEventList(Integer page, PageInfo pageInfo) throws Exception;
     Event getEvent(Integer eventId) throws Exception;
 //    Map<String, Object> getEvent(Integer eventId, HttpServletRequest request) throws Exception;
-    void readFile(String fileId, OutputStream out) throws Exception;
+    void readFile(Long fileId, OutputStream out) throws Exception;
     void removeEvent(Integer eventId) throws Exception;
     void modifyEvent(EventDTO eventDTO) throws Exception;
     Integer scrapEvent(Integer eventId)throws Exception;
-
 }

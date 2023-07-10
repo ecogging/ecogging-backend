@@ -21,14 +21,22 @@ public class EventController {
 
     private final EventService eventService;
 
+
     @GetMapping("/eventList/{page}")
     public ResponseEntity<Map<String,Object>> eventList(@PathVariable Integer page) {
         try {
             PageInfo pageInfo = new PageInfo();
             List<EventDTO> list = eventService.getEventList(page, pageInfo);
+            // 현재 페이지가 마지막 페이지인 경우 응답하지 않음
+            if (list.isEmpty()) {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+
+            boolean isLastPage = page >= pageInfo.getAllPage(); // 현재 페이지가 마지막 페이지인지 여부 판단
             Map<String, Object> res = new HashMap<>();
             res.put("pageInfo", pageInfo);
             res.put("list", list);
+            res.put("isLastPage", isLastPage); // 현재 페이지가 마지막 페이지인지 여부 전달
             return new ResponseEntity<Map<String, Object>>(res, HttpStatus.OK);
         } catch (Exception e) {
             e.printStackTrace();
@@ -80,10 +88,10 @@ public class EventController {
             }
         }
 
-        @GetMapping("/eventImg/{fileName}")
-        public  void eventImg(@PathVariable String fileName, HttpServletResponse response) {
+        @GetMapping("/eventImg/{fileId}")
+        public  void eventImg(@PathVariable Long fileId, HttpServletResponse response) {
             try {
-                eventService.readFile(fileName, response.getOutputStream());
+                eventService.readFile(fileId, response.getOutputStream());
             } catch (Exception e) {
                 e.printStackTrace();
             }

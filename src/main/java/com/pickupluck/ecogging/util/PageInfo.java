@@ -1,10 +1,6 @@
 package com.pickupluck.ecogging.util;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 @Getter
 @Setter
@@ -16,4 +12,13 @@ public class PageInfo {
 	private Integer curPage;
 	private Integer startPage;
 	private Integer endPage;
+	private boolean isLastPage; // isLastPage 필드 추가
+
+	public boolean getIsLastPage() {
+		return isLastPage;
+	}
+
+	public void setIsLastPage(boolean isLastPage) {
+		this.isLastPage = isLastPage;
+	}
 }

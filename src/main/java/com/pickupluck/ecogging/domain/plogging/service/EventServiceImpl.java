@@ -1,5 +1,6 @@
 package com.pickupluck.ecogging.domain.plogging.service;
 
+import com.pickupluck.ecogging.domain.file.entity.File;
 import com.pickupluck.ecogging.domain.file.repository.FileRepository;
 import com.pickupluck.ecogging.domain.plogging.dto.EventDTO;
 import com.pickupluck.ecogging.domain.plogging.entity.Event;
@@ -14,10 +15,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -49,7 +50,7 @@ public class EventServiceImpl implements EventService{
 
             Long fileId = fileRepository.save(fil).getId();
             eventDTO.setFileId(fileId);
-            File dfile = new File(fullPath);
+            java.io.File dfile = new java.io.File(fullPath);
             try {
                 file.transferTo(dfile);
             } catch (Exception e) {
@@ -64,13 +65,22 @@ public class EventServiceImpl implements EventService{
     public List<EventDTO> getEventList(Integer page, PageInfo pageInfo) throws Exception {
         PageRequest pageRequest = PageRequest.of(page-1, 2, Sort.by(Sort.Direction.DESC, "eventId"));
         Page<Event> pages = eventRepository.findBySaveFalse(pageRequest);
+
         pageInfo.setAllPage(pages.getTotalPages());
+
+        // 현재 페이지가 마지막 페이지인 경우 다음 페이지로 이동하지 않음
+        if (page > pageInfo.getAllPage()) {
+            return Collections.emptyList();
+        }
+
         pageInfo.setCurPage(page);
-        int startPage = (page-1)/10*10+1;
-        int endPage = startPage+10-1;
+        int startPage = (page-1)/2*2+1;
+        int endPage = startPage+2-1;
         if(endPage>pageInfo.getAllPage()) endPage=pageInfo.getAllPage();
         pageInfo.setStartPage(startPage);
         pageInfo.setEndPage(endPage);
+        boolean isLastPage = page >= pageInfo.getAllPage(); // 현재 페이지가 마지막 페이지인지 여부 판단
+        pageInfo.setIsLastPage(isLastPage); // isLastPage 값을 설정
 
         List<EventDTO> list = new ArrayList<>();
         for(Event event : pages.getContent()) {
@@ -107,12 +117,15 @@ public class EventServiceImpl implements EventService{
 //        return map;
 //    }
 
-    @Override
-    public void readFile(String fileId, OutputStream out) throws Exception {
+    public void readFile(Long fileId, OutputStream out) throws Exception {
         String path="D:/MJS/front-work/upload/";
-        FileInputStream fis = new FileInputStream(path+fileId);
-        FileCopyUtils.copy(fis, out);
-        out.flush();
+        Optional<File> ofile = fileRepository.findById(fileId);
+        if(ofile.isPresent()) {
+            String fileName = ofile.get().getOriginName();
+            FileInputStream fis = new FileInputStream(path+fileName);
+            FileCopyUtils.copy(fis, out);
+            out.flush();
+        }
     }
 
     @Override
