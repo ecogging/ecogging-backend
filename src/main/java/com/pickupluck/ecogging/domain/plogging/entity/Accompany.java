@@ -8,12 +8,16 @@ import lombok.*;
 
 import com.pickupluck.ecogging.domain.BaseEntity;
 import com.pickupluck.ecogging.domain.user.entity.User;
+import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.DynamicInsert;
 
 @Entity
 @Getter
+@Setter
 @NoArgsConstructor
 @EqualsAndHashCode(of="id", callSuper = false)
 @ToString(exclude = "writer")
+@DynamicInsert
 public class Accompany extends BaseEntity {
 
     @Id
@@ -31,8 +35,10 @@ public class Accompany extends BaseEntity {
 
     private Integer numOfPeople;
 
+    @ColumnDefault("true")
     private Boolean active;
 
+    @ColumnDefault("0")
     private Integer views;
 
     private Boolean save;
@@ -40,6 +46,9 @@ public class Accompany extends BaseEntity {
     private String location;
 
     private String locationDetail;
+
+    @ColumnDefault("0")
+    private  Integer joincnt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
