@@ -11,6 +11,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -21,7 +22,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-
 @Service
 @RequiredArgsConstructor
 public class EventServiceImpl implements EventService{
@@ -62,8 +62,19 @@ public class EventServiceImpl implements EventService{
     }
 
     @Override
-    public List<EventDTO> getEventList(Integer page, PageInfo pageInfo) throws Exception {
-        PageRequest pageRequest = PageRequest.of(page-1, 2, Sort.by(Sort.Direction.DESC, "eventId"));
+    public List<EventDTO> getEventList(Integer page, PageInfo pageInfo,  String sorttype) throws Exception {
+        PageRequest pageRequest = null;
+        if(sorttype.equals("latest")) {
+            pageRequest = PageRequest.of(page-1, 5, Sort.by(Direction.DESC, "createdAt"));
+        } else if(sorttype.equals("oldest")) {
+            pageRequest = PageRequest.of(page-1, 5, Sort.by(Direction.ASC, "createdAt"));
+        } else if(sorttype.equals("popular")) {
+            pageRequest = PageRequest.of(page-1, 5, Sort.by(Direction.DESC, "views"));
+        } else if(sorttype.equals("upcoming")) {
+            pageRequest = PageRequest.of(page-1, 5, Sort.by(Direction.ASC, "meetingDate"));
+        } else {
+            pageRequest = PageRequest.of(page-1, 5, Sort.by(Direction.DESC, "eventId"));
+        }
         Page<Event> pages = eventRepository.findBySaveFalse(pageRequest);
 
         pageInfo.setAllPage(pages.getTotalPages());

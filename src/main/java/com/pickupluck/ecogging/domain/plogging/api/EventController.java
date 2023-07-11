@@ -23,10 +23,14 @@ public class EventController {
 
 
     @GetMapping("/eventList/{page}")
-    public ResponseEntity<Map<String,Object>> eventList(@PathVariable Integer page) {
+    public ResponseEntity<Map<String,Object>> eventList(@PathVariable Integer page,
+                                                        @RequestParam(value="sorttype", required = false, defaultValue = "eventId") String sorttype) {
+
+        System.out.println("page:"+page);
+        System.out.println("sort:"+sorttype);
         try {
             PageInfo pageInfo = new PageInfo();
-            List<EventDTO> list = eventService.getEventList(page, pageInfo);
+            List<EventDTO> list = eventService.getEventList(page, pageInfo, sorttype);
             // 현재 페이지가 마지막 페이지인 경우 응답하지 않음
             if (list.isEmpty()) {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);

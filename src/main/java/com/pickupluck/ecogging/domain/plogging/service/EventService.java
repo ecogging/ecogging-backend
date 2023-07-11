@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface EventService {
     void writeEvent(EventDTO eventDTO, MultipartFile file) throws Exception;
-    List<EventDTO> getEventList(Integer page, PageInfo pageInfo) throws Exception;
+    List<EventDTO> getEventList(Integer page, PageInfo pageInfo, String sort) throws Exception;
     Event getEvent(Integer eventId) throws Exception;
 //    Map<String, Object> getEvent(Integer eventId, HttpServletRequest request) throws Exception;
     void readFile(Long fileId, OutputStream out) throws Exception;
