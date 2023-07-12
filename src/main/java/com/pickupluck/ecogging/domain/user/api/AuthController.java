@@ -1,5 +1,6 @@
 package com.pickupluck.ecogging.domain.user.api;
 
+import com.pickupluck.ecogging.domain.user.entity.User;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
@@ -50,7 +51,8 @@ public class AuthController {
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        String jwt = tokenProvider.createToken(authentication);
+        User findUser = userService.findUserByEmail(authentication.getName());
+        String jwt = tokenProvider.createToken(findUser);
 
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.add(JwtFilter.AUTHORIZATION_HEADER, "Bearer " + jwt);
