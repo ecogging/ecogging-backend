@@ -60,6 +60,23 @@ public class TokenProvider implements InitializingBean {
                 .compact();
     }
 
+    // authentication 으로부터 JWT 토큰 생성 반환
+    public String createToken(com.pickupluck.ecogging.domain.user.entity.User user) {
+        String authorities = "USER"; // todo: 모든 사용자 권한은 유저로 임시 설정
+
+        long now = (new Date()).getTime(); // milliseconds 반환
+        Date validity = new Date(now + this.tokenValidityInMilliseconds);
+
+        return Jwts.builder()
+                .setSubject(user.getEmail())
+                .claim(AUTHORITIES_KEY, authorities)
+                .claim("userId", user.getId())
+                .claim("nickname", user.getNickname())
+                .signWith(key, SignatureAlgorithm.HS512)
+                .setExpiration(validity)
+                .compact();
+    }
+
     public Authentication getAuthentication(String jwt) {
         Claims claims = Jwts.parserBuilder()
                 .setSigningKey(key)

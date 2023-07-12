@@ -1,6 +1,5 @@
 package com.pickupluck.ecogging.domain.user.service;
 
-import com.pickupluck.ecogging.domain.user.dto.UserLoginRequestDto;
 import com.pickupluck.ecogging.domain.user.dto.UserResponseDto;
 import com.pickupluck.ecogging.domain.user.dto.UserSignUpRequestDto;
 import com.pickupluck.ecogging.domain.user.entity.Authority;
@@ -11,8 +10,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Collections;
 
 @Service
 @RequiredArgsConstructor
