@@ -17,4 +17,5 @@ public interface EventService {
     void removeEvent(Integer eventId) throws Exception;
     void modifyEvent(EventDTO eventDTO) throws Exception;
     Integer scrapEvent(Integer eventId)throws Exception;
+    Integer updateView(Integer id) throws Exception;
 }

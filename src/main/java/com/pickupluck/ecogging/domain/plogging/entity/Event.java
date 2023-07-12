@@ -28,7 +28,7 @@ public class Event extends BaseEntity {
     private  String corpName;
     @Column
     private Boolean active;
-    @Column
+    @Column(columnDefinition = "integer default 0", nullable = false)
     private Integer views;
     @Column
     private Integer userId;

@@ -4,6 +4,8 @@ import com.pickupluck.ecogging.domain.plogging.dto.EventDTO;
 import com.pickupluck.ecogging.domain.plogging.entity.Event;
 import com.pickupluck.ecogging.domain.plogging.service.EventService;
 import com.pickupluck.ecogging.util.PageInfo;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -49,9 +51,36 @@ public class EventController {
     }
 
     @GetMapping("/eventDetail/{eventId}")
-    public  ResponseEntity<Event> eventDetail(@PathVariable Integer eventId) {
+    public  ResponseEntity<Event> eventDetail(@PathVariable Integer eventId, @PathVariable Integer id,
+                                              HttpServletRequest request, HttpServletResponse response) {
         try {
             Event event = eventService.getEvent(eventId);
+
+            /* 조회수 로직 */
+            Cookie oldCookie = null;
+            Cookie[] cookies = request.getCookies();
+            if (cookies != null) {
+                for (Cookie cookie : cookies) {
+                    if (cookie.getName().equals("postView")) {
+                        oldCookie = cookie;
+                    }
+                }
+            }
+            if (oldCookie != null) {
+                if (!oldCookie.getValue().contains("["+ id.toString() +"]")) {
+                    this.eventService.updateView(id);
+                    oldCookie.setValue(oldCookie.getValue() + "_[" + id + "]");
+                    oldCookie.setPath("/");
+                    oldCookie.setMaxAge(60 * 60 * 24);// 쿠키 시간
+                    response.addCookie(oldCookie);
+                }
+            } else {
+                this.eventService.updateView(id);
+                Cookie newCookie = new Cookie("postView", "[" + id + "]");
+                newCookie.setPath("/");
+                newCookie.setMaxAge(60 * 60 * 24);// 쿠키 시간
+                response.addCookie(newCookie);
+            }
             return new ResponseEntity<Event>(event, HttpStatus.OK);
         } catch (Exception e) {
             e.printStackTrace();

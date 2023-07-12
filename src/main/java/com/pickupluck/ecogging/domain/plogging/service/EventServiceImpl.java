@@ -4,24 +4,24 @@ import com.pickupluck.ecogging.domain.file.entity.File;
 import com.pickupluck.ecogging.domain.file.repository.FileRepository;
 import com.pickupluck.ecogging.domain.plogging.dto.EventDTO;
 import com.pickupluck.ecogging.domain.plogging.entity.Event;
+import com.pickupluck.ecogging.domain.plogging.entity.QEvent;
+import com.pickupluck.ecogging.domain.plogging.repository.CommonRepository;
 import com.pickupluck.ecogging.domain.plogging.repository.EventRepository;
 import com.pickupluck.ecogging.util.PageInfo;
+import com.querydsl.core.types.Order;
+import com.querydsl.core.types.OrderSpecifier;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.FileInputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+
 @Service
 @RequiredArgsConstructor
 public class EventServiceImpl implements EventService{
@@ -32,9 +32,10 @@ public class EventServiceImpl implements EventService{
 
     private final FileRepository fileRepository;
 
+    private  final CommonRepository commonRepository;
+
     private final String uploadDir = "D:/MJS/front-work/upload/";
 
-    @Override
     public void writeEvent(EventDTO eventDTO, MultipartFile file) throws Exception {
         if(file!=null && !file.isEmpty()) {
             String path="D:/MJS/front-work/upload/";
@@ -60,22 +61,28 @@ public class EventServiceImpl implements EventService{
         Event event = modelMappper.map(eventDTO, Event.class);
         eventRepository.save(event);
     }
-
     @Override
     public List<EventDTO> getEventList(Integer page, PageInfo pageInfo,  String sorttype) throws Exception {
-        PageRequest pageRequest = null;
+        PageRequest pageRequest = PageRequest.of(page-1, 5);
+        Boolean save = null;
+        Date endDate = null;
+
+        OrderSpecifier<?> orderSpecifier = null;
         if(sorttype.equals("latest")) {
-            pageRequest = PageRequest.of(page-1, 5, Sort.by(Direction.DESC, "createdAt"));
+            orderSpecifier = new OrderSpecifier(Order.DESC, QEvent.event.createdAt);
         } else if(sorttype.equals("oldest")) {
-            pageRequest = PageRequest.of(page-1, 5, Sort.by(Direction.ASC, "createdAt"));
+            orderSpecifier = new OrderSpecifier(Order.ASC, QEvent.event.createdAt);
         } else if(sorttype.equals("popular")) {
-            pageRequest = PageRequest.of(page-1, 5, Sort.by(Direction.DESC, "views"));
+            orderSpecifier = new OrderSpecifier(Order.DESC, QEvent.event.views);
         } else if(sorttype.equals("upcoming")) {
-            pageRequest = PageRequest.of(page-1, 5, Sort.by(Direction.ASC, "meetingDate"));
+            orderSpecifier = new OrderSpecifier(Order.ASC, QEvent.event.meetingDate);
         } else {
-            pageRequest = PageRequest.of(page-1, 5, Sort.by(Direction.DESC, "eventId"));
+            orderSpecifier = new OrderSpecifier(Order.DESC, QEvent.event.eventId);
         }
-        Page<Event> pages = eventRepository.findBySaveFalse(pageRequest);
+
+        //Page<Event> pages = eventRepository.findBySaveFalse(pageRequest);
+
+        Page<Event> pages = commonRepository.findBySaveFalseAndEndDateGraterThan(pageRequest, orderSpecifier, save, endDate);
 
         pageInfo.setAllPage(pages.getTotalPages());
 
@@ -99,6 +106,8 @@ public class EventServiceImpl implements EventService{
         }
         return list;
     }
+
+
 
     @Override
     public Event getEvent(Integer eventId) throws Exception {
@@ -156,5 +165,10 @@ public class EventServiceImpl implements EventService{
         if(oevent.isEmpty()) throw new Exception("이벤트 번호 오류");
        // return oevent.get().getScrap().;
         return  null;
+    }
+
+    @Override
+    public Integer updateView(Integer id) throws Exception {
+        return this.eventRepository.updateView(id);
     }
 }
