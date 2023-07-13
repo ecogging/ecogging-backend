@@ -1,6 +1,7 @@
 package com.pickupluck.ecogging.domain.plogging.dto;
 
 import com.pickupluck.ecogging.domain.BaseEntity;
+import com.pickupluck.ecogging.domain.plogging.entity.Event;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -26,4 +27,12 @@ public class EventDTO extends BaseEntity {
     private String explanation;
     private LocalDateTime createdAt;
     private Boolean save;
+
+    public EventDTO(Event event) {
+        this.title = title;
+        this.content = content;
+        this.corpName = corpName;
+        this.location = location;
+        this.explanation = explanation;
+    }
 }

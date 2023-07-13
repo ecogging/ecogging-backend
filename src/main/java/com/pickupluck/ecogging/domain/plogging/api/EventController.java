@@ -1,11 +1,8 @@
 package com.pickupluck.ecogging.domain.plogging.api;
 
 import com.pickupluck.ecogging.domain.plogging.dto.EventDTO;
-import com.pickupluck.ecogging.domain.plogging.entity.Event;
 import com.pickupluck.ecogging.domain.plogging.service.EventService;
 import com.pickupluck.ecogging.util.PageInfo;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -50,54 +47,21 @@ public class EventController {
         }
     }
 
-    @GetMapping("/eventDetail/{eventId}")
-    public  ResponseEntity<Event> eventDetail(@PathVariable Integer eventId, @PathVariable Integer id,
-                                              HttpServletRequest request, HttpServletResponse response) {
+    @GetMapping("/eventDetail")
+    public ResponseEntity<Map<String,Object>> eventDetail(@RequestBody Map<String, Integer> param) {
+        ResponseEntity<Map<String,Object>> res = null;
         try {
-            Event event = eventService.getEvent(eventId);
-
-            /* 조회수 로직 */
-            Cookie oldCookie = null;
-            Cookie[] cookies = request.getCookies();
-            if (cookies != null) {
-                for (Cookie cookie : cookies) {
-                    if (cookie.getName().equals("postView")) {
-                        oldCookie = cookie;
-                    }
-                }
-            }
-            if (oldCookie != null) {
-                if (!oldCookie.getValue().contains("["+ id.toString() +"]")) {
-                    this.eventService.updateView(id);
-                    oldCookie.setValue(oldCookie.getValue() + "_[" + id + "]");
-                    oldCookie.setPath("/");
-                    oldCookie.setMaxAge(60 * 60 * 24);// 쿠키 시간
-                    response.addCookie(oldCookie);
-                }
-            } else {
-                this.eventService.updateView(id);
-                Cookie newCookie = new Cookie("postView", "[" + id + "]");
-                newCookie.setPath("/");
-                newCookie.setMaxAge(60 * 60 * 24);// 쿠키 시간
-                response.addCookie(newCookie);
-            }
-            return new ResponseEntity<Event>(event, HttpStatus.OK);
+            Map<String,Object> map = new HashMap<>();
+            EventDTO eventDTO = eventService.getEvent(param.get("eventId"));
+            map.put("evnet",eventDTO);
+            Boolean isEventscrap = eventService.isEventScrap(Long.valueOf(param.get("userId")), param.get("eventId"));
+            map.put("isEventscrap", isEventscrap);
+            return new ResponseEntity<>(map, HttpStatus.OK);
         } catch (Exception e) {
             e.printStackTrace();
-            return new ResponseEntity<Event>(HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
-
-//    @GetMapping("/eventDetail/{eventId}")
-//    public  ResponseEntity<Map<String,Object>> eventDetail(@PathVariable Integer eventId) {
-//        try {
-//            Map<String, Object> eventDetail = eventService.getEvent(eventId, request);
-//            return new ResponseEntity<Map<String, Object>>(eventDetail, HttpStatus.OK);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            return new ResponseEntity<Map<String, Object>>(HttpStatus.BAD_REQUEST);
-//        }
-//    }
 
         @PostMapping("/eventWrite")
         public  ResponseEntity<String> eventWrite(@ModelAttribute EventDTO eventDTO, MultipartFile file) {
@@ -107,6 +71,18 @@ public class EventController {
             } catch (Exception e) {
                 e.printStackTrace();
                 return new ResponseEntity<String>(HttpStatus.BAD_REQUEST);
+            }
+        }
+
+        @PostMapping("/eventModify")
+        public ResponseEntity<String> eventModify(@RequestBody EventDTO eventDTO) {
+            ResponseEntity<String> res = null;
+            try {
+                eventService.modifyEvent(eventDTO);
+                return new ResponseEntity<>("행사 등록", HttpStatus.OK);
+            } catch (Exception e) {
+                e.printStackTrace();
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
         }
 
@@ -129,7 +105,6 @@ public class EventController {
                 e.printStackTrace();
             }
         }
-
 
 }
 

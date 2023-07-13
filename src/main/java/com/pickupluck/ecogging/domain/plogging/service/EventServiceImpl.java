@@ -7,6 +7,10 @@ import com.pickupluck.ecogging.domain.plogging.entity.Event;
 import com.pickupluck.ecogging.domain.plogging.entity.QEvent;
 import com.pickupluck.ecogging.domain.plogging.repository.CommonRepository;
 import com.pickupluck.ecogging.domain.plogging.repository.EventRepository;
+import com.pickupluck.ecogging.domain.scrap.entity.Eventscrap;
+import com.pickupluck.ecogging.domain.scrap.repository.EventscrapRepository;
+import com.pickupluck.ecogging.domain.user.entity.User;
+import com.pickupluck.ecogging.domain.user.repository.UserRepository;
 import com.pickupluck.ecogging.util.PageInfo;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
@@ -33,6 +37,10 @@ public class EventServiceImpl implements EventService{
     private final FileRepository fileRepository;
 
     private  final CommonRepository commonRepository;
+
+    private  final UserRepository userRepository;
+
+    private  final EventscrapRepository eventscrapRepository;
 
     private final String uploadDir = "D:/MJS/front-work/upload/";
 
@@ -110,32 +118,16 @@ public class EventServiceImpl implements EventService{
 
 
     @Override
-    public Event getEvent(Integer eventId) throws Exception {
+    public EventDTO getEvent(Integer eventId) throws Exception {
         Optional<Event> oevent = eventRepository.findById(eventId);
-        if(oevent.isEmpty()) throw new Exception("이벤트 아이디 오류");
-        return oevent.get();
-    }
+        if(oevent.isEmpty()) return null;
+        Event event = oevent.get();
+        EventDTO eventDTO = new EventDTO(event);
 
-//    @Override
-//    public Map<String, Object> getEvent(Integer eventId, HttpServletRequest request) throws Exception {
-//        Map<String, Object> map = new HashMap<>();
-//        Optional<Event> oevent = eventRepository.findById(eventId);
-//        if(oevent.isEmpty()) throw new Exception("이벤트 아이디 오류");
-//        Event event = oevent.get();
-//        map.put("event", modelMappper.map(event,EventDTO.class));
-//        // map.put("scrap", event.getS)
-//
-//        Integer id = (Integer) request.getAttribute("id");
-//        Boolean scrap = false;
-//        if(id!=null && id.equals("")) {
-//            List<Scrap> scrapList = event.getScrap();
-//            for(Scrap scrap : scrapList) {
-//                if(scrap.get)
-//            }
-//        }
-//
-//        return map;
-//    }
+        event.setViews(event.getViews()+1);
+        eventRepository.save(event);
+        return eventDTO;
+    }
 
     public void readFile(Long fileId, OutputStream out) throws Exception {
         String path="D:/MJS/front-work/upload/";
@@ -155,7 +147,11 @@ public class EventServiceImpl implements EventService{
 
     @Override
     public void modifyEvent(EventDTO eventDTO) throws Exception {
+        Optional<User> user = userRepository.findById(Long.valueOf(eventDTO.getUserId()));
         Event event = modelMappper.map(eventDTO, Event.class);
+        if(user.isPresent()) {
+            event.setUserId(user.get());
+        }
         eventRepository.save(event);
     }
 
@@ -171,4 +167,30 @@ public class EventServiceImpl implements EventService{
     public Integer updateView(Integer id) throws Exception {
         return this.eventRepository.updateView(id);
     }
+
+    @Override
+    public Boolean isEventScrap(Long userId, Integer eventId) throws Exception {
+        User user = userRepository.findById(userId).get();
+        Event event = eventRepository.findById(eventId).get();
+        Optional<Eventscrap> eventscrap = eventscrapRepository.findByUserAndEvent(user, event);
+        if(eventscrap.isPresent()) return true;
+        else return false;
+    }
+
+    @Override
+    public Boolean toggleEventScrap(Long userId, Integer eventId) throws Exception {
+        User user = userRepository.findById(userId).get();
+        Event event = eventRepository.findById(eventId).get();
+        Optional<Eventscrap> eventscrap = eventscrapRepository.findByUserAndEvent(user, event);
+
+        if(eventscrap.isEmpty()) {
+            eventscrapRepository.save(new Eventscrap(null, user, event));
+            return true;
+        } else {
+            eventscrapRepository.deleteById(eventscrap.get().getScrapId());
+            return false;
+        }
+    }
+
+
 }

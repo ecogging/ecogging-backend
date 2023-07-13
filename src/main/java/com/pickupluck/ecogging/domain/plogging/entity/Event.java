@@ -1,6 +1,7 @@
 package com.pickupluck.ecogging.domain.plogging.entity;
 
 import com.pickupluck.ecogging.domain.BaseEntity;
+import com.pickupluck.ecogging.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -31,7 +32,7 @@ public class Event extends BaseEntity {
     @Column(columnDefinition = "integer default 0", nullable = false)
     private Integer views;
     @Column
-    private Integer userId;
+    private User userId;
     @Column
     private Long fileId;
     @Column
@@ -67,7 +68,7 @@ public class Event extends BaseEntity {
     }
 
     public Event(String title, String content, LocalDate meetingDate, LocalDate endDate, String corpName, Boolean active,
-                 Integer views, Integer userId, Long fileId, String location, String explanation, Boolean save) {
+                 Integer views, User userId, Long fileId, String location, String explanation, Boolean save) {
         this.title = title;
         this.content = content;
         this.meetingDate = meetingDate;
