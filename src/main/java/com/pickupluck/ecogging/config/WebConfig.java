@@ -31,3 +31,4 @@ public class WebConfig implements WebMvcConfigurer {
 		return new JPAQueryFactory(entityManager);
 	}
 }
+

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>TITLE</title>
+</head>
+<body>
+<div id="contents">
+    <table>
+        <thead>
+        <tr>
+            <th class="num">번호</th>
+            <th class="title">제목</th>
+            <th class="author">작성자</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        <tr th:each="board, index:${postsList}">
+            <td>
+                <span th:text="${index.index}"></span>
+            </td>
+            <td>
+                <a th:href="@{'/list/' + ${board.id}}">
+                    <span th:text="${board.title}"></span>
+                </a>
+            </td>
+            <td>
+                <span th:text="${board.author}"></span>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

@@ -8,7 +8,6 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 @EnableJpaAuditing
 @SpringBootApplication()
 public class EcoggingApplication {
-
 	public static void main(String[] args) {
 		SpringApplication.run(EcoggingApplication.class, args);
 	}

@@ -20,10 +20,6 @@ public class Scrap extends BaseEntity {
     @JoinColumn(name="userId")
     private User userScrap;
 
-    @Column
-    private String targetType;
-
-
     @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name="eventId")
     private Event eventScrap;
