@@ -17,7 +17,7 @@ import java.util.List;
 
 @Service
 @Transactional
-public class ForumServiceImpl implements ForumService {
+public class ForumServiceImpl implements ForumService{
 
     @Autowired
     private ForumRepository forumRepository;
@@ -27,19 +27,17 @@ public class ForumServiceImpl implements ForumService {
     @Override
     public List<ForumDto> getReviews(Integer page, PageInfo pageInfo) throws Exception{
 //        List<Forum> list=forumRepository.findAll();
-        PageRequest pageRequest=PageRequest.of(page-1, 5, Sort.by(Sort.Direction.DESC,"forumId"));
-        Page<Forum> pages=null;
-        try {
-            pages =forumRepository.findAll(pageRequest);
-        }catch (Exception e){
-            e.printStackTrace();
-        }
+        PageRequest pageRequest=PageRequest.of(page-1, 10, Sort.by(Sort.Direction.DESC,"forumId"));
 
 
-        pageInfo.setAllPage(pages.getTotalPages());
+        //Page<Forum> pages=forumRepository.findRequest(pageRequest);
+
+
+
+        //pageInfo.setAllPage(pages.getTotalPages());
         pageInfo.setCurPage(page);
-        int startPage=(page-1)/10*10+1;
-        int endPage=startPage+10-1;
+        int startPage=(page-1)/5*5+1;
+        int endPage=startPage+5-1;
         if(endPage>pageInfo.getAllPage()){
             endPage=pageInfo.getAllPage();
         }
@@ -47,14 +45,9 @@ public class ForumServiceImpl implements ForumService {
         pageInfo.setEndPage(endPage);
 
         List<ForumDto> list=new ArrayList<>();
-        for(Forum forum:pages.getContent()){
-            list.add(modelMapper.map(forum, ForumDto.class));
-        }
+//        for(Forum forum:pages.getContent()){
+//            list.add(modelMapper.map(forum, ForumDto.class));
+//        }
         return list;
     }
-
-//    @Override
-//    public List<Forum> getReviewsTest() throws Exception {
-//        return forumRepository.findAll();
-//    }
 }

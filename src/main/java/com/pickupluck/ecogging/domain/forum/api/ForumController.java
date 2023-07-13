@@ -4,6 +4,7 @@ import com.pickupluck.ecogging.domain.forum.dto.ForumDto;
 import com.pickupluck.ecogging.domain.forum.entity.Forum;
 import com.pickupluck.ecogging.domain.forum.service.ForumService;
 import com.pickupluck.ecogging.util.PageInfo;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
+@RequiredArgsConstructor
 public class ForumController {
 
     @Autowired
@@ -24,6 +26,8 @@ public class ForumController {
 
     @GetMapping("/reviews/{page}")
     public ResponseEntity<Map<String,Object>> reviews(@PathVariable Integer page){
+
+        System.out.println("page : "+page);
         try {
             PageInfo pageInfo=new PageInfo();
             List<ForumDto> reviews=reviewService.getReviews(page, pageInfo);
@@ -36,20 +40,4 @@ public class ForumController {
             return new ResponseEntity<Map<String, Object>>(HttpStatus.BAD_REQUEST);
         }
     }
-
-
-//    @GetMapping("/reviewsTest")
-//    public ResponseEntity<Map<String,Object>> reviews(){
-//        try {
-//            Map<String, Object> map = new HashMap<>();
-//            List<Forum> forumList = reviewService.getReviewsTest();
-//            map.put("forumList",forumList);
-//            return new ResponseEntity<Map<String,Object>>(map, HttpStatus.OK);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            return new ResponseEntity<Map<String, Object>>(HttpStatus.BAD_REQUEST);
-////            return null;
-//        }
-//    }
-
 }
