@@ -20,7 +20,7 @@ public class Eventscrap extends BaseEntity {
     private Integer scrapId;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name="userId")
+    @JoinColumn(name="user_id")
     private User userScrap;
 
     @OneToOne(fetch = FetchType.EAGER)

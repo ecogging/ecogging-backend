@@ -31,8 +31,11 @@ public class Event extends BaseEntity {
     private Boolean active;
     @Column(columnDefinition = "integer default 0", nullable = false)
     private Integer views;
-    @Column
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="user_id")
     private User userId;
+
     @Column
     private Long fileId;
     @Column

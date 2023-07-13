@@ -147,7 +147,7 @@ public class EventServiceImpl implements EventService{
 
     @Override
     public void modifyEvent(EventDTO eventDTO) throws Exception {
-        Optional<User> user = userRepository.findById(Long.valueOf(eventDTO.getUserId()));
+        Optional<User> user = userRepository.findById(eventDTO.getUserId());
         Event event = modelMappper.map(eventDTO, Event.class);
         if(user.isPresent()) {
             event.setUserId(user.get());
@@ -168,20 +168,34 @@ public class EventServiceImpl implements EventService{
         return this.eventRepository.updateView(id);
     }
 
-    @Override
-    public Boolean isEventScrap(Long userId, Integer eventId) throws Exception {
-        User user = userRepository.findById(userId).get();
-        Event event = eventRepository.findById(eventId).get();
-        Optional<Eventscrap> eventscrap = eventscrapRepository.findByUserAndEvent(user, event);
-        if(eventscrap.isPresent()) return true;
-        else return false;
+//    @Override
+//    public Boolean isEventScrap(Long userId, Integer eventId) throws Exception {
+//        User user = userRepository.findById(userId).get();
+//        Event event = eventRepository.findById(eventId).get();
+//        Optional<Eventscrap> eventscrap = eventscrapRepository.findByUserScrapAndEventScrap(user, event);
+//        if(eventscrap.isPresent()) return true;
+//        else return false;
+//    }
+@Override
+public Boolean isEventScrap(Long userId, Integer eventId) throws Exception {
+    Optional<User> userOptional = userRepository.findById(userId);
+    Optional<Event> eventOptional = eventRepository.findById(eventId);
+
+    if (userOptional.isPresent() && eventOptional.isPresent()) {
+        User user = userOptional.get();
+        Event event = eventOptional.get();
+
+        Optional<Eventscrap> eventscrap = eventscrapRepository.findByUserScrapAndEventScrap(user, event);
+        return eventscrap.isPresent();
     }
+        return false;
+}
 
     @Override
     public Boolean toggleEventScrap(Long userId, Integer eventId) throws Exception {
         User user = userRepository.findById(userId).get();
         Event event = eventRepository.findById(eventId).get();
-        Optional<Eventscrap> eventscrap = eventscrapRepository.findByUserAndEvent(user, event);
+        Optional<Eventscrap> eventscrap = eventscrapRepository.findByUserScrapAndEventScrap(user, event);
 
         if(eventscrap.isEmpty()) {
             eventscrapRepository.save(new Eventscrap(null, user, event));

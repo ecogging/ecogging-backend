@@ -11,7 +11,6 @@ public interface EventService {
     void writeEvent(EventDTO eventDTO, MultipartFile file) throws Exception;
     List<EventDTO> getEventList(Integer page, PageInfo pageInfo, String sort) throws Exception;
     EventDTO getEvent(Integer eventId) throws Exception;
-//    Map<String, Object> getEvent(Integer eventId, HttpServletRequest request) throws Exception;
     void readFile(Long fileId, OutputStream out) throws Exception;
     void removeEvent(Integer eventId) throws Exception;
     void modifyEvent(EventDTO eventDTO) throws Exception;

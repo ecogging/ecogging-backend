@@ -47,13 +47,13 @@ public class EventController {
         }
     }
 
-    @GetMapping("/eventDetail")
+    @PostMapping("/eventDetail")
     public ResponseEntity<Map<String,Object>> eventDetail(@RequestBody Map<String, Integer> param) {
         ResponseEntity<Map<String,Object>> res = null;
         try {
             Map<String,Object> map = new HashMap<>();
             EventDTO eventDTO = eventService.getEvent(param.get("eventId"));
-            map.put("evnet",eventDTO);
+            map.put("event", eventDTO);
             Boolean isEventscrap = eventService.isEventScrap(Long.valueOf(param.get("userId")), param.get("eventId"));
             map.put("isEventscrap", isEventscrap);
             return new ResponseEntity<>(map, HttpStatus.OK);
@@ -103,6 +103,18 @@ public class EventController {
                 eventService.readFile(fileId, response.getOutputStream());
             } catch (Exception e) {
                 e.printStackTrace();
+            }
+        }
+
+        @PostMapping("/eventScrap")
+        public ResponseEntity<Boolean> eventScrap(@RequestBody Map<String,Object> param) {
+            ResponseEntity<Boolean> res = null;
+            try {
+                Boolean isScrap = eventService.toggleEventScrap((Long) param.get("userId"), (Integer) param.get("eventId"));
+                return new ResponseEntity<>(isScrap,HttpStatus.OK);
+            } catch (Exception e) {
+                e.printStackTrace();
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
         }
 

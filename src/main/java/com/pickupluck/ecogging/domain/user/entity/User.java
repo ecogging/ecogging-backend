@@ -1,13 +1,13 @@
 package com.pickupluck.ecogging.domain.user.entity;
 
+import com.pickupluck.ecogging.domain.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
-import com.pickupluck.ecogging.domain.BaseEntity;
-
 import java.util.ArrayList;
 import java.util.List;
+
 
 @Entity
 @Getter

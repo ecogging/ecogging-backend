@@ -8,6 +8,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 
 public interface EventscrapRepository extends JpaRepository<Eventscrap, Integer> {
-    Optional<Eventscrap> findByUserAndEvent(User user, Event event);
+    Optional<Eventscrap> findByUserScrapAndEventScrap(User user, Event event);
     
 }
