@@ -19,15 +19,19 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.*;
 
+
 @Service
 @RequiredArgsConstructor
 public class AccompanyServiceImpl implements AccompanyService {
 
     private final AccompanyRepository accompanyRepository;
+
     private final ParticipationRepository participationRepository;
     private final AccompanyscrapRepository accompanyscrapRepository;
     private final UserRepository userRepository;
+
     private final ModelMapper modelMapper;
+
     @Override
     public Map<String, Object> getAccompanyList(Integer page, String orderby) throws Exception {
         PageRequest pageRequest = null;
