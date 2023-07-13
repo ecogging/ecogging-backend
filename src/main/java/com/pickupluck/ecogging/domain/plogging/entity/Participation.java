@@ -11,16 +11,12 @@ import lombok.Setter;
 @NoArgsConstructor
 public class Participation {
     @Id @GeneratedValue(strategy=GenerationType.IDENTITY)
-    private Integer participationId ;
+    private Long participationId ;
 
     @Column
-    private Integer userId;
+    private Long userId;
     @Column
-    private Integer accompanyId;
-    @Column
-    private Integer eventId;
-    @Column
-    private Integer type;
+    private Long accompanyId;
     @Column
     private Boolean confirm;
 
@@ -30,17 +26,13 @@ public class Participation {
                 "participationId=" + participationId +
                 ", userId=" + userId +
                 ", accompanyId=" + accompanyId +
-                ", eventId=" + eventId +
-                ", type=" + type +
                 ", confirm=" + confirm +
                 '}';
     }
 
-    public Participation(Integer userId, Integer accompanyId, Integer eventId, Integer type, Boolean confirm) {
+    public Participation(Long userId, Long accompanyId, Boolean confirm) {
         this.userId = userId;
         this.accompanyId = accompanyId;
-        this.eventId = eventId;
-        this.type = type;
         this.confirm = confirm;
     }
 }
