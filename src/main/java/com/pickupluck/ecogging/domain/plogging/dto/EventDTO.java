@@ -27,6 +27,7 @@ public class EventDTO extends BaseEntity {
     private String explanation;
     private LocalDateTime createdAt;
     private Boolean save;
+    private String management;
 
     public EventDTO(Event event) {
         this.eventId = event.getEventId();
@@ -43,9 +44,11 @@ public class EventDTO extends BaseEntity {
         this.explanation = event.getExplanation();
         this.createdAt = event.getCreatedAt();
         this.save = event.getSave();
+        this.management = event.getManagement();
     }
 
-    public EventDTO(String title, String content, LocalDate meetingDate, LocalDate endDate, Boolean activate, Integer views, String corpName, Long userId, Long fileId, String location, String explanation, LocalDateTime createdAt, Boolean save) {
+    public EventDTO(String title, String content, LocalDate meetingDate, LocalDate endDate, Boolean activate, Integer views, String corpName,
+                    Long userId, Long fileId, String location, String explanation, LocalDateTime createdAt, Boolean save, String management) {
         this.title = title;
         this.content = content;
         this.meetingDate = meetingDate;
@@ -59,5 +62,6 @@ public class EventDTO extends BaseEntity {
         this.explanation = explanation;
         this.createdAt = createdAt;
         this.save = save;
+        this.management = management;
     }
 }

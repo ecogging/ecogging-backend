@@ -44,6 +44,8 @@ public class Event extends BaseEntity {
     private  String explanation;
     @Column
     private  Boolean save;
+    @Column
+    private String management;
 
 //    @ManyToOne
 //    @JoinColumn(name = "fileId")
@@ -67,11 +69,12 @@ public class Event extends BaseEntity {
                 ", save=" + save +
                 ", createdAt=" + createdAt +
                 ", updatedAt=" + updatedAt +
+                ", management=" + management +
                 '}';
     }
 
     public Event(String title, String content, LocalDate meetingDate, LocalDate endDate, String corpName, Boolean active,
-                 Integer views, User userId, Long fileId, String location, String explanation, Boolean save) {
+                 Integer views, User userId, Long fileId, String location, String explanation, Boolean save, String management) {
         this.title = title;
         this.content = content;
         this.meetingDate = meetingDate;
@@ -84,5 +87,6 @@ public class Event extends BaseEntity {
         this.location = location;
         this.explanation = explanation;
         this.save = save;
+        this.management = management;
     }
 }
