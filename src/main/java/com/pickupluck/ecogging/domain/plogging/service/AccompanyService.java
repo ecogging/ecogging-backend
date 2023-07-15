@@ -24,4 +24,7 @@ public interface AccompanyService {
     Boolean isAccompanyScrap(Long userId, Long accompanyId) throws Exception;
   
     Boolean toggleAccompanyScrap(Long userId, Long accompanyId) throws Exception;
+
+
+    Map<String, Object> getMainAccompanyList() throws Exception;
 }

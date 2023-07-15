@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
@@ -137,4 +138,21 @@ public class AccompanyServiceImpl implements AccompanyService {
             return false;
         }
     }
+
+    @Override
+    public Map<String, Object> getMainAccompanyList() throws Exception {
+        Map<String, Object> map = new HashMap<>();
+        List<AccompanyDTO> list = new ArrayList<>();
+
+        List<Accompany> listLatest = accompanyRepository.findTop3ByOrderByCreatedAtDesc(); // 상위 3개의 데이터 가져오기
+
+        for (Accompany accomp : listLatest) { // Accompany -> AccompanyDTO로 변환해서 List로 만들어주고
+            AccompanyDTO accompanyDTO = new AccompanyDTO(accomp);
+            list.add(accompanyDTO);
+        }
+        map.put("list", list); // list통째로 map에 'list' key : 리스트 value 로 넣어서 리턴
+        return map;
+    }
+
+
 }
