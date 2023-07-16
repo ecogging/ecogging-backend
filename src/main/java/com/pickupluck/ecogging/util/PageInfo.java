@@ -16,4 +16,13 @@ public class PageInfo {
     private Integer curPage;
     private Integer startPage;
     private Integer endPage;
+    private boolean isLastPage;
+
+    public boolean getIsLastPage() {
+        return isLastPage;
+    }
+
+    public void setIsLastPage(boolean isLastPage){
+        this.isLastPage=isLastPage;
+    }
 }

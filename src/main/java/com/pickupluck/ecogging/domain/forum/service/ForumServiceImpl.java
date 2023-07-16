@@ -1,13 +1,11 @@
 package com.pickupluck.ecogging.domain.forum.service;
 
-import com.pickupluck.ecogging.domain.forum.dto.ForumDto;
-import com.pickupluck.ecogging.domain.forum.entity.Forum;
+import com.pickupluck.ecogging.domain.plogging.dto.ReviewDTO;
 import com.pickupluck.ecogging.domain.forum.repository.ForumRepository;
 import com.pickupluck.ecogging.util.PageInfo;
 import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -25,7 +23,7 @@ public class ForumServiceImpl implements ForumService{
     private ModelMapper modelMapper;
 
     @Override
-    public List<ForumDto> getReviews(Integer page, PageInfo pageInfo) throws Exception{
+    public List<ReviewDTO> getReviews(Integer page, PageInfo pageInfo) throws Exception{
 //        List<Forum> list=forumRepository.findAll();
         PageRequest pageRequest=PageRequest.of(page-1, 10, Sort.by(Sort.Direction.DESC,"forumId"));
 
@@ -44,7 +42,7 @@ public class ForumServiceImpl implements ForumService{
         pageInfo.setStartPage(startPage);
         pageInfo.setEndPage(endPage);
 
-        List<ForumDto> list=new ArrayList<>();
+        List<ReviewDTO> list=new ArrayList<>();
 //        for(Forum forum:pages.getContent()){
 //            list.add(modelMapper.map(forum, ForumDto.class));
 //        }
