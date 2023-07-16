@@ -37,13 +37,16 @@ public class Notification extends BaseEntity {
     @Enumerated(value = EnumType.STRING)
     private NotificationType type;
 
+    private String detail;
+
     @Builder
-    public Notification(User sender, User receiver, Boolean isRead, Boolean isDeleted, Long targetId, NotificationType type) {
+    public Notification(User sender, User receiver, Boolean isRead, Boolean isDeleted, Long targetId, String detail, NotificationType type) {
         this.sender = sender;
         this.receiver = receiver;
         this.isRead = isRead;
         this.isDeleted = isDeleted;
         this.targetId = targetId;
+        this.detail = detail;
         this.type = type;
     }
 }
