@@ -1,16 +1,21 @@
 package com.pickupluck.ecogging.domain.notification.service;
 
+import java.security.InvalidParameterException;
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import lombok.RequiredArgsConstructor;
+
 import com.pickupluck.ecogging.domain.notification.dto.NotificationResponseDto;
 import com.pickupluck.ecogging.domain.notification.dto.NotificationSaveDto;
 import com.pickupluck.ecogging.domain.notification.entity.Notification;
 import com.pickupluck.ecogging.domain.notification.repository.NotificationRepository;
 import com.pickupluck.ecogging.domain.user.entity.User;
 import com.pickupluck.ecogging.domain.user.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
+import com.pickupluck.ecogging.util.SecurityUtil;
 
-import java.security.InvalidParameterException;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -31,8 +36,25 @@ public class NotificationServiceImpl implements NotificationService {
                 .build();
     }
 
-    public List<NotificationResponseDto> getMyNotifications(Long receiverId) {
-        List<Notification> notifications = notificationRepository.findByReceiverId(receiverId);
+    @Transactional
+    public List<NotificationResponseDto> getMyNotifications() {
+        String userEmail = SecurityUtil
+                .getCurrentUsername()
+                .orElseThrow(() -> new IllegalStateException("No user in security context"));
+
+        User user = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new IllegalArgumentException("No user for given email"));
+
+        long lastReceivedNotificationId = user.getLastReceivedNotificationId();
+        List<Notification> notifications = notificationRepository
+                .findByReceiverIdAndIdGreaterThan(user.getId(), lastReceivedNotificationId);
+
+        long updatedNotificationId = notifications.stream()
+                .mapToLong(notification -> notification.getId())
+                .max()
+                .orElse(lastReceivedNotificationId); // no update notification
+
+        user.updateLastReceivedNotificationNumber(updatedNotificationId);
 
         return notifications.stream()
                 .map(notification -> notificationToResponse(notification))
