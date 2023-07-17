@@ -17,5 +17,5 @@ public interface EventService {
     Integer scrapEvent(Integer eventId)throws Exception;
     Integer updateView(Integer id) throws Exception;
     Boolean isEventScrap(Long userId, Integer eventId) throws Exception;
-    Boolean toggleEventScrap(Long userId, Integer eventId) throws Exception;
+    Boolean toggleEventScrap(Long userId, Long eventId) throws Exception;
 }

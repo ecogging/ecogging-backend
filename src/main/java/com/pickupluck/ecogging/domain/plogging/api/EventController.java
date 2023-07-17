@@ -21,9 +21,8 @@ public class EventController {
     private final EventService eventService;
 
 
-    @GetMapping("/eventList/{page}")
-    public ResponseEntity<Map<String,Object>> eventList(@PathVariable Integer page,
-                                                        @RequestParam(value="sorttype", required = false, defaultValue = "eventId") String sorttype) {
+    @GetMapping("/eventList/{page}/{sorttype}")
+    public ResponseEntity<Map<String,Object>> eventList(@PathVariable Integer page, @PathVariable String sorttype) {
 
         System.out.println("page:"+page);
         System.out.println("sort:"+sorttype);
@@ -107,10 +106,10 @@ public class EventController {
         }
 
         @PostMapping("/eventScrap")
-        public ResponseEntity<Boolean> eventScrap(@RequestBody Map<String,Object> param) {
+        public ResponseEntity<Boolean> eventScrap(@RequestBody Map<String,Long> param) {
             ResponseEntity<Boolean> res = null;
             try {
-                Boolean isScrap = eventService.toggleEventScrap((Long) param.get("userId"), (Integer) param.get("eventId"));
+                Boolean isScrap = eventService.toggleEventScrap(param.get("userId"), param.get("eventId"));
                 return new ResponseEntity<>(isScrap,HttpStatus.OK);
             } catch (Exception e) {
                 e.printStackTrace();
