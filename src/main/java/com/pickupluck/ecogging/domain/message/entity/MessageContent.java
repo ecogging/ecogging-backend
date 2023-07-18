@@ -1,10 +1,7 @@
 package com.pickupluck.ecogging.domain.message.entity;
 
 import com.pickupluck.ecogging.domain.BaseEntity;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
+import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -16,12 +13,18 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode(of = "id", callSuper = false)
 public class MessageContent extends BaseEntity {
     @Id
-    @JoinColumn(name = "message_id")
-    private Long id;
+    @Column(name = "message_id", nullable = false)
+    private Long id; // Message Entity PK 참조
 
-    @Column(columnDefinition = "TEXT", nullable = false)
+    @OneToOne(fetch = FetchType.LAZY)
+    @MapsId // @id로 지정한 컬럼에 @OneToOne or @ManyToOne 관계 매핑
+    @JoinColumn(name = "message_id")
+    private Message message;
+
+    @Column(columnDefinition = "TEXT", nullable = false, length = 300) // 내용 길이 300자 제한
     private String content;
 
+    
     @Builder
     public MessageContent(Long id, String content) {
         this.id = id;

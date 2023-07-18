@@ -20,8 +20,9 @@ public class Message extends BaseEntity {
     @Column(name = "message_id")
     private Long id; // PK
 
-    @JoinColumn(name = "message_room_id")
-    private Long roomId; // FK
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "message_room_id", referencedColumnName = "message_room_id")
+    private MessageRoom messageRoom; // FK
 
     @Column(nullable = false, name = "is_read")
     private Integer read; // 읽음 여부 상태
@@ -43,9 +44,9 @@ public class Message extends BaseEntity {
     private Integer deletedBySnd;
 
     @Builder
-    public Message(Long id, Long roomId, Integer read, User receiver, User sender, Integer deletedByRcv, Integer deletedBySnd) {
+    public Message(Long id, MessageRoom messageRoom, Integer read, User receiver, User sender, Integer deletedByRcv, Integer deletedBySnd) {
         this.id = id;
-        this.roomId = roomId;
+        this.messageRoom = messageRoom;
         this.read = read;
         this.receiver = receiver;
         this.sender = sender;
@@ -57,7 +58,7 @@ public class Message extends BaseEntity {
     public String toString() {
         return "Message{" +
                 "id=" + id +
-                ", roomId=" + roomId +
+                ", messageRoom=" + messageRoom +
                 ", read=" + read +
                 ", receiver=" + receiver +
                 ", sender=" + sender +
