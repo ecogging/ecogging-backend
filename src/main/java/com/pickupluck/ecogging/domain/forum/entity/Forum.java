@@ -1,8 +1,11 @@
 package com.pickupluck.ecogging.domain.forum.entity;
 
-import com.pickupluck.ecogging.domain.BaseEntity;
-import com.pickupluck.ecogging.domain.user.entity.User;
 import jakarta.persistence.*;
+
+import com.pickupluck.ecogging.domain.BaseEntity;
+import com.pickupluck.ecogging.domain.file.entity.File;
+import com.pickupluck.ecogging.domain.user.entity.User;
+
 
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
@@ -23,5 +26,8 @@ public abstract class Forum extends BaseEntity {
     @JoinColumn(name = "user_id")
     private User user;
 
-    // todo: 임시저장, 이미지
+    // 이미지
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "file_id")
+    private File imageFile;
 }
