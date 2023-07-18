@@ -9,6 +9,7 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
+@Getter
 @NoArgsConstructor
 @EqualsAndHashCode(of="id", callSuper = false)
 public class Message extends BaseEntity {
@@ -17,13 +18,10 @@ public class Message extends BaseEntity {
     @Column(name = "message_id")
     private Long id;
 
-    @Column(nullable = false)
-    private String content;
-
     @Column(nullable = false, name = "is_read")
     private Integer read;
 
-    @ManyToOne(fetch = FetchType.LAZY) // 지연 업데이트
+    @ManyToOne(fetch = FetchType.LAZY) // 한 명 : 여러 개 쪽지(기준:Many)
     @JoinColumn(name = "receiver_id") // User 테이블과 JOIN 해서 아이디 가져오기
     @OnDelete(action = OnDeleteAction.NO_ACTION) // User 제거되면 이것도 제거
     private User receiver;
@@ -39,14 +37,4 @@ public class Message extends BaseEntity {
     @Column(nullable = false, name = "deleted_by_sender")
     private Boolean deletedBySnd;
 
-    @Builder
-    public Message(Long id, String content, Integer read, User receiver, User sender, Boolean deletedByRcv, Boolean deletedBySnd) {
-        this.id = id;
-        this.content = content;
-        this.read = read;
-        this.receiver = receiver;
-        this.sender = sender;
-        this.deletedByRcv = deletedByRcv;
-        this.deletedBySnd = deletedBySnd;
-    }
 }
