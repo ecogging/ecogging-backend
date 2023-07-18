@@ -20,17 +20,14 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.*;
 
-
 @Service
 @RequiredArgsConstructor
 public class AccompanyServiceImpl implements AccompanyService {
 
     private final AccompanyRepository accompanyRepository;
-
     private final ParticipationRepository participationRepository;
     private final AccompanyscrapRepository accompanyscrapRepository;
     private final UserRepository userRepository;
-
     private final ModelMapper modelMapper;
 
     @Override
@@ -153,6 +150,5 @@ public class AccompanyServiceImpl implements AccompanyService {
         map.put("list", list); // list통째로 map에 'list' key : 리스트 value 로 넣어서 리턴
         return map;
     }
-
 
 }
