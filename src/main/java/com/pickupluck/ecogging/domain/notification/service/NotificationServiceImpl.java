@@ -27,17 +27,18 @@ public class NotificationServiceImpl implements NotificationService {
 
     private NotificationResponseDto notificationToResponse(Notification notification) {
         return NotificationResponseDto.builder()
+                .id(notification.getId())
                 .targetId(notification.getTargetId())
                 .senderId(notification.getSender().getId())
                 .senderNickname(notification.getSender().getNickname())
-                .typeName(notification.getType().getName())
+                .type(notification.getType())
                 .detail(notification.getDetail())
                 .createdAt(notification.getCreatedAt())
                 .build();
     }
 
     @Transactional
-    public List<NotificationResponseDto> getMyNotifications() {
+    public List<NotificationResponseDto> getMyNotifications(Long lastReceivedNotificationId) {
         String userEmail = SecurityUtil
                 .getCurrentUsername()
                 .orElseThrow(() -> new IllegalStateException("No user in security context"));
@@ -45,16 +46,8 @@ public class NotificationServiceImpl implements NotificationService {
         User user = userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new IllegalArgumentException("No user for given email"));
 
-        long lastReceivedNotificationId = user.getLastReceivedNotificationId();
         List<Notification> notifications = notificationRepository
                 .findByReceiverIdAndIdGreaterThan(user.getId(), lastReceivedNotificationId);
-
-        long updatedNotificationId = notifications.stream()
-                .mapToLong(notification -> notification.getId())
-                .max()
-                .orElse(lastReceivedNotificationId); // no update notification
-
-        user.updateLastReceivedNotificationNumber(updatedNotificationId);
 
         return notifications.stream()
                 .map(notification -> notificationToResponse(notification))

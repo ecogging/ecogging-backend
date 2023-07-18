@@ -25,9 +25,11 @@ public class NotificationController {
     private final NotificationService notificationService;
 
     @GetMapping("/notifications")
-    public ResponseEntity<List<NotificationResponseDto>> getNotifications() {
+    public ResponseEntity<List<NotificationResponseDto>> getNotifications(
+            @RequestHeader(value = "Last-Received-Noti-Id", required = false, defaultValue = "0") Long after) {
+        log.info(after.toString());
 
-        List<NotificationResponseDto> myNotifications = notificationService.getMyNotifications();
+        List<NotificationResponseDto> myNotifications = notificationService.getMyNotifications(after);
 
         return new ResponseEntity<>(myNotifications, HttpStatus.OK);
     }

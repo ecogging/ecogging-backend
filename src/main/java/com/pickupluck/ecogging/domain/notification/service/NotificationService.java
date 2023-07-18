@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface NotificationService {
 
-    public List<NotificationResponseDto> getMyNotifications();
+    public List<NotificationResponseDto> getMyNotifications(Long lastReceivedNotificationId);
 
     public void createNotification(NotificationSaveDto notificationSaveDto);
 

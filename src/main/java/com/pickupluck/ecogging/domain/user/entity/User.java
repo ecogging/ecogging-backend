@@ -43,10 +43,6 @@ public class User extends BaseEntity {
     @OneToMany(mappedBy = "user")
     private List<Authority> authorities = new ArrayList<>();
 
-    @Column(name = "last_received_noti_Id")
-    @ColumnDefault("0")
-    private Long lastReceivedNotificationId;
-
     @Builder
     public User(String email, String name, String password, String nickname,
                 String tel, String notiYn, LoginType loginType) {
@@ -57,11 +53,6 @@ public class User extends BaseEntity {
         this.tel = tel;
         this.notiYn = notiYn;
         this.loginType = loginType;
-        this.lastReceivedNotificationId = 0L;
-    }
-
-    public void updateLastReceivedNotificationNumber(Long notificationId) {
-        this.lastReceivedNotificationId = notificationId;
     }
 
     public void updateNotiYn(String notiYn) {
