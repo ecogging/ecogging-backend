@@ -19,7 +19,7 @@ public class MessageContent extends BaseEntity {
     @JoinColumn(name = "message_id")
     private Long id;
 
-    @Column(columnDefinition = "TEXT", nullable = false)
+    @Column(columnDefinition = "TEXT", nullable = false, length = 300) // 내용 길이 300자 제한
     private String content;
 
     @Builder
