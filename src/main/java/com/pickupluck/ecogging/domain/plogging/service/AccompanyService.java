@@ -1,8 +1,4 @@
 package com.pickupluck.ecogging.domain.plogging.service;
-<<<<<<< HEAD
-=======
-
->>>>>>> f0797a6645a3dab68d75dd4fbb1c78777cb5ef28
 import com.pickupluck.ecogging.domain.plogging.dto.AccompanyDTO;
 import com.pickupluck.ecogging.domain.plogging.entity.Accompany;
 
