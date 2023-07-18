@@ -47,7 +47,7 @@ public class NotificationServiceImpl implements NotificationService {
                 .orElseThrow(() -> new IllegalArgumentException("No user for given email"));
 
         List<Notification> notifications = notificationRepository
-                .findByReceiverIdAndIdGreaterThan(user.getId(), lastReceivedNotificationId);
+                .findByReceiverIdAndIdGreaterThanOOrderByCreatedAtDesc(user.getId(), lastReceivedNotificationId);
 
         return notifications.stream()
                 .map(notification -> notificationToResponse(notification))
