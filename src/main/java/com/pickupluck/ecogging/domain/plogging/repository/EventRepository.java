@@ -12,7 +12,7 @@ public interface EventRepository extends JpaRepository<Event, Integer> {
     Page<Event> findBySaveFalse(Pageable pageable);
 
     @Modifying
-    @Query("update Event e set e.views = e.views + 1 where e.userId = :id")
+    @Query(value = "update Event e set e.views = e.views + 1 where e.userId = :id", nativeQuery = true)
     int updateView(@Param("id") Integer id);
 }
 

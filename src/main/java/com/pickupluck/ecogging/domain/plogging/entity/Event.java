@@ -34,7 +34,7 @@ public class Event extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="user_id")
-    private User userId;
+    private User user;
 
     @Column
     private Long fileId;
@@ -62,7 +62,7 @@ public class Event extends BaseEntity {
                 ", corpName='" + corpName + '\'' +
                 ", active=" + active +
                 ", views=" + views +
-                ", userId=" + userId +
+                ", userId=" + user.getId() +
                 ", fileId=" + fileId +
                 ", location='" + location + '\'' +
                 ", explanation='" + explanation + '\'' +
@@ -74,7 +74,7 @@ public class Event extends BaseEntity {
     }
 
     public Event(String title, String content, LocalDate meetingDate, LocalDate endDate, String corpName, Boolean active,
-                 Integer views, User userId, Long fileId, String location, String explanation, Boolean save, String management) {
+                 Integer views, User user, Long fileId, String location, String explanation, Boolean save, String management) {
         this.title = title;
         this.content = content;
         this.meetingDate = meetingDate;
@@ -82,7 +82,7 @@ public class Event extends BaseEntity {
         this.corpName = corpName;
         this.active = active;
         this.views = views;
-        this.userId = userId;
+        this.user =user;
         this.fileId = fileId;
         this.location = location;
         this.explanation = explanation;

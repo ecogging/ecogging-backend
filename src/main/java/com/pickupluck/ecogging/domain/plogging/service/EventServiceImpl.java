@@ -67,6 +67,10 @@ public class EventServiceImpl implements EventService{
             }
         }
         Event event = modelMappper.map(eventDTO, Event.class);
+        Optional<User> ouser = userRepository.findById(eventDTO.getUserId());
+        if(ouser.isPresent()) {
+            event.setUser(ouser.get());
+        }
         eventRepository.save(event);
     }
     @Override
@@ -146,11 +150,32 @@ public class EventServiceImpl implements EventService{
     }
 
     @Override
-    public void modifyEvent(EventDTO eventDTO) throws Exception {
-        Optional<User> user = userRepository.findById(eventDTO.getUserId());
+    public void modifyEvent(EventDTO eventDTO, MultipartFile file) throws Exception {
+        if(file!=null && !file.isEmpty()) {
+            String path="D:/MJS/front-work/upload/";
+            String originName = file.getOriginalFilename();
+            Long size = file.getSize();
+            String fullPath = path+originName;
+
+            com.pickupluck.ecogging.domain.file.entity.File fil = new com.pickupluck.ecogging.domain.file.entity.File();
+            fil.setOriginName(originName);
+            fil.setSize(size);
+            fil.setFullPath(fullPath);
+            fileRepository.save(fil);
+
+            Long fileId = fileRepository.save(fil).getId();
+            eventDTO.setFileId(fileId);
+            java.io.File dfile = new java.io.File(fullPath);
+            try {
+                file.transferTo(dfile);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
         Event event = modelMappper.map(eventDTO, Event.class);
+        Optional<User> user = userRepository.findById(eventDTO.getUserId());
         if(user.isPresent()) {
-            event.setUserId(user.get());
+            event.setUser(user.get());
         }
         eventRepository.save(event);
     }

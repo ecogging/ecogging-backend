@@ -5,12 +5,14 @@ import com.pickupluck.ecogging.domain.plogging.entity.Event;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Getter
 @Setter
+@ToString
 @NoArgsConstructor
 public class EventDTO extends BaseEntity {
     private Integer eventId ;
@@ -38,7 +40,7 @@ public class EventDTO extends BaseEntity {
         this.activate = event.getActive();
         this.views = event.getViews();
         this.corpName = event.getCorpName();
-        this.userId = event.getUserId().getId();
+        this.userId = event.getUser().getId();
         this.fileId = event.getFileId();
         this.location = event.getLocation();
         this.explanation = event.getExplanation();

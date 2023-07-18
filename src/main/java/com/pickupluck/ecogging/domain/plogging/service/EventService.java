@@ -13,7 +13,7 @@ public interface EventService {
     EventDTO getEvent(Integer eventId) throws Exception;
     void readFile(Long fileId, OutputStream out) throws Exception;
     void removeEvent(Integer eventId) throws Exception;
-    void modifyEvent(EventDTO eventDTO) throws Exception;
+    void modifyEvent(EventDTO eventDTO, MultipartFile file) throws Exception;
     Integer scrapEvent(Integer eventId)throws Exception;
     Integer updateView(Integer id) throws Exception;
     Boolean isEventScrap(Long userId, Integer eventId) throws Exception;

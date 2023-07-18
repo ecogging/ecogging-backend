@@ -74,14 +74,14 @@ public class EventController {
         }
 
         @PostMapping("/eventModify")
-        public ResponseEntity<String> eventModify(@RequestBody EventDTO eventDTO) {
-            ResponseEntity<String> res = null;
+        public ResponseEntity<String> eventModify(@ModelAttribute EventDTO eventDTO, MultipartFile file) {
+           // ResponseEntity<String> res = null;
             try {
-                eventService.modifyEvent(eventDTO);
-                return new ResponseEntity<>("행사 등록", HttpStatus.OK);
+                eventService.modifyEvent(eventDTO, file);
+                return new ResponseEntity<String>("동행모집 등록", HttpStatus.OK);
             } catch (Exception e) {
                 e.printStackTrace();
-                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+                return new ResponseEntity<String>(HttpStatus.BAD_REQUEST);
             }
         }
 
