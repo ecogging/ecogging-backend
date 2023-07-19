@@ -1,18 +1,14 @@
 package com.pickupluck.ecogging.domain.message.service;
 
-import com.pickupluck.ecogging.domain.message.repository.MessageContentRepository;
-import com.pickupluck.ecogging.domain.message.repository.MessageRepository;
-import com.pickupluck.ecogging.domain.message.repository.MessageRoomRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import com.pickupluck.ecogging.domain.message.dto.request.MessageRoomRequestCreateDto;
+import com.pickupluck.ecogging.domain.message.dto.response.MessageRoomIdResponseDto;
 
-@Service
 public interface MessageRoomService {
 
-    private final MessageRoomRepository messageRoomRepository;
-    private final MessageRepository messageRepository;
-    private final MessageContentRepository messageContentRepository;
+    // 쪽지함 존재 확인 위한 검색
+    public Long getMessageRoomId(Long userId, Long receiverId);
 
+    //  쪽지함 생성
+    public MessageRoomIdResponseDto saveMessageRoom(Long userId, MessageRoomRequestCreateDto request);
 
 }

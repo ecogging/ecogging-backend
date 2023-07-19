@@ -24,6 +24,9 @@ public class Message extends BaseEntity {
     @JoinColumn(name = "message_room_id", referencedColumnName = "message_room_id")
     private MessageRoom messageRoom; // FK
 
+    @Column(columnDefinition = "TEXT", nullable = false, length = 300) // 내용 길이 300자 제한
+    private String content;
+
     @Column(nullable = false, name = "is_read")
     private Integer read; // 읽음 여부 상태
 
@@ -44,9 +47,10 @@ public class Message extends BaseEntity {
     private Integer deletedBySnd;
 
     @Builder
-    public Message(Long id, MessageRoom messageRoom, Integer read, User receiver, User sender, Integer deletedByRcv, Integer deletedBySnd) {
+    public Message(Long id, MessageRoom messageRoom, String content, Integer read, User receiver, User sender, Integer deletedByRcv, Integer deletedBySnd) {
         this.id = id;
         this.messageRoom = messageRoom;
+        this.content = content;
         this.read = read;
         this.receiver = receiver;
         this.sender = sender;
@@ -59,6 +63,7 @@ public class Message extends BaseEntity {
         return "Message{" +
                 "id=" + id +
                 ", messageRoom=" + messageRoom +
+                ", content='" + content + '\'' +
                 ", read=" + read +
                 ", receiver=" + receiver +
                 ", sender=" + sender +
