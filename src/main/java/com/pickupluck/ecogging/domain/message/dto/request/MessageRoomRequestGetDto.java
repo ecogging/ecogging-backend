@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+// 쪽지함 불러오기
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
