@@ -17,7 +17,7 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
     public List<Notification> findBySenderId(Long senderId);
 
     @EntityGraph(attributePaths = "receiver")
-    public List<Notification> findByReceiverIdAndIdGreaterThanOOrderByCreatedAtDesc(Long receiverId, Long lastReceivedNotificationId);
+    public List<Notification> findByReceiverIdAndIdGreaterThanOrderByCreatedAtDesc(Long receiverId, Long lastReceivedNotificationId);
 
     public List<Notification> findByType(NotificationType type);
 }
