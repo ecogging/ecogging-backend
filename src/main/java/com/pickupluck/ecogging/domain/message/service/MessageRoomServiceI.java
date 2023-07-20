@@ -15,6 +15,8 @@ import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class MessageRoomServiceI implements MessageRoomService{
@@ -23,37 +25,32 @@ public class MessageRoomServiceI implements MessageRoomService{
     private final MessageRepository messageRepository;
     private final UserRepository userRepository;
 
+    // 쪽지함 id 조회
+    @Override
     @Transactional(readOnly = true)
-    public Long getMessageRoomId(Long userId, Long receiverId) {
-        userRepository.findById(userId);
-        userRepository.findById(receiverId);
+    public Optional<Long> getMessageRoomId(Long curId, Long contactId) {
+        User sender = null;
+        User recevier = null;
 
-        return messageRoomRepository.findIdByInfo(userId, receiverId);
-    }
-
-    @Transactional // MessageRoom 생성 (MessageRoomId) -- userId, receiverId&firstMessage
-    public MessageRoomIdResponseDto saveMessageRoom(Long userId, MessageRoomRequestCreateDto request) {
-        if(userId == request.getReceiverId()) { // userId랑 만들고자하는 MessageRoom의 상대방Id(받은사람)가 같으면
-            System.out.println("본인");
+        try {
+            sender = userRepository.findById(curId)
+                    .orElseThrow(ChangeSetPersister.NotFoundException::new);
+            recevier = userRepository.findById(contactId)
+                    .orElseThrow(ChangeSetPersister.NotFoundException::new); // 수신자 레포지 존재 여부 확인
+        } catch (ChangeSetPersister.NotFoundException e) {
+            System.out.println("주어진 id에 해당하는 사용자 정보가 없습니다");
         }
-        User currentUser = userRepository.findById(userId).get(); // 현재 유저 - 기준 (발신자)
-        User receiver = userRepository.findById(request.getReceiverId()).get(); // 받는 사람 (수신자)
 
-        MessageRoom messageRoom = MessageRoom.builder() // MessageRoom - 처음 수/발신자 설정해서 생성
-                .initialSender(currentUser)
-                .initialReceiver(receiver)
-                .build();
-        MessageRoom savedMessageRoom = messageRoomRepository.save(messageRoom); // 레포지토리에 messageRoom 저장
-
-        Message message = Message.builder() // Message에 msgRoom, 발신자, 쪽지 내용 설정해서 생성
-                .messageRoom(savedMessageRoom)
-                .sender(currentUser)
-                .content(request.getFirstMessage())
-                .build();
-        messageRepository.save(message); // 레포지토리에 message 저장
-        
-        return new MessageRoomIdResponseDto(savedMessageRoom); // MessageRoomId만 가진 Dto로 entity륿 변환해 리턴
+        return messageRoomRepository.findIdByInitialSenderAndInitialReceiver(sender, recevier);
     }
+
+
+//    @Transactional // MessageRoom 생성 (MessageRoomId) -- userId, receiverId&firstMessage
+//    public MessageRoomIdResponseDto saveMessageRoom(Long userId, MessageRoomRequestCreateDto request) {
+//        if (userId == request.getReceiverId()) { // userId랑 만들고자하는 MessageRoom의 상대방Id(받은사람)가 같으면
+//            return null;
+//        }
+//    }
 
 
 }
