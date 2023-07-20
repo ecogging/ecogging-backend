@@ -9,6 +9,9 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity // JPA에서 관리할 수 있도록 -> 기본 생성자 필수( JPA가 entity 객체 생성할 때 기본 생성자 사용 )
 @Getter
 @NoArgsConstructor // 기본 생성자
@@ -20,12 +23,18 @@ public class MessageRoom extends BaseEntity {
     private Long id; // message_room table의 PK
 
     @ManyToOne(fetch = FetchType.LAZY) // 지연로딩, Rooms N : User 1
-    @JoinColumn(name = "initial_sender")
+    @JoinColumn(name = "initial_sender_id")
     private User initialSender;
 
     @ManyToOne(fetch = FetchType.LAZY) // 지연로딩
-    @JoinColumn(name = "initial_receiver")
+    @JoinColumn(name = "initial_receiver_id")
     private User initialReceiver;
+
+    // * mappedBy 두 객체 중 하나의 객체만 테이블을 관리 가능하도록 설정
+    // mappedBy가 적용된 객체는 조회만 가능 --> mappedBy가 정의되지 않은 객체가 Owner
+    // 일반적으로 FK를 가진 객체를 Owner로 정의하는 것이 바람직
+    @OneToMany(mappedBy = "messageRoom")
+    private List<Message> messages = new ArrayList<>();
 
     @Builder
     public MessageRoom(Long id, User initialSender, User initialReceiver) {

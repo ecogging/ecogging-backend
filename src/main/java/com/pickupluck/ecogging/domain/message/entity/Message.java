@@ -15,6 +15,7 @@ import java.util.Date;
 @NoArgsConstructor
 @EqualsAndHashCode(of="id", callSuper = false) // equals, hashCode 메서드 자동 생성 -> 내용, 객체 동등성/동일성 비교
 public class Message extends BaseEntity {
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) // 기본키 생성을 DB에 위임 auto_increment
     @Column(name = "message_id")
@@ -24,10 +25,10 @@ public class Message extends BaseEntity {
     @JoinColumn(name = "message_room_id", referencedColumnName = "message_room_id")
     private MessageRoom messageRoom; // FK
 
-    @Column(columnDefinition = "TEXT", nullable = false, length = 300) // 내용 길이 300자 제한
+    @Column(columnDefinition = "TEXT", nullable = false, length = 300) // 내용 길이 300자 제한 -- 프론트에서 필터
     private String content;
 
-    @Column(nullable = false, name = "is_read")
+    @Column(nullable = false, name = "raed_YN")
     private Integer read; // 읽음 여부 상태
 
     @ManyToOne(fetch = FetchType.LAZY) // 한 명 : 여러 개 쪽지(기준:Many)
@@ -40,10 +41,10 @@ public class Message extends BaseEntity {
     @OnDelete(action = OnDeleteAction.NO_ACTION)
     private User sender; // FK
 
-    @Column(nullable = false, name = "deleted_by_receiver")
+    @Column(nullable = false, name = "deleted_by_receiver_YN")
     private Integer deletedByRcv;
 
-    @Column(nullable = false, name = "deleted_by_sender")
+    @Column(nullable = false, name = "deleted_by_sender_YN")
     private Integer deletedBySnd;
 
     @Builder
