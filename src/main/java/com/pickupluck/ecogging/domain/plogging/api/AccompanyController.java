@@ -74,10 +74,12 @@ public class AccompanyController {
             Map<String,Object> map = new HashMap<>();
             AccompanyDTO accompanyDTO = accompanyService.getAccompany(param.get("accompanyId"));
             map.put("accompany", accompanyDTO);
-            Boolean isParticipation = accompanyService.isParticipation(param.get("userId"),param.get("accompanyId"));
-            map.put("isParticipation", isParticipation);
-            Boolean isAccompanyscrap = accompanyService.isAccompanyScrap(param.get("userId"),param.get("accompanyId"));
-            map.put("isAccompanyscrap", isAccompanyscrap);
+            if(param.get("userId")!=null) {
+                Boolean isParticipation = accompanyService.isParticipation(param.get("userId"), param.get("accompanyId"));
+                map.put("isParticipation", isParticipation);
+                Boolean isAccompanyscrap = accompanyService.isAccompanyScrap(param.get("userId"), param.get("accompanyId"));
+                map.put("isAccompanyscrap", isAccompanyscrap);
+            }
             return new ResponseEntity<>(map, HttpStatus.OK);
         } catch (Exception e) {
             e.printStackTrace();
