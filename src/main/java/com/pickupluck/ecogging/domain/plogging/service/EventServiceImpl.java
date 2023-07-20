@@ -119,7 +119,51 @@ public class EventServiceImpl implements EventService{
         return list;
     }
 
+    @Override
+    public List<EventDTO> getEventListSave(Integer page, PageInfo pageInfo, String sorttype) throws Exception {
+        PageRequest pageRequest = PageRequest.of(page-1, 5);
+        Boolean save = null;
+        Date endDate = null;
 
+        OrderSpecifier<?> orderSpecifier = null;
+        if(sorttype.equals("latest")) {
+            orderSpecifier = new OrderSpecifier(Order.DESC, QEvent.event.createdAt);
+        } else if(sorttype.equals("oldest")) {
+            orderSpecifier = new OrderSpecifier(Order.ASC, QEvent.event.createdAt);
+        } else if(sorttype.equals("popular")) {
+            orderSpecifier = new OrderSpecifier(Order.DESC, QEvent.event.views);
+        } else if(sorttype.equals("upcoming")) {
+            orderSpecifier = new OrderSpecifier(Order.ASC, QEvent.event.meetingDate);
+        } else {
+            orderSpecifier = new OrderSpecifier(Order.DESC, QEvent.event.eventId);
+        }
+
+        //Page<Event> pages = eventRepository.findBySaveFalse(pageRequest);
+
+        Page<Event> pages = commonRepository.findBySaveTrueAndEndDateGraterThan(pageRequest, orderSpecifier, save, endDate);
+
+        pageInfo.setAllPage(pages.getTotalPages());
+
+        // 현재 페이지가 마지막 페이지인 경우 다음 페이지로 이동하지 않음
+        if (page > pageInfo.getAllPage()) {
+            return Collections.emptyList();
+        }
+
+        pageInfo.setCurPage(page);
+        int startPage = (page-1)/2*2+1;
+        int endPage = startPage+2-1;
+        if(endPage>pageInfo.getAllPage()) endPage=pageInfo.getAllPage();
+        pageInfo.setStartPage(startPage);
+        pageInfo.setEndPage(endPage);
+        boolean isLastPage = page >= pageInfo.getAllPage(); // 현재 페이지가 마지막 페이지인지 여부 판단
+        pageInfo.setIsLastPage(isLastPage); // isLastPage 값을 설정
+
+        List<EventDTO> list = new ArrayList<>();
+        for(Event event : pages.getContent()) {
+            list.add(modelMappper.map(event, EventDTO.class));
+        }
+        return list;
+    }
 
     @Override
     public EventDTO getEvent(Integer eventId) throws Exception {
@@ -193,14 +237,6 @@ public class EventServiceImpl implements EventService{
         return this.eventRepository.updateView(id);
     }
 
-//    @Override
-//    public Boolean isEventScrap(Long userId, Integer eventId) throws Exception {
-//        User user = userRepository.findById(userId).get();
-//        Event event = eventRepository.findById(eventId).get();
-//        Optional<Eventscrap> eventscrap = eventscrapRepository.findByUserScrapAndEventScrap(user, event);
-//        if(eventscrap.isPresent()) return true;
-//        else return false;
-//    }
     @Override
     public Boolean isEventScrap(Long userId, Integer eventId) throws Exception {
         User user = userRepository.findById(userId).get();

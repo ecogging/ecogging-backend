@@ -23,12 +23,31 @@ public class EventController {
 
     @GetMapping("/eventList/{page}/{sorttype}")
     public ResponseEntity<Map<String,Object>> eventList(@PathVariable Integer page, @PathVariable String sorttype) {
-
-        System.out.println("page:"+page);
-        System.out.println("sort:"+sorttype);
         try {
             PageInfo pageInfo = new PageInfo();
             List<EventDTO> list = eventService.getEventList(page, pageInfo, sorttype);
+            // 현재 페이지가 마지막 페이지인 경우 응답하지 않음
+            if (list.isEmpty()) {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+
+            boolean isLastPage = page >= pageInfo.getAllPage(); // 현재 페이지가 마지막 페이지인지 여부 판단
+            Map<String, Object> res = new HashMap<>();
+            res.put("pageInfo", pageInfo);
+            res.put("list", list);
+            res.put("isLastPage", isLastPage); // 현재 페이지가 마지막 페이지인지 여부 전달
+            return new ResponseEntity<Map<String, Object>>(res, HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<Map<String, Object>>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @GetMapping("/eventListSave/{page}/{sorttype}")
+    public ResponseEntity<Map<String,Object>> eventListSave(@PathVariable Integer page, @PathVariable String sorttype) {
+        try {
+            PageInfo pageInfo = new PageInfo();
+            List<EventDTO> list = eventService.getEventListSave(page, pageInfo, sorttype);
             // 현재 페이지가 마지막 페이지인 경우 응답하지 않음
             if (list.isEmpty()) {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -53,8 +72,10 @@ public class EventController {
             Map<String,Object> map = new HashMap<>();
             EventDTO eventDTO = eventService.getEvent(param.get("eventId"));
             map.put("event", eventDTO);
-            Boolean isEventscrap = eventService.isEventScrap(Long.valueOf(param.get("userId")), param.get("eventId"));
-            map.put("isEventscrap", isEventscrap);
+            if(param.get("userId") != null) {
+                Boolean isEventscrap = eventService.isEventScrap(Long.valueOf(param.get("userId")), param.get("eventId"));
+                map.put("isEventscrap", isEventscrap);
+            }
             return new ResponseEntity<>(map, HttpStatus.OK);
         } catch (Exception e) {
             e.printStackTrace();
@@ -87,12 +108,13 @@ public class EventController {
 
         @DeleteMapping("/eventDelete/{eventId}")
         public  ResponseEntity<Boolean> eventDelete(@PathVariable Integer eventId) {
+            ResponseEntity<Boolean> res = null;
             try {
                 eventService.removeEvent(eventId);
-                return new ResponseEntity<Boolean>(true, HttpStatus.OK);
+                return new ResponseEntity<>(true, HttpStatus.OK);
             } catch (Exception e) {
                 e.printStackTrace();
-                return new ResponseEntity<Boolean>(HttpStatus.BAD_REQUEST);
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
         }
 
@@ -110,7 +132,7 @@ public class EventController {
             ResponseEntity<Boolean> res = null;
             try {
                 Boolean isScrap = eventService.toggleEventScrap(param.get("userId"), param.get("eventId"));
-                return new ResponseEntity<>(isScrap,HttpStatus.OK);
+                return new ResponseEntity<>(isScrap, HttpStatus.OK);
             } catch (Exception e) {
                 e.printStackTrace();
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
