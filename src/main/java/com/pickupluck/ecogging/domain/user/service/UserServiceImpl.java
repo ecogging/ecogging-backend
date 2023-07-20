@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+
     private final PasswordEncoder passwordEncoder;
 
     @Override
@@ -23,6 +24,11 @@ public class UserServiceImpl implements UserService {
         User findUser = userRepository.findById(id)
                 .orElseThrow(IllegalArgumentException::new); // todo: custom exception
         return findUser;
+    }
+
+    @Override
+    public Boolean isValidEmailForSignup(String email) {
+        return !userRepository.existsByEmail(email);
     }
 
     @Override
@@ -52,7 +58,8 @@ public class UserServiceImpl implements UserService {
                 .email(userDto.getEmail())
                 .password(passwordEncoder.encode(userDto.getPassword()))
                 .nickname(userDto.getNickname())
-                .tel(userDto.getTel())
+                .tel(userDto.getTelephone())
+                .notiYn("Y")
                 .build();
 
         return UserResponseDto.from(userRepository.save(user));

@@ -1,12 +1,10 @@
 package com.pickupluck.ecogging.domain.plogging.api;
 
 import com.pickupluck.ecogging.domain.plogging.dto.EventDTO;
-import com.pickupluck.ecogging.domain.plogging.entity.Event;
 import com.pickupluck.ecogging.domain.plogging.service.EventService;
 import com.pickupluck.ecogging.util.PageInfo;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,14 +20,25 @@ public class EventController {
 
     private final EventService eventService;
 
-    @GetMapping("/eventList/{page}")
-    public ResponseEntity<Map<String,Object>> eventList(@PathVariable Integer page) {
+
+    @GetMapping("/eventList/{page}/{sorttype}")
+    public ResponseEntity<Map<String,Object>> eventList(@PathVariable Integer page, @PathVariable String sorttype) {
+
+        System.out.println("page:"+page);
+        System.out.println("sort:"+sorttype);
         try {
             PageInfo pageInfo = new PageInfo();
-            List<EventDTO> list = eventService.getEventList(page, pageInfo);
+            List<EventDTO> list = eventService.getEventList(page, pageInfo, sorttype);
+            // 현재 페이지가 마지막 페이지인 경우 응답하지 않음
+            if (list.isEmpty()) {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+
+            boolean isLastPage = page >= pageInfo.getAllPage(); // 현재 페이지가 마지막 페이지인지 여부 판단
             Map<String, Object> res = new HashMap<>();
             res.put("pageInfo", pageInfo);
             res.put("list", list);
+            res.put("isLastPage", isLastPage); // 현재 페이지가 마지막 페이지인지 여부 전달
             return new ResponseEntity<Map<String, Object>>(res, HttpStatus.OK);
         } catch (Exception e) {
             e.printStackTrace();
@@ -37,27 +46,21 @@ public class EventController {
         }
     }
 
-    @GetMapping("/eventDetail/{eventId}")
-    public  ResponseEntity<Event> eventDetail(@PathVariable Integer eventId) {
+    @PostMapping("/eventDetail")
+    public ResponseEntity<Map<String,Object>> eventDetail(@RequestBody Map<String, Integer> param) {
+        ResponseEntity<Map<String,Object>> res = null;
         try {
-            Event event = eventService.getEvent(eventId);
-            return new ResponseEntity<Event>(event, HttpStatus.OK);
+            Map<String,Object> map = new HashMap<>();
+            EventDTO eventDTO = eventService.getEvent(param.get("eventId"));
+            map.put("event", eventDTO);
+            Boolean isEventscrap = eventService.isEventScrap(Long.valueOf(param.get("userId")), param.get("eventId"));
+            map.put("isEventscrap", isEventscrap);
+            return new ResponseEntity<>(map, HttpStatus.OK);
         } catch (Exception e) {
             e.printStackTrace();
-            return new ResponseEntity<Event>(HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
-
-//    @GetMapping("/eventDetail/{eventId}")
-//    public  ResponseEntity<Map<String,Object>> eventDetail(@PathVariable Integer eventId) {
-//        try {
-//            Map<String, Object> eventDetail = eventService.getEvent(eventId, request);
-//            return new ResponseEntity<Map<String, Object>>(eventDetail, HttpStatus.OK);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            return new ResponseEntity<Map<String, Object>>(HttpStatus.BAD_REQUEST);
-//        }
-//    }
 
         @PostMapping("/eventWrite")
         public  ResponseEntity<String> eventWrite(@ModelAttribute EventDTO eventDTO, MultipartFile file) {
@@ -70,26 +73,49 @@ public class EventController {
             }
         }
 
+        @PostMapping("/eventModify")
+        public ResponseEntity<String> eventModify(@ModelAttribute EventDTO eventDTO, MultipartFile file) {
+           // ResponseEntity<String> res = null;
+            try {
+                eventService.modifyEvent(eventDTO, file);
+                return new ResponseEntity<String>("동행모집 등록", HttpStatus.OK);
+            } catch (Exception e) {
+                e.printStackTrace();
+                return new ResponseEntity<String>(HttpStatus.BAD_REQUEST);
+            }
+        }
+
         @DeleteMapping("/eventDelete/{eventId}")
         public  ResponseEntity<Boolean> eventDelete(@PathVariable Integer eventId) {
             try {
                 eventService.removeEvent(eventId);
-                return  new ResponseEntity<Boolean>(true, HttpStatus.OK);
+                return new ResponseEntity<Boolean>(true, HttpStatus.OK);
             } catch (Exception e) {
                 e.printStackTrace();
                 return new ResponseEntity<Boolean>(HttpStatus.BAD_REQUEST);
             }
         }
 
-        @GetMapping("/eventImg/{fileName}")
-        public  void eventImg(@PathVariable String fileName, HttpServletResponse response) {
+        @GetMapping("/eventImg/{fileId}")
+        public  void eventImg(@PathVariable Long fileId, HttpServletResponse response) {
             try {
-                eventService.readFile(fileName, response.getOutputStream());
+                eventService.readFile(fileId, response.getOutputStream());
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
 
+        @PostMapping("/eventScrap")
+        public ResponseEntity<Boolean> eventScrap(@RequestBody Map<String,Long> param) {
+            ResponseEntity<Boolean> res = null;
+            try {
+                Boolean isScrap = eventService.toggleEventScrap(param.get("userId"), param.get("eventId"));
+                return new ResponseEntity<>(isScrap,HttpStatus.OK);
+            } catch (Exception e) {
+                e.printStackTrace();
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
+        }
 
 }
 

@@ -4,15 +4,17 @@ import com.pickupluck.ecogging.domain.BaseEntity;
 import com.pickupluck.ecogging.domain.plogging.entity.Event;
 import com.pickupluck.ecogging.domain.user.entity.User;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Entity
 @Getter
 @Setter
 @NoArgsConstructor
-public class Scrap extends BaseEntity {
+@AllArgsConstructor
+@Entity
+public class Eventscrap extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer scrapId;

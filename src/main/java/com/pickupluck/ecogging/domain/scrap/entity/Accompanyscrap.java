@@ -19,7 +19,7 @@ public class Accompanyscrap {
     private Long scrapId;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name="userId")
+    @JoinColumn(name="user_id")
     private User user;
 
     @OneToOne(fetch = FetchType.EAGER)
