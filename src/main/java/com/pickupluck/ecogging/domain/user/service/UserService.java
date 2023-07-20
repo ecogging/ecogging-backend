@@ -11,6 +11,8 @@ public interface UserService {
 
     User findUserByEmail(String email);
 
+    Boolean isValidEmailForSignup(String email);
+
     void logout();
 
     UserResponseDto signup(UserSignUpRequestDto userDto) throws Exception;

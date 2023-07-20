@@ -1,6 +1,10 @@
 package com.pickupluck.ecogging.domain.user.api;
 
+import com.pickupluck.ecogging.domain.user.dto.*;
 import com.pickupluck.ecogging.domain.user.entity.User;
+import com.pickupluck.ecogging.util.InMemoryKeyValueStore;
+import com.pickupluck.ecogging.util.SecurityUtil;
+import com.pickupluck.ecogging.util.mail.MailService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
@@ -16,9 +20,6 @@ import org.springframework.web.bind.annotation.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import com.pickupluck.ecogging.domain.user.dto.UserLoginRequestDto;
-import com.pickupluck.ecogging.domain.user.dto.UserResponseDto;
-import com.pickupluck.ecogging.domain.user.dto.UserSignUpRequestDto;
 import com.pickupluck.ecogging.domain.user.service.UserService;
 import com.pickupluck.ecogging.util.jwt.JwtFilter;
 import com.pickupluck.ecogging.util.jwt.TokenDto;
@@ -31,10 +32,10 @@ import com.pickupluck.ecogging.util.jwt.TokenProvider;
 public class AuthController {
 
     private final UserService userService;
-
+    private final MailService mailService;
     private final TokenProvider tokenProvider;
-
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
+    private final InMemoryKeyValueStore keyValueStore;
 
     @PostMapping("/auth/login")
     public ResponseEntity<TokenDto> login(@RequestBody UserLoginRequestDto request) {
@@ -70,6 +71,45 @@ public class AuthController {
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
+    }
+
+    @PostMapping("/auth/email-duplicated")
+    public ResponseEntity<EmailValidationResponse> isDuplicatedEmail(@RequestBody EmailValidationRequest emailRequest) {
+        Boolean isValid = userService.isValidEmailForSignup(emailRequest.getEmail());
+        log.info(emailRequest.getEmail());
+        String message = isValid ? "사용가능한 이메일입니다." : "이미 사용중인 이메일입니다.";
+
+        EmailValidationResponse emailValidationResponse = EmailValidationResponse.builder()
+                .isValid(isValid)
+                .message(message).build();
+
+        return new ResponseEntity<>(emailValidationResponse, HttpStatus.OK);
+    }
+
+    @PostMapping("/auth/email-auth-send")
+    public ResponseEntity<String> sendAuthorizationEmail(@RequestBody EmailValidationRequest emailRequest) {
+        // generate auth number
+        String authNumber = SecurityUtil.generateSixDigitRandomNumber();
+        // send email
+        String email = emailRequest.getEmail();
+
+        boolean result = mailService.sendSignUpAuthMail(email, authNumber);
+        if (result)
+            log.info("메일 전송 완료");
+        else
+            log.info("메일 전송 실패");
+
+        return new ResponseEntity<String>(HttpStatus.OK);
+    }
+
+    @PostMapping("/auth/email-auth-confirm")
+    public ResponseEntity<Boolean> isAuthorizedEmail(@RequestBody EmailAuthNumberConfirmRequest emailAuthConfirmRequest) {
+
+        Boolean isConfirmed = mailService.confirmEmail(emailAuthConfirmRequest);
+
+        log.info("isConfirmed: {}", isConfirmed);
+
+        return new ResponseEntity<>(isConfirmed, HttpStatus.OK);
     }
 
     @GetMapping("/user/me")

@@ -1,5 +1,8 @@
 package com.pickupluck.ecogging.domain.plogging.api;
 
+import com.pickupluck.ecogging.domain.notification.dto.NotificationSaveDto;
+import com.pickupluck.ecogging.domain.notification.entity.NotificationType;
+import com.pickupluck.ecogging.domain.notification.service.NotificationService;
 import com.pickupluck.ecogging.domain.plogging.dto.AccompanyDTO;
 import com.pickupluck.ecogging.domain.plogging.service.AccompanyService;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +21,9 @@ public class AccompanyController {
 
     @Autowired
     private AccompanyService accompanyService;
+
+    @Autowired
+    private NotificationService notificationService;
 
     @GetMapping("/accompanies/{page}")
     public ResponseEntity<Map<String,Object>> accompanyList(@PathVariable Integer page,
