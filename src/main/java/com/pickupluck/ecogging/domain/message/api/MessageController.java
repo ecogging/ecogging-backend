@@ -23,11 +23,13 @@ public class MessageController {
     public ResponseEntity<String> sendRedirectedMessage(
             @PathVariable("messageRoomId") Long messageRoomId,
             @RequestParam("curId") Long curId,
+            @RequestParam("contactId") Long contactId,
             @RequestParam("content") String content) {
 
         System.out.println("sendRedirectedMessage 함수 진입");
         System.out.println("msgRoomID: "+messageRoomId);
         System.out.println("curId: "+curId);
+        System.out.println("contactId: "+contactId);
         System.out.println("content: "+content); // 진입 성공
 
         // requestSendDto 생성
@@ -35,7 +37,7 @@ public class MessageController {
         System.out.println(request.getMessage());
 
         // 쪽지 전송
-        messageService.sendMessage(curId, messageRoomId, request);
+        messageService.sendMessage(curId, messageRoomId, contactId, request);
         return ResponseEntity.ok(new String("리다이렉트된 쪽지 전송 진짜 완료!"));
     }
 

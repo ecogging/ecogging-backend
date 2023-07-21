@@ -54,6 +54,8 @@ public class MessageRoomController {
                             .append(isAlreadyExistId.get())
                             .append("/redirect-message?curId=")
                             .append(curId)
+                            .append("&contactId=")
+                            .append(contactId)
                             .append("&content=")
                             .append(URLEncoder.encode(content, StandardCharsets.UTF_8.toString()))
                             .toString()

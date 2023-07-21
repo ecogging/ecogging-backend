@@ -24,10 +24,11 @@ public class MessageServiceI implements MessageService{
     // 1. 쪽지 전송
     @Override
     @Transactional
-    public void sendMessage(Long curId, Long messageRoomId, MessageRequestSendDto msgSendDto) {
+    public void sendMessage(Long curId, Long messageRoomId, Long contactId, MessageRequestSendDto msgSendDto) {
 
         // 현재 유저 조회 & 쪽지함 조회
         User currentUser = userRepository.findById(curId).get();
+        User contactUser = userRepository.findById(contactId).get();
         MessageRoom messageRoom = messageRoomRepository.findById(messageRoomId).get();
 
         // 유저 쪽지 권한 조회
@@ -37,6 +38,7 @@ public class MessageServiceI implements MessageService{
         Message message = Message.builder()
                 .messageRoom(messageRoom)
                 .sender(currentUser)
+                .receiver(contactUser)
                 .content(msgSendDto.getMessage())
                 .deletedByRcv(0)
                 .deletedBySnd(0)
