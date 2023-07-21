@@ -16,7 +16,7 @@ public class MessageResponseDto {
     private final String content;
 
     public MessageResponseDto(Message msg, User contact) {
-        this.isReceived = Objects.equals(contact.getId(), msg.getSender().getId()) ? 1 : 0; // 상대id == msg발신자id 같으면 수신 (1)
+        this.isReceived = contact.getId() == msg.getSender().getId() ? 1 : 0; // 상대id == msg발신자id 같으면 수신 (1)
         this.createdAt = msg.getCreatedAt();
         this.content = msg.getContent();
     }

@@ -74,6 +74,7 @@ public class MessageRoomServiceI implements MessageRoomService {
         }
     }
 
+    // 쪽지함 생성
     @Override
     @Transactional
     public MessageRoomIdResponseDto saveMessageRoom(Long curId, Long contactId, String firstMessage) {
@@ -117,6 +118,7 @@ public class MessageRoomServiceI implements MessageRoomService {
 
     }
 
+    // 쪽지함 조회해서 리스트로 반환
     @Override
     @Transactional(readOnly = true)
     public Page<MessageRoomListResponseDto> getMessageRooms(Long userId, Pageable pageable) {
@@ -153,14 +155,19 @@ public class MessageRoomServiceI implements MessageRoomService {
         return responses;
     }
 
+    // 쪽지함 조회해서 상세 쪽지목록 있는 쪽지함 반환
     @Override
     @Transactional(readOnly = true)
     public MessageRoomResponseDto getMessageRoom(Long userId, MessageRoomRequestGetDto requestGetDto) {
+        // 1. 현재 유저 조회
         User currentUser = userRepository.findById(userId).get();
+        // 2. 쪽지함레포지에서 쪽지함id로 검색해 조회
         MessageRoom messageRoom = messageRoomRepository.findById(requestGetDto.getMessageRoomId()).get();
 
+        // 삭제 상태 확인
         checkMessageRoomIsDeleted(messageRoom, userId);
 
+        // 페이징
         Pageable pageable = PageRequest.of(0, 10, Sort.by("createdAt").descending());
         Page<Message> messages = messageRoomRepository.findMessagesByMessageRoomId(
                 messageRoom.getId(), pageable);

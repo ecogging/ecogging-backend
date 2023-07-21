@@ -52,7 +52,7 @@ public class MessageRoomController {
         // 1-1. 쪽지함 기존 존재여부 확인
         Optional<Long> isAlreadyExistId = messageRoomService.getMessageRoomId(curId, contactId);
 
-        // 1-1-a. 둘이 대화하던 쪽지함이 이미 존재할 경우 messageService.sendRedirectedMessage()
+        // 1-2. 둘이 대화하던 쪽지함이 이미 존재할 경우 messageService.sendRedirectedMessage()
         if (isAlreadyExistId.isPresent()) {
             System.out.println("이미 존재하는 쪽지함");
 
@@ -80,7 +80,7 @@ public class MessageRoomController {
                     .body(new String("이미 존재하는 쪽지함 -> 쪽지 전송 요청으로 리다이렉트됨"));
 
         } else {
-        // 1-2. 둘이 대화하던 쪽지함이 존재하지 않을 경우 새로운 쪽지함을 생성하고 해당하는 쪽지함ID 반환
+        // 1-3. 둘이 대화하던 쪽지함이 존재하지 않을 경우 새로운 쪽지함을 생성하고 해당하는 쪽지함ID 반환
         MessageRoomIdResponseDto newMessageRoom = messageRoomService.saveMessageRoom(curId, contactId, content);
         System.out.println("쪽지함 생성 완료");
 
@@ -91,13 +91,14 @@ public class MessageRoomController {
     // 2. 쪽지함 조회 - 기존 존재하고 있는 쪽지함 조회 GET /{messageRoomId}
     // getMessageRoom()
     @GetMapping("/{userId}/messageroom/{messageRoomId}")
-    public ResponseEntity<Map<String, Object>> getMessageRoom(
-            @PathVariable("userId")Long userId,
-            @PathVariable("messageRoomId")Long messageRoomId
-    ) {
+    public ResponseEntity<Map<String, Object>> getMessageRoom( @PathVariable("userId")Long userId,
+                                                               @PathVariable("messageRoomId")Long messageRoomId) {
+        // 2-1. MessageRoom -> getRequest 생성
         MessageRoomRequestGetDto request = new MessageRoomRequestGetDto(messageRoomId);
+        // 2-2. 생성한 MessageRoomRequestGetDto, userId로 MessageRoomResponseDto 획득
         MessageRoomResponseDto response = messageRoomService.getMessageRoom(userId, request);
 
+        // 2-3. responseBody에 message, data(쪽지함 상세 리스트 담은 - contactNickname & messages ) 저장
         Map<String, Object> responseBody = new HashMap<>();
         responseBody.put("message", "쪽지함 상세 리스트 조회 완료");
         responseBody.put("data", response);
