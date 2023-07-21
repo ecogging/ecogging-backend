@@ -36,7 +36,6 @@ public class User extends BaseEntity {
 
     private String tel;
 
-    @Column(name = "noti_yn")
     private String notiYn;
 
     @Enumerated(EnumType.STRING)
@@ -44,9 +43,6 @@ public class User extends BaseEntity {
 
     @OneToMany(mappedBy = "user")
     private List<Authority> authorities = new ArrayList<>();
-
-//    @OneToMany(mappedBy = "user")
-//    private List<Accompany> accompanies = new ArrayList<>();
 
     private String profileImageUrl;
 
