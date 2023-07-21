@@ -1,5 +1,6 @@
 package com.pickupluck.ecogging.domain.user.entity;
 
+import com.pickupluck.ecogging.domain.plogging.entity.Accompany;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
@@ -12,7 +13,6 @@ import java.util.List;
 
 @Entity
 @Getter
-@ToString
 @NoArgsConstructor
 @EqualsAndHashCode(of="id", callSuper = false)
 public class User extends BaseEntity {
@@ -43,6 +43,9 @@ public class User extends BaseEntity {
     @OneToMany(mappedBy = "user")
     private List<Authority> authorities = new ArrayList<>();
 
+//    @OneToMany(mappedBy = "user")
+//    private List<Accompany> accompanies = new ArrayList<>();
+
     @Builder
     public User(String email, String name, String password, String nickname,
                 String tel, String notiYn, LoginType loginType) {
@@ -57,5 +60,10 @@ public class User extends BaseEntity {
 
     public void updateNotiYn(String notiYn) {
         this.notiYn = notiYn;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("[%s,%s,%s,%s,%s]",id,email,name,nickname,tel);
     }
 }

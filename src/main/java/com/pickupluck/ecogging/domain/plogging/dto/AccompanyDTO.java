@@ -45,10 +45,10 @@ public class AccompanyDTO {
         this.joincnt = accompany.getJoincnt();
         this.createdAt = accompany.getCreatedAt();
         this.updatedAt = accompany.getUpdatedAt();
-        if(accompany.getWriter()!=null) {
-            this.nickname = accompany.getWriter().getNickname();
-            this.userId = accompany.getWriter().getId();
-            this.email = accompany.getWriter().getEmail();
+        if(accompany.getUser()!=null) {
+            this.nickname = accompany.getUser().getNickname();
+            this.userId = accompany.getUser().getId();
+            this.email = accompany.getUser().getEmail();
         }
     }
 
