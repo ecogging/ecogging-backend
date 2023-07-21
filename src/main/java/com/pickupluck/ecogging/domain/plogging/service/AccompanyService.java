@@ -25,4 +25,13 @@ public interface AccompanyService {
     Boolean toggleAccompanyScrap(Long userId, Long accompanyId) throws Exception;
 
     Map<String, Object> getMainAccompanyList() throws Exception;
+
+    Map<String, Object> getMyAccompanyList(Long userId, Integer page) throws Exception;
+
+    Map<String, Object> getMyParticipationList(Long userId, Integer page) throws Exception;
+
+    Map<String, Object> getMyAccompanyscrapList(Long userId, Integer page) throws Exception;
+
+    Map<String, Object> getMyAccompanyTempList(Long userId, Integer page) throws Exception;
+
 }
