@@ -4,6 +4,7 @@ import com.pickupluck.ecogging.domain.message.dto.request.MessageRoomRequestCrea
 import com.pickupluck.ecogging.domain.message.dto.request.MessageRoomRequestGetDto;
 import com.pickupluck.ecogging.domain.message.dto.response.MessageRoomIdResponseDto;
 import com.pickupluck.ecogging.domain.message.dto.response.MessageRoomListResponseDto;
+import com.pickupluck.ecogging.domain.message.dto.response.MessageRoomResponseDto;
 import com.pickupluck.ecogging.domain.message.service.MessageRoomService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -89,6 +90,23 @@ public class MessageRoomController {
 
     // 2. 쪽지함 조회 - 기존 존재하고 있는 쪽지함 조회 GET /{messageRoomId}
     // getMessageRoom()
+    @GetMapping("/{userId}/messageroom/{messageRoomId}")
+    public ResponseEntity<Map<String, Object>> getMessageRoom(
+            @PathVariable("userId")Long userId,
+            @PathVariable("messageRoomId")Long messageRoomId
+    ) {
+        MessageRoomRequestGetDto request = new MessageRoomRequestGetDto(messageRoomId);
+        MessageRoomResponseDto response = messageRoomService.getMessageRoom(userId, request);
+
+        Map<String, Object> responseBody = new HashMap<>();
+        responseBody.put("message", "쪽지함 상세 리스트 조회 완료");
+        responseBody.put("data", response);
+
+        System.out.println("데이터확인~~~~~~~~~~~~~~~~"+response.getMessages().toString());
+        System.out.println("##"+response.getContactNickname());
+
+        return ResponseEntity.ok(responseBody);
+    }
 
     // 3. 쪽지함 리스트 조회 GET
     // getMessageRooms()

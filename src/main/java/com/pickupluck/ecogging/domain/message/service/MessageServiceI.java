@@ -40,8 +40,6 @@ public class MessageServiceI implements MessageService{
                 .sender(currentUser)
                 .receiver(contactUser)
                 .content(msgSendDto.getMessage())
-                .deletedByRcv(0)
-                .deletedBySnd(0)
                 .read(0)
                 .build();
         // Message Entity -> Repo 저장

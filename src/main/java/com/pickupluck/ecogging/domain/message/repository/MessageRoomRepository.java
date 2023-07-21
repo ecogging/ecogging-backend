@@ -1,6 +1,7 @@
 package com.pickupluck.ecogging.domain.message.repository;
 
 import com.pickupluck.ecogging.domain.message.dto.MessageRoomsWithLastMessages;
+import com.pickupluck.ecogging.domain.message.entity.Message;
 import com.pickupluck.ecogging.domain.message.entity.MessageRoom;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -48,4 +49,8 @@ public interface MessageRoomRepository extends JpaRepository<MessageRoom, Long> 
                     + "where (initial_receiver_id=:id or initial_sender_id=:id) ")
     Page<MessageRoomsWithLastMessages> findMessageRoomsAndLastMessagesByUserId(@Param("id") Long userId, Pageable pageable);
 
+    @Query(
+            value = "select m from Message m join fetch m.messageRoom join fetch m.sender where m.messageRoom.id=:id",
+            countQuery = "select count(m) from Message m where m.id=:id")
+    Page<Message> findMessagesByMessageRoomId(@Param("id") Long messageRoomId, Pageable pageable);
 }

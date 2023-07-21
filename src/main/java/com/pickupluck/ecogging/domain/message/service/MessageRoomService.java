@@ -1,8 +1,11 @@
 package com.pickupluck.ecogging.domain.message.service;
 
 import com.pickupluck.ecogging.domain.message.dto.request.MessageRoomRequestCreateDto;
+import com.pickupluck.ecogging.domain.message.dto.request.MessageRoomRequestGetDto;
 import com.pickupluck.ecogging.domain.message.dto.response.MessageRoomIdResponseDto;
 import com.pickupluck.ecogging.domain.message.dto.response.MessageRoomListResponseDto;
+import com.pickupluck.ecogging.domain.message.dto.response.MessageRoomResponseDto;
+import com.pickupluck.ecogging.domain.message.entity.MessageRoom;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -20,4 +23,8 @@ public interface MessageRoomService {
     // 쪽지함 리스트 조회한 페이지 반환
     Page<MessageRoomListResponseDto> getMessageRooms(Long userId, Pageable pageable);
 
+    // 쪽지함 상세 조회
+    MessageRoomResponseDto getMessageRoom(Long userId, MessageRoomRequestGetDto requestGetDto);
+
 }
+

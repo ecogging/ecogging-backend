@@ -3,10 +3,13 @@ package com.pickupluck.ecogging.domain.message.service;
 import ch.qos.logback.core.spi.ErrorCodes;
 import com.pickupluck.ecogging.domain.message.dto.MessageRoomsWithLastMessages;
 import com.pickupluck.ecogging.domain.message.dto.request.MessageRoomRequestCreateDto;
+import com.pickupluck.ecogging.domain.message.dto.request.MessageRoomRequestGetDto;
 import com.pickupluck.ecogging.domain.message.dto.response.MessageRoomIdResponseDto;
 import com.pickupluck.ecogging.domain.message.dto.response.MessageRoomListResponseDto;
+import com.pickupluck.ecogging.domain.message.dto.response.MessageRoomResponseDto;
 import com.pickupluck.ecogging.domain.message.entity.Message;
 import com.pickupluck.ecogging.domain.message.entity.MessageRoom;
+import com.pickupluck.ecogging.domain.message.entity.VisibilityState;
 import com.pickupluck.ecogging.domain.message.repository.MessageRepository;
 import com.pickupluck.ecogging.domain.message.repository.MessageRoomRepository;
 import com.pickupluck.ecogging.domain.user.entity.User;
@@ -14,9 +17,12 @@ import com.pickupluck.ecogging.domain.user.repository.UserRepository;
 import com.sun.jdi.event.ExceptionEvent;
 import com.sun.jdi.request.InvalidRequestStateException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.PermissionDeniedDataAccessException;
 import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,7 +31,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class MessageRoomServiceI implements MessageRoomService{
+public class MessageRoomServiceI implements MessageRoomService {
 
     private final MessageRoomRepository messageRoomRepository;
     private final MessageRepository messageRepository;
@@ -43,24 +49,24 @@ public class MessageRoomServiceI implements MessageRoomService{
                     .orElseThrow(ChangeSetPersister.NotFoundException::new).getId();
             recevierId = userRepository.findById(contactId)
                     .orElseThrow(ChangeSetPersister.NotFoundException::new).getId(); // 수신자 레포지 존재 여부 확인
-            System.out.println("발신자::"+senderId+", 수신자::"+recevierId); // 여기까지 진입 완료
+            System.out.println("발신자::" + senderId + ", 수신자::" + recevierId); // 여기까지 진입 완료
 
             // 쪽지함 존재여부 조회
             Optional<Long> existedRoomIdOptional = messageRoomRepository.findIdByInitialSenderAndInitialReceiver(
                     senderId, recevierId);
-            if(existedRoomIdOptional.isPresent() && existedRoomIdOptional.get() != null) {
+            if (existedRoomIdOptional.isPresent() && existedRoomIdOptional.get() != null) {
                 System.out.println("주어진 사용자 id들이 갖고있는 쪽지함 존재함");
                 return existedRoomIdOptional;
             } else {
                 Optional<Long> existedRoomIdOpitonalAgain = messageRoomRepository.findIdByInitialReceiverAndInitialSender(
                         senderId, recevierId);
-                if(existedRoomIdOpitonalAgain.isPresent() && existedRoomIdOpitonalAgain.get() != null) {
+                if (existedRoomIdOpitonalAgain.isPresent() && existedRoomIdOpitonalAgain.get() != null) {
                     System.out.println("주어진 사용자 id들이 갖고있는 쪽지함 존재함");
                     return existedRoomIdOpitonalAgain;
                 } else {
-                        System.out.println("주어진 사용자 id들이 갖고있는 쪽지함 존재하지 않음!");
-                        return Optional.empty(); // 진입 완료 - 성공
-                     }
+                    System.out.println("주어진 사용자 id들이 갖고있는 쪽지함 존재하지 않음!");
+                    return Optional.empty(); // 진입 완료 - 성공
+                }
             }
         } catch (ChangeSetPersister.NotFoundException e) {
             System.out.println("주어진 id에 해당하는 사용자 정보가 없습니다");
@@ -72,7 +78,7 @@ public class MessageRoomServiceI implements MessageRoomService{
     @Transactional
     public MessageRoomIdResponseDto saveMessageRoom(Long curId, Long contactId, String firstMessage) {
 
-        if(curId == contactId) {
+        if (curId == contactId) {
             throw new InvalidRequestStateException("**자기 자신에게 쪽지를 보낼 수 없음");
         }
 
@@ -98,8 +104,6 @@ public class MessageRoomServiceI implements MessageRoomService{
                 .sender(sender)
                 .receiver(receiver)
                 .content(firstMessage)
-                .deletedByRcv(0)
-                .deletedBySnd(0)
                 .read(0)
                 .build();
 
@@ -129,12 +133,12 @@ public class MessageRoomServiceI implements MessageRoomService{
         Page<MessageRoomListResponseDto> responses = messageRooms.map(messageRoom -> {
             Long contactId =
                     (userId == messageRoom.getInitialSenderId().longValue()) ?
-                     messageRoom.getInitialReceiverId().longValue()
-                    : messageRoom.getInitialSenderId().longValue();
-            System.out.println("userID     "+userId);
-            System.out.println("InitialSender  "+messageRoom.getInitialSenderId().longValue());
-            System.out.println("InitialReceiver  "+messageRoom.getInitialReceiverId().longValue());
-            System.out.println("********최종상대:   "+contactId);
+                            messageRoom.getInitialReceiverId().longValue()
+                            : messageRoom.getInitialSenderId().longValue();
+            System.out.println("userID     " + userId);
+            System.out.println("InitialSender  " + messageRoom.getInitialSenderId().longValue());
+            System.out.println("InitialReceiver  " + messageRoom.getInitialReceiverId().longValue());
+            System.out.println("********최종상대:   " + contactId);
 
             User contact = userRepository.findById(contactId).get();
 
@@ -147,5 +151,39 @@ public class MessageRoomServiceI implements MessageRoomService{
         });
 
         return responses;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public MessageRoomResponseDto getMessageRoom(Long userId, MessageRoomRequestGetDto requestGetDto) {
+        User currentUser = userRepository.findById(userId).get();
+        MessageRoom messageRoom = messageRoomRepository.findById(requestGetDto.getMessageRoomId()).get();
+
+        checkMessageRoomIsDeleted(messageRoom, userId);
+
+        Pageable pageable = PageRequest.of(0, 10, Sort.by("createdAt").descending());
+        Page<Message> messages = messageRoomRepository.findMessagesByMessageRoomId(
+                messageRoom.getId(), pageable);
+        User contact =
+                (currentUser.getId() == messageRoom.getInitialSender().getId()) ?
+                messageRoom.getInitialReceiver() : messageRoom.getInitialSender();
+
+        return MessageRoomResponseDto.builder()
+                .messages(messages)
+                .messageRoom(messageRoom)
+                .contact(contact)
+                .build();
+    }
+
+    // 쪽지함 삭제한 사람인지 확인
+    private void checkMessageRoomIsDeleted(MessageRoom messageRoom, Long userId) {
+        VisibilityState visibility = messageRoom.getVisibilityTo(); // MessageRoom Enum (삭제 상태) 확인
+        if (visibility.equals(VisibilityState.NO_ONE) ||
+                (messageRoom.getInitialSender().getId() == userId &&
+                        visibility.equals(VisibilityState.ONLY_INITIAL_RECEIVER)) ||
+                (messageRoom.getInitialReceiver().getId() == userId &&
+                        visibility.equals(VisibilityState.ONLY_INITIAL_SENDER))) {
+            throw new PermissionDeniedDataAccessException("접근불가능", new Throwable());
+        }
     }
 }

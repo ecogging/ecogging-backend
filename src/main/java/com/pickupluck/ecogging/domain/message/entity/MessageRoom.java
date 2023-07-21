@@ -36,11 +36,30 @@ public class MessageRoom extends BaseEntity {
     @OneToMany(mappedBy = "messageRoom")
     private List<Message> messages = new ArrayList<>();
 
+    @Column(name = "visible_to", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private VisibilityState visibilityTo;
+
     @Builder
     public MessageRoom(Long id, User initialSender, User initialReceiver) {
         this.id = id;
         this.initialSender = initialSender;
         this.initialReceiver = initialReceiver;
+        this.visibilityTo = VisibilityState.BOTH;
+    }
+
+    public void changeVisibilityTo(VisibilityState visibilityTo) {
+        if (this.visibilityTo.equals(VisibilityState.BOTH)) {
+            this.visibilityTo = visibilityTo;
+        } else if (this.visibilityTo.equals(VisibilityState.ONLY_INITIAL_RECEIVER)) {
+            if (visibilityTo.equals(VisibilityState.ONLY_INITIAL_SENDER)) {
+                this.visibilityTo = VisibilityState.NO_ONE;
+            }
+        } else if (this.visibilityTo.equals(VisibilityState.ONLY_INITIAL_SENDER)) {
+            if (visibilityTo.equals(VisibilityState.ONLY_INITIAL_RECEIVER)) {
+                this.visibilityTo = VisibilityState.NO_ONE;
+            }
+        }
     }
 
     @Override
@@ -53,4 +72,6 @@ public class MessageRoom extends BaseEntity {
                 ", updatedAt=" + updatedAt +
                 '}';
     }
+
+
 }
