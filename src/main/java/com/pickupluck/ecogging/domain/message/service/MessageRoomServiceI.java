@@ -43,16 +43,20 @@ public class MessageRoomServiceI implements MessageRoomService{
             // 쪽지함 존재여부 조회
             Optional<Long> existedRoomIdOptional = messageRoomRepository.findIdByInitialSenderAndInitialReceiver(
                     senderId, recevierId);
-            Long existedRoomId = existedRoomIdOptional.get(); // 기본값으로 null 지정
-
-            if(existedRoomId > 0) {
+            if(existedRoomIdOptional.isPresent() && existedRoomIdOptional.get() != null) {
                 System.out.println("주어진 사용자 id들이 갖고있는 쪽지함 존재함");
                 return existedRoomIdOptional;
             } else {
-                System.out.println("주어진 사용자 id들이 갖고있는 쪽지함 존재하지 않음!");
-                return Optional.empty(); // 진입 완료 - 성공
+                Optional<Long> existedRoomIdOpitonalAgain = messageRoomRepository.findIdByInitialReceiverAndInitialSender(
+                        senderId, recevierId);
+                if(existedRoomIdOpitonalAgain.isPresent() && existedRoomIdOpitonalAgain.get() != null) {
+                    System.out.println("주어진 사용자 id들이 갖고있는 쪽지함 존재함");
+                    return existedRoomIdOpitonalAgain;
+                } else {
+                        System.out.println("주어진 사용자 id들이 갖고있는 쪽지함 존재하지 않음!");
+                        return Optional.empty(); // 진입 완료 - 성공
+                     }
             }
-
         } catch (ChangeSetPersister.NotFoundException e) {
             System.out.println("주어진 id에 해당하는 사용자 정보가 없습니다");
             return Optional.empty();

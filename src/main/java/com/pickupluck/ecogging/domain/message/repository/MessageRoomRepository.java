@@ -16,4 +16,13 @@ public interface MessageRoomRepository extends JpaRepository<MessageRoom, Long> 
     )
     Optional<Long> findIdByInitialSenderAndInitialReceiver(
             @Param("senderId") Long senderId, @Param("receiverId") Long receiverId);
+
+
+    @Query (
+            value = "SELECT message_room_id FROM message_room "
+                    + "WHERE (initial_receiver_id = :senderId AND initial_sender_id = :receiverId)",
+            nativeQuery = true
+    )
+    Optional<Long> findIdByInitialReceiverAndInitialSender(
+            @Param("senderId") Long senderId, @Param("receiverId") Long receiverId);
 }
