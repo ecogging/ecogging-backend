@@ -1,10 +1,16 @@
 package com.pickupluck.ecogging.domain.message.api;
 
 import com.pickupluck.ecogging.domain.message.dto.request.MessageRoomRequestCreateDto;
+import com.pickupluck.ecogging.domain.message.dto.request.MessageRoomRequestGetDto;
 import com.pickupluck.ecogging.domain.message.dto.response.MessageRoomIdResponseDto;
+import com.pickupluck.ecogging.domain.message.dto.response.MessageRoomListResponseDto;
 import com.pickupluck.ecogging.domain.message.service.MessageRoomService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +24,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -30,7 +38,7 @@ public class MessageRoomController {
 
     // 1. 쪽지함 생성 - 쪽지함 기존 존재 유무 확인 단계 필요
     // - 존재하지 않을 때 생성 함수 실행 POST / 존재하면 sendRedirectedMessage()
-    // createMessageRoom()
+    // createMessageRoom() -->  아이디에서 쪽지 보내기
     @PostMapping("/messagerooms")
     public ResponseEntity<String> createMessageRoom(@RequestBody Map<String, Object> requestBody) throws URISyntaxException, UnsupportedEncodingException {
         Long curId = Long.parseLong((String) requestBody.get("curId"));
@@ -84,6 +92,23 @@ public class MessageRoomController {
 
     // 3. 쪽지함 리스트 조회 GET
     // getMessageRooms()
+    @GetMapping("/mypage/{userId}/messagerooms")
+    public ResponseEntity<Map<String,Object>> getMessageRooms(
+            @PathVariable("userId")Long userId,
+            @PageableDefault(size = 10, sort = "updated_at", direction = Sort.Direction.DESC) final Pageable pageable) {
+        System.out.println("##############GETMESSAGEROOM 진입 완료");
+        System.out.println(userId);
+        System.out.println(userId.getClass().getName()); // Long타입으로 userId 확보 성공
+
+        Page<MessageRoomListResponseDto> response = messageRoomService.getMessageRooms(userId, pageable);
+
+        Map<String, Object> responseBody = new HashMap<>();
+        responseBody.put("message", "쪽지방 리스트 조회 완료~");
+        responseBody.put("data", response.getContent());
+
+        return ResponseEntity.ok(responseBody);
+    }
+
 
     // 4. 쪽지함 삭제 DELETE /{messageRoomId}/delete
     // deleteMessageRoom()

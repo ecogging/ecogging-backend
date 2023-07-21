@@ -1,8 +1,10 @@
 package com.pickupluck.ecogging.domain.message.service;
 
 import ch.qos.logback.core.spi.ErrorCodes;
+import com.pickupluck.ecogging.domain.message.dto.MessageRoomsWithLastMessages;
 import com.pickupluck.ecogging.domain.message.dto.request.MessageRoomRequestCreateDto;
 import com.pickupluck.ecogging.domain.message.dto.response.MessageRoomIdResponseDto;
+import com.pickupluck.ecogging.domain.message.dto.response.MessageRoomListResponseDto;
 import com.pickupluck.ecogging.domain.message.entity.Message;
 import com.pickupluck.ecogging.domain.message.entity.MessageRoom;
 import com.pickupluck.ecogging.domain.message.repository.MessageRepository;
@@ -13,9 +15,12 @@ import com.sun.jdi.event.ExceptionEvent;
 import com.sun.jdi.request.InvalidRequestStateException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.crossstore.ChangeSetPersister;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -108,5 +113,39 @@ public class MessageRoomServiceI implements MessageRoomService{
 
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public Page<MessageRoomListResponseDto> getMessageRooms(Long userId, Pageable pageable) {
+        User currentUser = userRepository.findById(userId).get();
 
+        // 페이지대로 정렬해서 리스트 조회
+        Page<MessageRoomsWithLastMessages> messageRooms = messageRoomRepository.findMessageRoomsAndLastMessagesByUserId(
+                currentUser.getId(), pageable);
+
+        // map을 이용해 Page 내용 변환
+        // userId와 msgRoom의 initialSenderId를 비교
+        // -> 둘이 같으면 initialSenderId를 contactId로 설정
+        // -> 같지 않으면 initialReceiverId를 contactId로 설정
+        Page<MessageRoomListResponseDto> responses = messageRooms.map(messageRoom -> {
+            Long contactId =
+                    (userId == messageRoom.getInitialSenderId().longValue()) ?
+                     messageRoom.getInitialReceiverId().longValue()
+                    : messageRoom.getInitialSenderId().longValue();
+            System.out.println("userID     "+userId);
+            System.out.println("InitialSender  "+messageRoom.getInitialSenderId().longValue());
+            System.out.println("InitialReceiver  "+messageRoom.getInitialReceiverId().longValue());
+            System.out.println("********최종상대:   "+contactId);
+
+            User contact = userRepository.findById(contactId).get();
+
+            return MessageRoomListResponseDto.builder()
+                    .msgRoomId(messageRoom.getMessageRoomId().longValue())
+                    .contactNickname(contact.getNickname())
+                    .lastMessageSentTime(messageRoom.getCreatedAt().toLocalDateTime())
+                    .lastMessageContent(messageRoom.getContent())
+                    .build();
+        });
+
+        return responses;
+    }
 }

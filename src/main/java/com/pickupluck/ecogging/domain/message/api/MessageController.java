@@ -2,6 +2,7 @@ package com.pickupluck.ecogging.domain.message.api;
 
 import com.pickupluck.ecogging.domain.message.dto.request.MessageRequestSendDto;
 import com.pickupluck.ecogging.domain.message.service.MessageService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -14,8 +15,15 @@ public class MessageController {
 
     private final MessageService messageService;
 
-    // 1. 쪽지 전송 POST /{messageRoomId}/messages
+    // 1. 쪽지 전송 POST /{messageRoomId}/messages --> 이게 쪽지함에서 답장하기
     // sendMessage()
+//    @PostMapping("/{messageRoomId}/messages")
+//    public ResponseEntity<String> sendMesssage(
+//            @PathVariable("messageRoomId") Long messageRoomId,
+//            @Valid @RequestBody final MessageRequestSendDto request) {
+//
+//            messageService.sendMessage(messageRoomId, request);
+//    }
 
     // 2. 쪽지함 생성에서 쪽지함이 기존에 이미 존재하는 경우 리다이렉트된 쪽지 전송 POST /{messageRoomId}/redirect-message
     // sendRedirectedMessage()

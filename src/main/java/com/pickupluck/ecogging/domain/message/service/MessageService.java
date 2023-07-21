@@ -7,4 +7,6 @@ public interface MessageService {
 
     // 쪽지 전송
     public void sendMessage(Long curId, Long messageRoomId, Long contactId, MessageRequestSendDto msgSendDto);
+
+
 }
