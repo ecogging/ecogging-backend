@@ -18,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -120,52 +121,6 @@ public class EventServiceImpl implements EventService{
     }
 
     @Override
-    public List<EventDTO> getEventListSave(Integer page, PageInfo pageInfo, String sorttype) throws Exception {
-        PageRequest pageRequest = PageRequest.of(page-1, 5);
-        Boolean save = null;
-        Date endDate = null;
-
-        OrderSpecifier<?> orderSpecifier = null;
-        if(sorttype.equals("latest")) {
-            orderSpecifier = new OrderSpecifier(Order.DESC, QEvent.event.createdAt);
-        } else if(sorttype.equals("oldest")) {
-            orderSpecifier = new OrderSpecifier(Order.ASC, QEvent.event.createdAt);
-        } else if(sorttype.equals("popular")) {
-            orderSpecifier = new OrderSpecifier(Order.DESC, QEvent.event.views);
-        } else if(sorttype.equals("upcoming")) {
-            orderSpecifier = new OrderSpecifier(Order.ASC, QEvent.event.meetingDate);
-        } else {
-            orderSpecifier = new OrderSpecifier(Order.DESC, QEvent.event.eventId);
-        }
-
-        //Page<Event> pages = eventRepository.findBySaveFalse(pageRequest);
-
-        Page<Event> pages = commonRepository.findBySaveTrueAndEndDateGraterThan(pageRequest, orderSpecifier, save, endDate);
-
-        pageInfo.setAllPage(pages.getTotalPages());
-
-        // 현재 페이지가 마지막 페이지인 경우 다음 페이지로 이동하지 않음
-        if (page > pageInfo.getAllPage()) {
-            return Collections.emptyList();
-        }
-
-        pageInfo.setCurPage(page);
-        int startPage = (page-1)/2*2+1;
-        int endPage = startPage+2-1;
-        if(endPage>pageInfo.getAllPage()) endPage=pageInfo.getAllPage();
-        pageInfo.setStartPage(startPage);
-        pageInfo.setEndPage(endPage);
-        boolean isLastPage = page >= pageInfo.getAllPage(); // 현재 페이지가 마지막 페이지인지 여부 판단
-        pageInfo.setIsLastPage(isLastPage); // isLastPage 값을 설정
-
-        List<EventDTO> list = new ArrayList<>();
-        for(Event event : pages.getContent()) {
-            list.add(modelMappper.map(event, EventDTO.class));
-        }
-        return list;
-    }
-
-    @Override
     public EventDTO getEvent(Integer eventId) throws Exception {
         Optional<Event> oevent = eventRepository.findById(eventId);
         if(oevent.isEmpty()) return null;
@@ -175,6 +130,68 @@ public class EventServiceImpl implements EventService{
         event.setViews(event.getViews()+1);
         eventRepository.save(event);
         return eventDTO;
+    }
+
+    private PageInfo calcPage(Integer allPage, Integer page) {
+        PageInfo pageInfo = new PageInfo();
+        pageInfo.setCurPage(page);
+        pageInfo.setAllPage(allPage);
+        int startPage = (page-1)/10*10+1;
+        int endPage = startPage+10-1;
+        if(endPage>pageInfo.getAllPage()) endPage=pageInfo.getAllPage();
+        pageInfo.setStartPage(startPage);
+        pageInfo.setEndPage(endPage);
+        return pageInfo;
+    }
+
+    @Override
+    public Map<String, Object> getMyEventList(Long userId, Integer page) throws Exception {
+        PageRequest pageRequest = PageRequest.of(page-1,5, Sort.by(Sort.Direction.DESC, "eventId"));
+        Page<Event> eventPage = eventRepository.findByUserId(userId, pageRequest);
+
+        Map<String, Object> map = new HashMap<>();
+        List<EventDTO> list = new ArrayList<>();
+        for(Event event : eventPage.getContent()){
+            EventDTO eventDTO = new EventDTO(event);
+            list.add(eventDTO);
+        }
+        map.put("list", list);
+        PageInfo pageInfo = calcPage(eventPage.getTotalPages(), page);
+        map.put("pageInfo", pageInfo);
+        return map;
+    }
+
+    @Override
+    public Map<String, Object> getMyEventTempList(Long userId, Integer page) throws Exception {
+        PageRequest pageRequest = PageRequest.of(page-1,5, Sort.by(Sort.Direction.DESC, "eventId"));
+        Page<Event> eventPage = eventRepository.findByUserIdAndSaveTrue(userId, pageRequest);
+        Map<String, Object> map = new HashMap<>();
+        List<EventDTO> list = new ArrayList<>();
+        for(Event event : eventPage.getContent()){
+            EventDTO eventDTO = new EventDTO(event);
+            list.add(eventDTO);
+        }
+        map.put("list", list);
+        PageInfo pageInfo = calcPage(eventPage.getTotalPages(), page);
+        map.put("pageInfo", pageInfo);
+        return map;
+    }
+
+    @Override
+    public Map<String, Object> getMyEventscrapList(Long userId, Integer page) throws Exception {
+        PageRequest pageRequest = PageRequest.of(page-1,5, Sort.by(Sort.Direction.DESC, "eventId"));
+        Page<Eventscrap> eventscrapPage = eventscrapRepository.findByUserScrap(userId, pageRequest);
+
+        Map<String, Object> map = new HashMap<>();
+        List<EventDTO> list = new ArrayList<>();
+        for(Eventscrap eventscrap : eventscrapPage.getContent()){
+            EventDTO eventDTO = new EventDTO(eventscrap.getEventScrap());
+            list.add(eventDTO);
+        }
+        map.put("list", list);
+        PageInfo pageInfo = calcPage(eventscrapPage.getTotalPages(), page);
+        map.put("pageInfo", pageInfo);
+        return map;
     }
 
     public void readFile(Long fileId, OutputStream out) throws Exception {

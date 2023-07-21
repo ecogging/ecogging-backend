@@ -4,6 +4,7 @@ import com.pickupluck.ecogging.domain.plogging.entity.Event;
 import com.pickupluck.ecogging.domain.plogging.entity.QEvent;
 import com.pickupluck.ecogging.domain.scrap.entity.Eventscrap;
 import com.pickupluck.ecogging.domain.scrap.entity.QEventscrap;
+import com.pickupluck.ecogging.domain.user.entity.QUser;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +28,25 @@ public class CommonRepository {
 
         List<Event> events = jpaQueryFactory.selectFrom(event)
                 .where(event.save.eq(false).and(event.endDate.after(currentDate).or(event.endDate.eq(currentDate))))
+                .offset(pageRequest.getOffset())
+                .limit(pageRequest.getPageSize())
+                .orderBy(orderSpecifier)
+                .fetch();
+
+        long totalCount = jpaQueryFactory.selectFrom(event)
+                .where(event.save.eq(false).and(event.endDate.after(currentDate).or(event.endDate.eq(currentDate))))
+                .fetchCount();
+
+        return new PageImpl<>(events, pageRequest, totalCount);
+    }
+
+    public Page<Event> findMyRecruit(PageRequest pageRequest, OrderSpecifier<?> orderSpecifier, Boolean save, Date endDate) {
+        QEvent event = QEvent.event;
+        QUser user = QUser.user;
+        LocalDate currentDate = LocalDate.now(); // 현재 날짜를 얻어옵니다.
+
+        List<Event> events = jpaQueryFactory.selectFrom(event)
+                .where(event.save.eq(false).and(event.user.id.eq(user.id)))
                 .offset(pageRequest.getOffset())
                 .limit(pageRequest.getPageSize())
                 .orderBy(orderSpecifier)

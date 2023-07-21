@@ -19,7 +19,7 @@ public class Event extends BaseEntity {
 
     @Column
     private String title;
-    @Column
+    @Column( length = 100000 )
     private String content;
     @Column
     private LocalDate meetingDate;
@@ -47,9 +47,6 @@ public class Event extends BaseEntity {
     @Column
     private String management;
 
-//    @ManyToOne
-//    @JoinColumn(name = "fileId")
-//    private File file;
 
     @Override
     public String toString() {

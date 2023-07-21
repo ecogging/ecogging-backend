@@ -30,7 +30,6 @@ public class EventController {
             if (list.isEmpty()) {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
-
             boolean isLastPage = page >= pageInfo.getAllPage(); // 현재 페이지가 마지막 페이지인지 여부 판단
             Map<String, Object> res = new HashMap<>();
             res.put("pageInfo", pageInfo);
@@ -42,26 +41,43 @@ public class EventController {
             return new ResponseEntity<Map<String, Object>>(HttpStatus.BAD_REQUEST);
         }
     }
-
-    @GetMapping("/eventListSave/{page}/{sorttype}")
-    public ResponseEntity<Map<String,Object>> eventListSave(@PathVariable Integer page, @PathVariable String sorttype) {
+    @PostMapping("/myevent")
+    public ResponseEntity<Map<String,Object>> myEventList(@RequestBody Map<String,Object> param) {
+        Long userId = Long.parseLong((String) param.get("userId"));
+        Integer page = Integer.valueOf((String)param.get("page"));
+        System.out.println(page);
         try {
-            PageInfo pageInfo = new PageInfo();
-            List<EventDTO> list = eventService.getEventListSave(page, pageInfo, sorttype);
-            // 현재 페이지가 마지막 페이지인 경우 응답하지 않음
-            if (list.isEmpty()) {
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-            }
-
-            boolean isLastPage = page >= pageInfo.getAllPage(); // 현재 페이지가 마지막 페이지인지 여부 판단
-            Map<String, Object> res = new HashMap<>();
-            res.put("pageInfo", pageInfo);
-            res.put("list", list);
-            res.put("isLastPage", isLastPage); // 현재 페이지가 마지막 페이지인지 여부 전달
-            return new ResponseEntity<Map<String, Object>>(res, HttpStatus.OK);
-        } catch (Exception e) {
+            Map<String,Object> map= eventService.getMyEventList(userId, page);
+            return new ResponseEntity<>(map, HttpStatus.OK);
+        } catch(Exception e) {
             e.printStackTrace();
-            return new ResponseEntity<Map<String, Object>>(HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PostMapping("/myevnettemp")
+    public ResponseEntity<Map<String,Object>> myEvnetTempList(@RequestBody Map<String,Object> param) {
+        Long userId = (Long)param.get("userId");
+        Integer page = (Integer)param.get("page");
+        try {
+            Map<String,Object> map= eventService.getMyEventTempList(userId, page);
+            return new ResponseEntity<>(map, HttpStatus.OK);
+        } catch(Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PostMapping("/myaeventscrap")
+    public ResponseEntity<Map<String,Object>> myEventscrapList(@RequestBody Map<String,Object> param) {
+        Long userId = (Long)param.get("userId");
+        Integer page = (Integer)param.get("page");
+        try {
+            Map<String,Object> map= eventService.getMyEventscrapList(userId, page);
+            return new ResponseEntity<>(map, HttpStatus.OK);
+        } catch(Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
 

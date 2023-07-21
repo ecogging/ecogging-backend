@@ -1,7 +1,5 @@
 package com.pickupluck.ecogging.domain.plogging.api;
 
-import com.pickupluck.ecogging.domain.notification.dto.NotificationSaveDto;
-import com.pickupluck.ecogging.domain.notification.entity.NotificationType;
 import com.pickupluck.ecogging.domain.notification.service.NotificationService;
 import com.pickupluck.ecogging.domain.plogging.dto.AccompanyDTO;
 import com.pickupluck.ecogging.domain.plogging.service.AccompanyService;
@@ -125,7 +123,7 @@ public class AccompanyController {
 
     @PostMapping("/myaccompanies")
     public ResponseEntity<Map<String,Object>> myAccompanyList(@RequestBody Map<String,Object> param) {
-        Long userId = (Long)param.get("userId");
+        Long userId = Long.parseLong((String) param.get("userId"));
         Integer page = (Integer)param.get("page");
         try {
             Map<String,Object> map= accompanyService.getMyAccompanyList(userId, page);

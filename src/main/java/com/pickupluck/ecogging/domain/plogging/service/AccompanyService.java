@@ -1,10 +1,8 @@
 package com.pickupluck.ecogging.domain.plogging.service;
-import com.pickupluck.ecogging.domain.plogging.dto.AccompanyDTO;
-import com.pickupluck.ecogging.domain.plogging.entity.Accompany;
 
-import java.util.List;
+import com.pickupluck.ecogging.domain.plogging.dto.AccompanyDTO;
+
 import java.util.Map;
-import java.util.Optional;
 
 public interface AccompanyService {
 
