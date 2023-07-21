@@ -11,6 +11,8 @@ import org.hibernate.annotations.ColumnDefault;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.springframework.util.StringUtils.hasText;
+
 @Entity
 @Getter
 @NoArgsConstructor
@@ -46,6 +48,8 @@ public class User extends BaseEntity {
 //    @OneToMany(mappedBy = "user")
 //    private List<Accompany> accompanies = new ArrayList<>();
 
+    private String profileImageUrl;
+
     @Builder
     public User(String email, String name, String password, String nickname,
                 String tel, String notiYn, LoginType loginType) {
@@ -59,11 +63,19 @@ public class User extends BaseEntity {
     }
 
     public void updateNotiYn(String notiYn) {
-        this.notiYn = notiYn;
+        if (hasText(notiYn)) {
+            this.notiYn = notiYn;
+        }
     }
 
     @Override
     public String toString() {
-        return String.format("[%s,%s,%s,%s,%s]",id,email,name,nickname,tel);
+        return String.format("[%s, %s, %s, %s, %s]", id, email, name, nickname, tel);
+    }
+
+    public void changeProfileImageUrl(String imageUrl) {
+        if (hasText(imageUrl)) {
+            this.profileImageUrl = imageUrl;
+        }
     }
 }
