@@ -171,6 +171,8 @@ public class MessageRoomServiceI implements MessageRoomService {
         Pageable pageable = PageRequest.of(0, 10, Sort.by("createdAt").descending());
         Page<Message> messages = messageRoomRepository.findMessagesByMessageRoomId(
                 messageRoom.getId(), pageable);
+        System.out.println("=============================GETMESSAGEvROOOOOOOM!!!!!!!!!!!!");
+        System.out.println(messages);
         User contact =
                 (currentUser.getId() == messageRoom.getInitialSender().getId()) ?
                 messageRoom.getInitialReceiver() : messageRoom.getInitialSender();
