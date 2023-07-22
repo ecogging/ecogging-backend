@@ -26,5 +26,8 @@ public interface MessageRoomService {
     // 쪽지함 상세 조회
     MessageRoomResponseDto getMessageRoom(Long userId, MessageRoomRequestGetDto requestGetDto);
 
+    // 쪽지함 삭제
+    void deleteMessageRoom(Long userId, Long messageRoomId);
+
 }
 

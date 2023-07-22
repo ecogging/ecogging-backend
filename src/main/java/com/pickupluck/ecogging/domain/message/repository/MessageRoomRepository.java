@@ -38,7 +38,9 @@ public interface MessageRoomRepository extends JpaRepository<MessageRoom, Long> 
                     + "inner join (select max(created_at) as max_created_at, message_room_id "
                     + "from message "
                     + "group by message_room_id) as m2 on m1.created_at=m2.max_created_at "
-                    + "where (initial_receiver_id=:id or initial_sender_id=:id) ",
+                    + "WHERE (initial_receiver_id = :id AND mr.visible_to = 'ONLY_INITIAL_RECEIVER') "
+                    + "OR (initial_sender_id = :id AND mr.visible_to = 'ONLY_INITIAL_SENDER') "
+                    + "OR mr.visible_to = 'BOTH'",
             nativeQuery = true,
             countQuery = "select count(*) "
                     + "from message_room as mr "
@@ -46,7 +48,9 @@ public interface MessageRoomRepository extends JpaRepository<MessageRoom, Long> 
                     + "inner join (select max(created_at) as max_created_at, message_room_id "
                     + "from message "
                     + "group by message_room_id) as m2 on m1.created_at=m2.max_created_at "
-                    + "where (initial_receiver_id=:id or initial_sender_id=:id) ")
+                    + "WHERE (initial_receiver_id = :id AND mr.visible_to = 'ONLY_INITIAL_RECEIVER') "
+                    + "OR (initial_sender_id = :id AND mr.visible_to = 'ONLY_INITIAL_SENDER') "
+                    + "OR mr.visible_to = 'BOTH'")
     Page<MessageRoomsWithLastMessages> findMessageRoomsAndLastMessagesByUserId(@Param("id") Long userId, Pageable pageable);
 
     @Query(

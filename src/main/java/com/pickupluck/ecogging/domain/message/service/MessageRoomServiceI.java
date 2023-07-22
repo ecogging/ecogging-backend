@@ -182,6 +182,24 @@ public class MessageRoomServiceI implements MessageRoomService {
                 .build();
     }
 
+    // 쪽지함 삭제 - Enum 상태만 변경
+    @Override
+    @Transactional
+    public void deleteMessageRoom(Long userId, Long messageRoomId) {
+        // 현재 유저 조회
+        User currentUser = userRepository.findById(userId).get();
+        // 쪽지함 조회
+        MessageRoom messageRoom = messageRoomRepository.findById(messageRoomId).get();
+
+        // 삭제 권한 확인
+        checkUserAuthority(currentUser, messageRoom);
+
+        // 삭제상태 수정
+        VisibilityState visibilityState = isInitialSender(currentUser, messageRoom) ?
+                VisibilityState.ONLY_INITIAL_RECEIVER : VisibilityState.ONLY_INITIAL_SENDER;
+        messageRoom.changeVisibilityTo(visibilityState);
+    }
+
     // 쪽지함 삭제한 사람인지 확인
     private void checkMessageRoomIsDeleted(MessageRoom messageRoom, Long userId) {
         VisibilityState visibility = messageRoom.getVisibilityTo(); // MessageRoom Enum (삭제 상태) 확인
@@ -192,5 +210,22 @@ public class MessageRoomServiceI implements MessageRoomService {
                         visibility.equals(VisibilityState.ONLY_INITIAL_SENDER))) {
             throw new PermissionDeniedDataAccessException("접근불가능", new Throwable());
         }
+    }
+
+    // 쪽지함 수정(삭제/차단) 권한 확인
+    private void checkUserAuthority(User user, MessageRoom messageRoom) {
+        if (!(messageRoom.getInitialSender().getId() == user.getId()) && // 첫 발신자 == 현재 유저가 아니고
+                !(messageRoom.getInitialReceiver().getId() == user.getId())) { // 첫 수신자 == 현재 유저가 아니라면 권한 X
+            throw new PermissionDeniedDataAccessException("권한 없는 사용자", new Throwable());
+        }
+    }
+
+    
+    //현재 유저가 첫 발신자인지 확인
+    private boolean isInitialSender(User user, MessageRoom messageRoom) {
+        if (messageRoom.getInitialSender().getId() == user.getId()) {
+            return true;
+        }
+        return false;
     }
 }

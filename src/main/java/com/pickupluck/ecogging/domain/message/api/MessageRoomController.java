@@ -88,7 +88,7 @@ public class MessageRoomController {
         }
     }
 
-    // 2. 쪽지함 조회 - 기존 존재하고 있는 쪽지함 조회 GET /{messageRoomId}
+    // 2. 쪽지함 조회 - 기존 존재하고 있는 쪽지함 조회 GET /{messageRoomId} - 쪽지 목록까지!
     // getMessageRoom()
     @GetMapping("/{userId}/messageroom/{messageRoomId}")
     public ResponseEntity<Map<String, Object>> getMessageRoom( @PathVariable("userId")Long userId,
@@ -131,4 +131,16 @@ public class MessageRoomController {
 
     // 4. 쪽지함 삭제 DELETE /{messageRoomId}/delete
     // deleteMessageRoom()
+    @DeleteMapping("/{userId}/messageroom/{messageRoomId}")
+    public ResponseEntity<Map<String, Object>> deleteMessageRoom(@PathVariable("userId")Long userId,
+                                                                 @PathVariable("messageRoomId")Long messageRoomId) {
+        // Service의 delete method 실행 -> 쪽지함 삭제
+        messageRoomService.deleteMessageRoom(userId, messageRoomId);
+
+        // Map에 '쪽지함 삭제 완료' 메세지 설정해서 리턴
+        Map<String, Object> responseBody = new HashMap<>();
+        responseBody.put("message", "쪽지방 삭제 완료");
+        
+        return ResponseEntity.ok(responseBody);
+    }
 }
