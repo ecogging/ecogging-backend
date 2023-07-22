@@ -3,6 +3,7 @@ package com.pickupluck.ecogging.domain.notification.service;
 import java.security.InvalidParameterException;
 import java.util.List;
 
+import com.pickupluck.ecogging.util.SecurityUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,10 +38,14 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     @Transactional
-    public List<NotificationResponseDto> getMyNotifications(Long receiverId, Long lastReceivedNotificationId) {
+    public List<NotificationResponseDto> getMyNotifications(Long lastReceivedNotificationId) throws Exception {
+
+        User user = SecurityUtil.getCurrentUsername()
+                .flatMap(userRepository::findByEmail)
+                .orElseThrow(() -> new Exception("Member not found"));
 
         List<Notification> notifications = notificationRepository
-                .findByReceiverIdAndIdGreaterThanOrderByCreatedAtDesc(receiverId, lastReceivedNotificationId);
+                .findByReceiverIdAndIdGreaterThanOrderByCreatedAtDesc(user.getId(), lastReceivedNotificationId);
 
         return notifications.stream()
                 .map(notification -> notificationToResponse(notification))

@@ -32,7 +32,7 @@ public class NotificationController {
             String userEmail = SecurityUtil.getCurrentUsername().orElseThrow();
             Long userId = userService.findUserByEmail(userEmail).getId();
 
-            List<NotificationResponseDto> myNotifications = notificationService.getMyNotifications(userId, after);
+            List<NotificationResponseDto> myNotifications = notificationService.getMyNotifications(after);
             return new ResponseEntity<>(myNotifications, HttpStatus.OK);
 
         } catch (Exception e) {

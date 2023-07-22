@@ -1,12 +1,11 @@
 package com.pickupluck.ecogging.domain.user.entity;
 
-import com.pickupluck.ecogging.domain.plogging.entity.Accompany;
+import com.pickupluck.ecogging.domain.user.dto.UserProfileModifyRequest;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 import com.pickupluck.ecogging.domain.BaseEntity;
-import org.hibernate.annotations.ColumnDefault;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +33,7 @@ public class User extends BaseEntity {
 
     private String nickname;
 
-    private String tel;
+    private String telephone;
 
     private String notiYn;
 
@@ -48,14 +47,15 @@ public class User extends BaseEntity {
 
     @Builder
     public User(String email, String name, String password, String nickname,
-                String tel, String notiYn, LoginType loginType) {
+                String telephone, String notiYn, LoginType loginType, String profileImageUrl) {
         this.email = email;
         this.name = name;
         this.password = password;
         this.nickname = nickname;
-        this.tel = tel;
+        this.telephone = telephone;
         this.notiYn = notiYn;
         this.loginType = loginType;
+        this.profileImageUrl = profileImageUrl;
     }
 
     public void updateNotiYn(String notiYn) {
@@ -66,12 +66,20 @@ public class User extends BaseEntity {
 
     @Override
     public String toString() {
-        return String.format("[%s, %s, %s, %s, %s]", id, email, name, nickname, tel);
+        return String.format("[%s, %s, %s, %s, %s]", id, email, name, nickname, telephone);
     }
 
     public void changeProfileImageUrl(String imageUrl) {
         if (hasText(imageUrl)) {
             this.profileImageUrl = imageUrl;
         }
+    }
+
+    public void modifyProfile(String profileImageUrl, UserProfileModifyRequest userInfoModifyRequest) {
+        this.email = userInfoModifyRequest.getEmail();
+        this.name = userInfoModifyRequest.getName();
+        this.nickname = userInfoModifyRequest.getNickname();
+        this.telephone = userInfoModifyRequest.getTelephone();
+        changeProfileImageUrl(profileImageUrl);
     }
 }
