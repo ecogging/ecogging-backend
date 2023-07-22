@@ -8,6 +8,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @Slf4j
 @RestController
 @RequiredArgsConstructor
@@ -17,13 +19,20 @@ public class MessageController {
 
     // 1. 쪽지 전송 POST /{messageRoomId}/messages --> 이게 쪽지함에서 답장하기
     // sendMessage()
-//    @PostMapping("/{messageRoomId}/messages")
-//    public ResponseEntity<String> sendMesssage(
-//            @PathVariable("messageRoomId") Long messageRoomId,
-//            @Valid @RequestBody final MessageRequestSendDto request) {
-//
-//            messageService.sendMessage(messageRoomId, request);
-//    }
+    @PostMapping("{userId}/messageroom/{messageRoomId}/messages")
+    public ResponseEntity<String> sendMesssage(
+            @PathVariable("userId") Long userId,
+            @PathVariable("messageRoomId") Long messageRoomId,
+            @RequestBody Map<String, Object> request) {
+
+            Long contactId = Long.parseLong(request.get("contactId").toString());
+            String content = request.get("content").toString();
+            MessageRequestSendDto requestDto = new MessageRequestSendDto(content);
+
+            messageService.sendMessage(userId, messageRoomId, contactId, requestDto);
+
+            return ResponseEntity.ok(new String("*******쪽지 전송 완료*******"));
+    }
 
     // 2. 쪽지함 생성에서 쪽지함이 기존에 이미 존재하는 경우 리다이렉트된 쪽지 전송 POST /{messageRoomId}/redirect-message
     // sendRedirectedMessage()
