@@ -3,6 +3,7 @@ package com.pickupluck.ecogging.domain.notification.service;
 import java.security.InvalidParameterException;
 import java.util.List;
 
+import com.pickupluck.ecogging.util.SecurityUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,7 +15,6 @@ import com.pickupluck.ecogging.domain.notification.entity.Notification;
 import com.pickupluck.ecogging.domain.notification.repository.NotificationRepository;
 import com.pickupluck.ecogging.domain.user.entity.User;
 import com.pickupluck.ecogging.domain.user.repository.UserRepository;
-import com.pickupluck.ecogging.util.SecurityUtil;
 
 
 @Service
@@ -38,13 +38,11 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     @Transactional
-    public List<NotificationResponseDto> getMyNotifications(Long lastReceivedNotificationId) {
-        String userEmail = SecurityUtil
-                .getCurrentUsername()
-                .orElseThrow(() -> new IllegalStateException("No user in security context"));
+    public List<NotificationResponseDto> getMyNotifications(Long lastReceivedNotificationId) throws Exception {
 
-        User user = userRepository.findByEmail(userEmail)
-                .orElseThrow(() -> new IllegalArgumentException("No user for given email"));
+        User user = SecurityUtil.getCurrentUsername()
+                .flatMap(userRepository::findByEmail)
+                .orElseThrow(() -> new Exception("Member not found"));
 
         List<Notification> notifications = notificationRepository
                 .findByReceiverIdAndIdGreaterThanOrderByCreatedAtDesc(user.getId(), lastReceivedNotificationId);

@@ -28,10 +28,18 @@ public class NotificationController {
     public ResponseEntity<List<NotificationResponseDto>> getNotifications(
             @RequestHeader(value = "Last-Received-Noti-Id", required = false, defaultValue = "0") Long after) {
         log.info(after.toString());
+        try {
+            String userEmail = SecurityUtil.getCurrentUsername().orElseThrow();
+            Long userId = userService.findUserByEmail(userEmail).getId();
 
-        List<NotificationResponseDto> myNotifications = notificationService.getMyNotifications(after);
+            List<NotificationResponseDto> myNotifications = notificationService.getMyNotifications(after);
+            return new ResponseEntity<>(myNotifications, HttpStatus.OK);
 
-        return new ResponseEntity<>(myNotifications, HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
     @DeleteMapping("/notifications/{id}")

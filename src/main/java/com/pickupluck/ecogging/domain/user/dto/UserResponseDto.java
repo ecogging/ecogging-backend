@@ -21,9 +21,9 @@ public class UserResponseDto {
 
     private String nickname;
 
-    private String tel;
+    private String telephone;
 
-    private String birthDate;
+    private String profileImageUrl;
 
     private Set<AuthorityDto> authorityDtoSet;
 
