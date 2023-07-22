@@ -128,11 +128,16 @@ public class MessageRoomServiceI implements MessageRoomService {
         Page<MessageRoomsWithLastMessages> messageRooms = messageRoomRepository.findMessageRoomsAndLastMessagesByUserId(
                 currentUser.getId(), pageable);
 
+        System.out.println("=======================쪽지방 가져오기===============");
+        System.out.println(messageRooms);
+
         // map을 이용해 Page 내용 변환
         // userId와 msgRoom의 initialSenderId를 비교
         // -> 둘이 같으면 initialSenderId를 contactId로 설정
         // -> 같지 않으면 initialReceiverId를 contactId로 설정
         Page<MessageRoomListResponseDto> responses = messageRooms.map(messageRoom -> {
+            System.out.println(messageRoom.getMessageRoomId());
+            System.out.println(messageRoom.getContent());
             Long contactId =
                     (userId == messageRoom.getInitialSenderId().longValue()) ?
                             messageRoom.getInitialReceiverId().longValue()

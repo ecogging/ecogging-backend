@@ -1,14 +1,21 @@
 package com.pickupluck.ecogging.domain.message.api;
 
 import com.pickupluck.ecogging.domain.message.dto.request.MessageRequestSendDto;
+import com.pickupluck.ecogging.domain.message.dto.response.MessageResponseDto;
 import com.pickupluck.ecogging.domain.message.service.MessageService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.Map;
+
 
 @Slf4j
 @RestController
@@ -58,7 +65,19 @@ public class MessageController {
         return ResponseEntity.ok(new String("리다이렉트된 쪽지 전송 진짜 완료!"));
     }
 
-    // 3. 모든 쪽지 조회 GET /{messageRoomId}/messages
-    // getAllMessages()
+//    // 3. 모든 쪽지 조회 GET /{messageRoomId}/messages
+//    // getAllMessages()
+//    @GetMapping("{userId}/messagerooms/{messageRoomId}/messages")
+//    public ResponseEntity<Map<String,Object>> getAllMassages(@PathVariable("userId") Long curId,
+//                                                             @PathVariable("messageRoomId") Long msgRoomId,
+//                                                             @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) final Pageable pageable) {
+//        Page<MessageResponseDto> allMessages = messageService.getAllMessages(curId, msgRoomId, pageable);
+//
+//        Map<String,Object> responseBody = new HashMap<>();
+//        responseBody.put("message", "모든 쪽지 조회 완료~");
+//        responseBody.put("allMsgs", allMessages);
+//
+//        return ResponseEntity.ok(responseBody);
+//    }
 
 }

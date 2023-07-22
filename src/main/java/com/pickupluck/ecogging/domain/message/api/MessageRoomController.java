@@ -114,7 +114,7 @@ public class MessageRoomController {
     @GetMapping("/mypage/{userId}/messagerooms")
     public ResponseEntity<Map<String,Object>> getMessageRooms(
             @PathVariable("userId")Long userId,
-            @PageableDefault(size = 10, sort = "updated_at", direction = Sort.Direction.DESC) final Pageable pageable) {
+            @PageableDefault(size = 10, sort = "max_created_at", direction = Sort.Direction.DESC) final Pageable pageable) {
         System.out.println("##############GETMESSAGEROOM 진입 완료");
         System.out.println(userId);
         System.out.println(userId.getClass().getName()); // Long타입으로 userId 확보 성공
