@@ -3,6 +3,7 @@ package com.pickupluck.ecogging.domain.user.service;
 import com.pickupluck.ecogging.domain.file.dto.AwsS3Dto;
 import com.pickupluck.ecogging.domain.file.service.AwsS3Service;
 import com.pickupluck.ecogging.domain.user.dto.*;
+import com.pickupluck.ecogging.domain.user.entity.Corporate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -49,16 +50,16 @@ public class UserServiceImpl implements UserService {
         return findUser;
     }
 
+    @Transactional
     @Override
     public void logout() {
         // todo
     }
 
     @Transactional
-    public UserResponseDto signup(UserSignUpRequestDto userDto) throws Exception {
-        if (userRepository.findByEmail(userDto.getEmail()).orElse(null) != null) {
-            throw new Exception("이미 가입되어 있는 유저입니다.");
-        }
+    @Override
+    public Long signUp(UserSignUpRequestDto userDto) throws Exception {
+        validateDuplicatedEmail(userDto.getEmail());
 
         Authority authority = Authority.builder()
                 .name("USER")
@@ -75,7 +76,8 @@ public class UserServiceImpl implements UserService {
                 .profileImageUrl(defaultProfileImageUrl)
                 .build();
 
-        return UserResponseDto.from(userRepository.save(user));
+        User savedUser = userRepository.save(user);
+        return savedUser.getId();
     }
 
     @Transactional(readOnly = true)
@@ -90,8 +92,8 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
-    public UserProfileModifyResponse modifyUserProfile(
-            MultipartFile image, UserProfileModifyRequest userInfoModifyRequest) throws Exception {
+    public UserProfileResponse modifyUserProfile(
+            MultipartFile image, UserProfileModifyRequest userProfileModifyRequest) throws Exception {
 
         User user = getCurrentUser();
         String userProfileImageUrl = "";
@@ -103,13 +105,71 @@ public class UserServiceImpl implements UserService {
             userProfileImageUrl = user.getProfileImageUrl();
         }
 
-        user.modifyProfile(userProfileImageUrl, userInfoModifyRequest);
+        user.modifyProfile(userProfileImageUrl, userProfileModifyRequest);
 
-        return UserProfileModifyResponse.from(user);
+        return UserProfileResponse.from(user);
     }
+
+    @Transactional
+    @Override
+    public CorporateProfileResponse modifyCorporateProfile(
+            MultipartFile image, CorporateProfileModifyRequest corporateProfileModifyRequest) throws Exception {
+
+        User user = getCurrentUser();
+        String userProfileImageUrl = "";
+
+        if (image != null && !image.isEmpty()) {
+            AwsS3Dto awsS3Dto = awsS3Service.upload(image, S3_PROFILE_UPLOAD_DIR);
+            userProfileImageUrl = awsS3Dto.getAbsolutPath();
+        } else {
+            userProfileImageUrl = user.getProfileImageUrl();
+        }
+
+        user.modifyCorporateProfile(userProfileImageUrl, corporateProfileModifyRequest);
+
+        return CorporateProfileResponse.from(user);
+    }
+
 
     public UserProfileResponse getCurrentUserProfile() throws Exception {
         return UserProfileResponse.from(getCurrentUser());
+    }
+
+    public CorporateProfileResponse getCurrentCorporateProfile() throws Exception {
+        return CorporateProfileResponse.from(getCurrentUser());
+    }
+
+    @Transactional
+    @Override
+    public Long corporateSignUp(CorporateSignUpRequest request) throws Exception {
+
+        validateDuplicatedEmail(request.getEmail());
+
+        Authority authority = Authority.builder()
+                .name("USER")
+                .build();
+
+        String defaultProfileImageUrl = getDefaultProfileImageUrl();
+
+        User user = User.builder()
+                .email(request.getEmail())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .nickname(request.getNickname())
+                .telephone(request.getTelephone())
+                .notiYn("Y")
+                .profileImageUrl(defaultProfileImageUrl)
+                .build();
+
+        Corporate corporate = Corporate.builder()
+                .corpName(request.getCorpName())
+                .corpRegisterNumber(request.getCorpRegisterNumber())
+                .corpRepresentative(request.getCorpRepresentative())
+                .build();
+
+        user.registerCorporate(corporate);
+        User savedUser = userRepository.save(user);
+
+        return savedUser.getId();
     }
 
     private User getCurrentUser() throws Exception {
@@ -122,6 +182,14 @@ public class UserServiceImpl implements UserService {
         return awsS3Service.getExistImageUrl(
                 String.join("/", S3_PROFILE_UPLOAD_DIR, S3_DEFAULT_PROFILE_IMAGE_NAME));
     }
+
+    private void validateDuplicatedEmail(String email) throws Exception {
+        if (userRepository.findByEmail(email).isPresent()) {
+            throw new Exception("이미 가입되어 있는 유저입니다.");
+        }
+    }
+
+
 }
 
 

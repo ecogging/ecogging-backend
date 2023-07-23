@@ -9,6 +9,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CorporateProfileResponse {
+
     private String email;
 
     private String name;
@@ -21,11 +22,11 @@ public class CorporateProfileResponse {
 
     private String notiYn;
 
-    private String corporateName;
+    private String corpName;
 
-    private String representative;
+    private String corpRepresentative;
 
-    private String registerNumber;
+    private String corpRegisterNumber;
 
     public static CorporateProfileResponse from(User user) {
         return CorporateProfileResponse.builder()
@@ -35,9 +36,9 @@ public class CorporateProfileResponse {
                 .telephone(user.getTelephone())
                 .profileImageUrl(user.getProfileImageUrl())
                 .notiYn(user.getNotiYn())
-                .corporateName(user.getCorporate().getName())
-                .representative(user.getCorporate().getRepresentative())
-                .registerNumber(user.getCorporate().getRegisterNumber())
+                .corpName(user.getCorporate().getCorpName())
+                .corpRepresentative(user.getCorporate().getCorpRepresentative())
+                .corpRegisterNumber(user.getCorporate().getCorpRegisterNumber())
                 .build();
     }
 }

@@ -1,5 +1,6 @@
 package com.pickupluck.ecogging.domain.user.entity;
 
+import com.pickupluck.ecogging.domain.user.dto.CorporateProfileModifyRequest;
 import com.pickupluck.ecogging.domain.user.dto.UserProfileModifyRequest;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -37,7 +38,7 @@ public class User extends BaseEntity {
 
     private String notiYn;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "corporate_id")
     private Corporate corporate;
 
@@ -84,6 +85,15 @@ public class User extends BaseEntity {
         this.name = userInfoModifyRequest.getName();
         this.nickname = userInfoModifyRequest.getNickname();
         this.telephone = userInfoModifyRequest.getTelephone();
+        changeProfileImageUrl(profileImageUrl);
+    }
+
+    public void modifyCorporateProfile(String profileImageUrl, CorporateProfileModifyRequest request) {
+        this.email = request.getEmail();
+        this.nickname = request.getNickname();
+        this.telephone = request.getTelephone();
+        this.corporate.modifyInformation(request);
+
         changeProfileImageUrl(profileImageUrl);
     }
 

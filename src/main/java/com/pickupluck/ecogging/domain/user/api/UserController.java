@@ -29,19 +29,17 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class UserController {
 
-    private final AwsS3Service awsS3Service;
-
     private final UserService userService;
 
     @PostMapping(value = "/mypage", consumes= MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<UserProfileModifyResponse> modifyUserProfile(
+    public ResponseEntity<UserProfileResponse> modifyUserProfile(
             @RequestPart(value = "image", required = false) MultipartFile image,
             @RequestPart("profile") UserProfileModifyRequest userInfoModifyRequest
     ) throws Exception {
         log.info(userInfoModifyRequest.toString());
-        UserProfileModifyResponse response = userService.modifyUserProfile(image, userInfoModifyRequest);
+        UserProfileResponse response = userService.modifyUserProfile(image, userInfoModifyRequest);
 
-        return new ResponseEntity<UserProfileModifyResponse>(response, HttpStatus.OK);
+        return new ResponseEntity<UserProfileResponse>(response, HttpStatus.OK);
     }
 
     @GetMapping("/mypage")
