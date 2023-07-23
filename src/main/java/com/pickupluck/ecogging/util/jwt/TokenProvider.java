@@ -67,6 +67,8 @@ public class TokenProvider implements InitializingBean {
         long now = (new Date()).getTime(); // milliseconds 반환
         Date validity = new Date(now + this.tokenValidityInMilliseconds);
 
+        boolean isCorporate = user.getCorporate() != null;
+
         return Jwts.builder()
                 .setSubject(user.getEmail())
                 .claim(AUTHORITIES_KEY, authorities)

@@ -2,7 +2,6 @@ package com.pickupluck.ecogging.domain.user.api;
 
 import com.pickupluck.ecogging.domain.user.dto.*;
 import com.pickupluck.ecogging.domain.user.entity.User;
-import com.pickupluck.ecogging.util.InMemoryKeyValueStore;
 import com.pickupluck.ecogging.util.SecurityUtil;
 import com.pickupluck.ecogging.util.mail.MailService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -35,7 +34,6 @@ public class AuthController {
     private final MailService mailService;
     private final TokenProvider tokenProvider;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
-    private final InMemoryKeyValueStore keyValueStore;
 
     @PostMapping("/auth/login")
     public ResponseEntity<TokenDto> login(@RequestBody UserLoginRequestDto request) {
@@ -61,12 +59,49 @@ public class AuthController {
         return new ResponseEntity<>(new TokenDto(jwt), httpHeaders, HttpStatus.OK);
     }
 
-    @PostMapping("/auth/signup")
-    public ResponseEntity<UserResponseDto> signup (
+    @PostMapping("/auth/corporate/login")
+    public ResponseEntity<TokenDto> corporateLogin(@RequestBody UserLoginRequestDto request) {
+        String requestEmail = request.getEmail();
+        String requestPassword = request.getPassword();
+
+        log.info("corp email: {}",  requestEmail);
+        log.info("corpo password: {}", requestPassword);
+
+        UsernamePasswordAuthenticationToken authenticationToken
+                = new UsernamePasswordAuthenticationToken(requestEmail, requestPassword);
+
+        Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
+
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        User findUser = userService.findUserByEmail(authentication.getName());
+        String jwt = tokenProvider.createToken(findUser);
+
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.add(JwtFilter.AUTHORIZATION_HEADER, "Bearer " + jwt);
+
+        return new ResponseEntity<>(new TokenDto(jwt), httpHeaders, HttpStatus.OK);
+    }
+
+    @PostMapping("/auth/signUp")
+    public ResponseEntity signUp (
             @Valid @RequestBody UserSignUpRequestDto userDto
     ) {
         try {
-            return ResponseEntity.ok(userService.signup(userDto));
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PostMapping("/auth/corporate/signUp")
+    public ResponseEntity corporateSignUp (
+            @Valid @RequestBody CorporateSignUpRequest corporateSignUpRequest
+    ) {
+        try {
+            userService.corporateSignUp(corporateSignUpRequest);
+            return new ResponseEntity<>(HttpStatus.OK);
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -112,25 +147,12 @@ public class AuthController {
         return new ResponseEntity<>(isConfirmed, HttpStatus.OK);
     }
 
-    @GetMapping("/user/me")
-//    @PreAuthorize("hasAnyRole('USER','ADMIN')")
-    public ResponseEntity<UserResponseDto> getMyUserInfo(HttpServletRequest request) {
-        try {
-            return ResponseEntity.ok(userService.getMyUserWithAuthorities());
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-    }
-
     // todo: 관리자 권한 일단 제외
 //    @GetMapping("/user/{username}")
 //    @PreAuthorize("hasAnyRole('ADMIN')")
 //    public ResponseEntity<UserResponseDto> getUserInfo(@PathVariable String username) {
 //        return ResponseEntity.ok(userService.getUserWithAuthorities(username));
 //    }
-
-
 
     @PostMapping("/auth/logout")
     public String logout() {
