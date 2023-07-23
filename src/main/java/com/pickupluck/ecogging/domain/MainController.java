@@ -21,23 +21,9 @@ import java.util.Map;
 @RequiredArgsConstructor
 @RestController
 public class MainController {
-    @Autowired
-    private PostsService postsService;
 
     @Autowired
     private AccompanyService accompanyService;
-
-    public MainController(PostsService postsService) {
-        this.postsService=postsService;
-    }
-
-    @GetMapping("/api/list")
-    public List<PostResponseDto> list() {
-        List<PostResponseDto> postDtoList = postsService.findAll();
-        System.out.println("오나료");
-        return postDtoList;
-//        return Arrays.asList("이거임?", "이거냐고..");
-    }
 
     @GetMapping("/main/accompanies")
     public Map<String,Object> accompList() {
