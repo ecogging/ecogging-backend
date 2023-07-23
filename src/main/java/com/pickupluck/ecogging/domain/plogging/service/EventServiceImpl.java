@@ -3,6 +3,7 @@ package com.pickupluck.ecogging.domain.plogging.service;
 import com.pickupluck.ecogging.domain.file.entity.File;
 import com.pickupluck.ecogging.domain.file.repository.FileRepository;
 import com.pickupluck.ecogging.domain.plogging.dto.EventDTO;
+import com.pickupluck.ecogging.domain.plogging.dto.MainEventResponseDto;
 import com.pickupluck.ecogging.domain.plogging.entity.Event;
 import com.pickupluck.ecogging.domain.plogging.entity.QEvent;
 import com.pickupluck.ecogging.domain.plogging.repository.CommonRepository;
@@ -18,7 +19,9 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -224,6 +227,34 @@ public class EventServiceImpl implements EventService{
             return false;
         }
     }
+
+
+    // Main Events
+    @Override
+    @Transactional(readOnly = true)
+    public Page<MainEventResponseDto> getMainEvents(Pageable pageable){
+
+        // 데이터 확보
+        Page<Event> latestEventsFour = eventRepository.findAllWithoutTemp(pageable);
+        // Entity -> DTO
+        Page<MainEventResponseDto> latesEventsToDto = latestEventsFour.map(evnt -> {
+            return MainEventResponseDto.builder()
+                    .evtid(evnt.getEventId().longValue())
+                    .evtTitle(evnt.getTitle())
+                    .evtStartDate(evnt.getMeetingDate())
+                    .evtEndDate(evnt.getEndDate())
+                    .active(evnt.getActive())
+                    .evtLocation(evnt.getLocation())
+                    .nickname(evnt.getCorpName())
+                    .fileId(evnt.getFileId())
+                    .build();
+        });
+
+        return latesEventsToDto;
+    }
+
+
+
 
 
 }

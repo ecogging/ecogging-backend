@@ -14,5 +14,11 @@ public interface EventRepository extends JpaRepository<Event, Integer> {
     @Modifying
     @Query(value = "update Event e set e.views = e.views + 1 where e.userId = :id", nativeQuery = true)
     int updateView(@Param("id") Integer id);
+
+
+
+    // Main Events
+    @Query("SELECT e FROM Event e WHERE e.save = false")
+    Page<Event> findAllWithoutTemp(Pageable pageable);
 }
 

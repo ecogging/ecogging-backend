@@ -1,7 +1,10 @@
 package com.pickupluck.ecogging.domain.plogging.service;
 
 import com.pickupluck.ecogging.domain.plogging.dto.EventDTO;
+import com.pickupluck.ecogging.domain.plogging.dto.MainEventResponseDto;
 import com.pickupluck.ecogging.util.PageInfo;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.OutputStream;
@@ -18,4 +21,7 @@ public interface EventService {
     Integer updateView(Integer id) throws Exception;
     Boolean isEventScrap(Long userId, Integer eventId) throws Exception;
     Boolean toggleEventScrap(Long userId, Long eventId) throws Exception;
+
+    // Main Events
+    Page<MainEventResponseDto> getMainEvents(Pageable pageable);
 }
