@@ -2,7 +2,6 @@ package com.pickupluck.ecogging.domain.user.api;
 
 import com.pickupluck.ecogging.domain.user.dto.*;
 import com.pickupluck.ecogging.domain.user.entity.User;
-import com.pickupluck.ecogging.util.InMemoryKeyValueStore;
 import com.pickupluck.ecogging.util.SecurityUtil;
 import com.pickupluck.ecogging.util.mail.MailService;
 import jakarta.servlet.http.HttpServletRequest;
