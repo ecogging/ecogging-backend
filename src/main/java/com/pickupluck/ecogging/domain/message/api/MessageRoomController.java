@@ -25,10 +25,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Slf4j
 @RestController
@@ -139,8 +136,27 @@ public class MessageRoomController {
 
         // Map에 '쪽지함 삭제 완료' 메세지 설정해서 리턴
         Map<String, Object> responseBody = new HashMap<>();
-        responseBody.put("message", "쪽지방 삭제 완료");
+        responseBody.put("message", "쪽지함 삭제 완료");
         
         return ResponseEntity.ok(responseBody);
+    }
+
+    // 5. 쪽지함 복수 삭제 DELETE /mypage/{userId}/messagerooms
+    @DeleteMapping("/mypage/{userId}/messagerooms")
+    public ResponseEntity<Map<String, Object>> deleteMessageRooms(@PathVariable("userId")Long userId,
+                                                                  @RequestBody List<Integer> requestBody) {
+        List<Integer> deleteMsgRoomsIdInt = requestBody;
+
+        // Long 으로 변환해서 쪽지함 하나씩 차례차례 삭제 처리
+        for(int i=0;i<deleteMsgRoomsIdInt.size();i++){
+            Long tempToLong = Long.parseLong(deleteMsgRoomsIdInt.get(i).toString()); // Long으로 변환
+            messageRoomService.deleteMessageRoom(userId, tempToLong);
+        }
+
+        // Map에 문자열 설정해서 리턴
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "쪽지함 복수 삭제 완료");
+
+        return ResponseEntity.ok(response);
     }
 }
