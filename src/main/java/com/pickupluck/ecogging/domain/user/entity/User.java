@@ -37,6 +37,10 @@ public class User extends BaseEntity {
 
     private String notiYn;
 
+    @OneToOne
+    @JoinColumn(name = "corporate_id")
+    private Corporate corporate;
+
     @Enumerated(EnumType.STRING)
     private LoginType loginType;
 
@@ -81,5 +85,10 @@ public class User extends BaseEntity {
         this.nickname = userInfoModifyRequest.getNickname();
         this.telephone = userInfoModifyRequest.getTelephone();
         changeProfileImageUrl(profileImageUrl);
+    }
+
+    public void registerCorporate(Corporate corporate) {
+        corporate.registerManager(this);
+        this.corporate = corporate;
     }
 }
