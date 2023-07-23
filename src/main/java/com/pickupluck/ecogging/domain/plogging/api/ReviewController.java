@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.HashMap;
 import java.util.List;
@@ -51,7 +52,6 @@ public class ReviewController {
 
     @PostMapping ("/reviewInfo")
     public ResponseEntity<Map<String,Object>> reviewInfo(@RequestBody Map<String, Long> param){
-        ResponseEntity<Map<String,Object>> res=null;
 
         try {
             Map<String,Object> map=new HashMap<>();
@@ -65,9 +65,73 @@ public class ReviewController {
     }
 
 
-    @PostMapping ("/reviewModify")
-    public ResponseEntity<Map<String,Object>> reviewModify(@RequestBody Map<String, Long> param){
-        return null;
+    @PostMapping ("/reviewModify/{id}")
+    public ResponseEntity<String> reviewModify(@RequestBody Map<String, String> requestData,@PathVariable long id){
+        System.out.println("리뷰 수정하기");
+        System.out.println("id : "+id);
+        String content=requestData.get("content");
+        String title=requestData.get("title");
+
+        try {
+            Map<String,String> res=new HashMap<>();
+            res.put("title",title);
+            res.put("content",content);
+            reviewService.reviewModify(res,id);
+            return new ResponseEntity<>("리뷰 수정 완료",HttpStatus.OK);
+        }catch (Exception e){
+            e.printStackTrace();
+            return new ResponseEntity<>("리뷰 수정 실패",HttpStatus.BAD_REQUEST);
+        }
     }
 
+    @PostMapping("/reviewImgUpload")
+    public ResponseEntity<String> reviewImgUpload(MultipartFile file) {
+        System.out.println("file : "+file);
+        try {
+            System.out.println("리뷰 작성");
+            if(file.isEmpty()){
+                System.out.println("비어있음");
+                return new ResponseEntity<>("controller message : 파일이 비어있습니다.", HttpStatus.BAD_REQUEST);
+            }
+            String imgfile=reviewService.reviewImgUpload(file);
+
+
+            return new ResponseEntity<String>(imgfile,HttpStatus.OK);
+        }catch (Exception e){
+            System.out.println("리뷰이미지등록실패 "+e.getMessage());
+            return new ResponseEntity<>("controller message : 리뷰 이미지 등록 실패",HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PostMapping("/reviewWrite")
+    public ResponseEntity<String> reviewWrite(@RequestBody Map<String, String> requestData){
+        String content=requestData.get("content");
+        String title=requestData.get("title");
+
+        try {
+            System.out.println("review Write Controller");
+            Map<String,String> res=new HashMap<>();
+            res.put("title",title);
+            res.put("content",content);
+            reviewService.reviewWrite(res);
+            return new ResponseEntity<>("controller message : 리뷰 등록 성공",HttpStatus.OK);
+        }catch (Exception e){
+            e.printStackTrace();
+            return new ResponseEntity<>("controller message : 리뷰 등록 실패",HttpStatus.BAD_REQUEST);
+        }
+    }
+
+
+    @PostMapping("/reviewDel/{id}")
+    public ResponseEntity<String> reviewDel(@PathVariable long id){
+        System.out.println("id : "+id);
+        try {
+            System.out.println("review del Controller");
+            reviewService.reviewDel(id);
+            return new ResponseEntity<>("controller message : 리뷰 등록 성공",HttpStatus.OK);
+        }catch (Exception e){
+            e.printStackTrace();
+            return new ResponseEntity<>("controller message : 리뷰 등록 실패",HttpStatus.BAD_REQUEST);
+        }
+    }
 }

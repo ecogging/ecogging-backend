@@ -56,7 +56,7 @@ public class Review {
     @Column
     private long views;
 
-    @Column
+    @Column(name="file_id")
     private Integer fileId;
 
     @Column(name = "is_temporary")

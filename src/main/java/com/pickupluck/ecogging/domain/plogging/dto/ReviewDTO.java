@@ -2,6 +2,7 @@ package com.pickupluck.ecogging.domain.plogging.dto;
 
 import com.pickupluck.ecogging.domain.BaseEntity;
 import com.pickupluck.ecogging.domain.forum.entity.Forum;
+import com.pickupluck.ecogging.domain.forum.entity.Share;
 import com.pickupluck.ecogging.domain.plogging.entity.Review;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -13,15 +14,15 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class ReviewDTO extends BaseEntity {
 
-    private Long id;
+    private long id;
     private String type;
     private String title;
     private String content;
     private LocalDateTime createdAt;
-    private Long views;
+    private long views;
     private Integer fileId;
-    private Boolean isTemporary;
-    private Long userId;
+    private boolean isTemporary;
+    private long userId;
     private String routeLoc;
     private String routeLocDetail;
     private Integer accompanyId;

@@ -57,8 +57,10 @@ import java.util.Date;
 @Entity
 @Getter
 @Setter
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @AllArgsConstructor
 @NoArgsConstructor
+@Table(name = "Forum")
 public class Forum {
 
     @Id
@@ -81,7 +83,7 @@ public class Forum {
     @Column
     private long views;
 
-    @Column
+    @Column(name = "file_id")
     private Integer fileId;
 
     @Column(name = "is_temporary")
@@ -97,7 +99,10 @@ public class Forum {
     private String routeLocationDetail;
 
     @Column(name = "accompany_id")
-    private Integer accompanyId;
+    private long accompanyId;
 
+    public Boolean getIsTemporary() {
+        return this.isTemporary;
+    }
 
 }
