@@ -35,7 +35,6 @@ public class AuthController {
     private final MailService mailService;
     private final TokenProvider tokenProvider;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
-    private final InMemoryKeyValueStore keyValueStore;
 
     @PostMapping("/auth/login")
     public ResponseEntity<TokenDto> login(@RequestBody UserLoginRequestDto request) {
@@ -129,8 +128,6 @@ public class AuthController {
 //    public ResponseEntity<UserResponseDto> getUserInfo(@PathVariable String username) {
 //        return ResponseEntity.ok(userService.getUserWithAuthorities(username));
 //    }
-
-
 
     @PostMapping("/auth/logout")
     public String logout() {
