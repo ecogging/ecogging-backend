@@ -1,5 +1,7 @@
 package com.pickupluck.ecogging.domain.plogging.api;
 
+import com.pickupluck.ecogging.domain.comment.dto.CommentResponse;
+import com.pickupluck.ecogging.domain.comment.service.CommentService;
 import com.pickupluck.ecogging.domain.notification.dto.NotificationSaveDto;
 import com.pickupluck.ecogging.domain.notification.entity.NotificationType;
 import com.pickupluck.ecogging.domain.notification.service.NotificationService;
@@ -19,11 +21,11 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class AccompanyController {
 
-    @Autowired
-    private AccompanyService accompanyService;
+    private final AccompanyService accompanyService;
 
-    @Autowired
-    private NotificationService notificationService;
+    private final NotificationService notificationService;
+
+    private final CommentService commentService;
 
     @GetMapping("/accompanies/{page}")
     public ResponseEntity<Map<String,Object>> accompanyList(@PathVariable Integer page,
@@ -79,6 +81,9 @@ public class AccompanyController {
                 map.put("isParticipation", isParticipation);
                 Boolean isAccompanyscrap = accompanyService.isAccompanyScrap(param.get("userId"), param.get("accompanyId"));
                 map.put("isAccompanyscrap", isAccompanyscrap);
+                // comment
+                List<CommentResponse> comments = commentService.findByAccompanyId(param.get("accompanyId"));
+                map.put("comments", comments);
             }
             return new ResponseEntity<>(map, HttpStatus.OK);
         } catch (Exception e) {

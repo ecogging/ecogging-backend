@@ -1,6 +1,7 @@
 package com.pickupluck.ecogging.domain.comment.service;
 
 import com.pickupluck.ecogging.domain.BoardType;
+import com.pickupluck.ecogging.domain.comment.dto.CommentResponse;
 import com.pickupluck.ecogging.domain.comment.dto.CommentSaveRequest;
 import com.pickupluck.ecogging.domain.comment.entity.Comment;
 import com.pickupluck.ecogging.domain.comment.repository.CommentRepository;
@@ -21,16 +22,31 @@ public class CommentServiceImpl implements CommentService {
     private final CommentRepository commentRepository;
 
     @Override
-    public List<Comment> findByWriterId(Long id) throws Exception {
-        String email = SecurityUtil.getCurrentUsername().orElse("");
+    public List<CommentResponse> getMyComments() throws Exception {
+        final String email = SecurityUtil.getCurrentUsername().orElse("");
+
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new Exception("No user for email: " + email));
-        return commentRepository.findByWriter(user);
+
+        return commentRepository.findByWriter(user)
+                .stream()
+                .map(CommentResponse::from)
+                .toList();
+    }
+
+    @Override
+    public List<CommentResponse> findByAccompanyId(Long id) throws Exception {
+        final BoardType boardType = BoardType.ACCOMPANY;
+
+        return commentRepository.findByBoardTypeAndArticleId(boardType, id)
+                .stream()
+                .map(CommentResponse::from)
+                .toList();
     }
 
     @Override
     public void save(CommentSaveRequest request) throws Exception {
-        String email = SecurityUtil.getCurrentUsername().orElse("");
+        final String email = SecurityUtil.getCurrentUsername().orElse("");
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new Exception("No user for email: " + email));
 
