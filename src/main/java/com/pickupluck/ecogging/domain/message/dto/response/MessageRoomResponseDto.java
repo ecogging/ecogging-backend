@@ -12,12 +12,14 @@ import org.springframework.data.domain.Page;
 public class MessageRoomResponseDto {
     private final Long contactId;
     private final String contactNickname;
+    private final String contactPicUrl;
     private final Page<MessageResponseDto> messages;
 
     @Builder
     public MessageRoomResponseDto(MessageRoom messageRoom, Page<Message> messages, User contact) {
         this.contactId = contact.getId();
         this.contactNickname = contact.getNickname();
+        this.contactPicUrl = contact.getProfileImageUrl();
         this.messages = messages.map(message -> new MessageResponseDto(message, contact));
     }
 }

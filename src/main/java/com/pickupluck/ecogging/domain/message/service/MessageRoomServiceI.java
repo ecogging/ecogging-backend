@@ -150,7 +150,8 @@ public class MessageRoomServiceI implements MessageRoomService {
             User contact = userRepository.findById(contactId).get();
 
             return MessageRoomListResponseDto.builder()
-                    .msgRoomId(messageRoom.getMessageRoomId().longValue())
+                    .messageRoomId(messageRoom.getMessageRoomId().longValue())
+                    .contactPicUrl(contact.getProfileImageUrl())
                     .contactNickname(contact.getNickname())
                     .lastMessageSentTime(messageRoom.getCreatedAt().toLocalDateTime())
                     .lastMessageContent(messageRoom.getContent())
