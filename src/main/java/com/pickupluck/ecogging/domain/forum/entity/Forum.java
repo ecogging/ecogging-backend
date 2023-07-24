@@ -37,13 +37,16 @@ public class Forum extends BaseEntity {
     @JoinColumn(name = "file_id")
     private ForumFile file; // 나눔 - 첨부파일 -> DB: ForumFile PK인 첨부파일 ID 저장
 
-    @Column(nullable = false)
+    @Column(name = "file_id", insertable = false, updatable = false)
+    private Long fileId; // 나눔 - 첨부파일 ID
+
+    @Column(name = "is_temporary", nullable = false)
     private Boolean isTemporary; // 임시저장 여부 (기본값 0 == false)
 
-    @Column
+    @Column(name = "route_location")
     private String routeLocation; // 경로추천 - 위치 (카카오맵)
 
-    @Column
+    @Column(name = "route_location_detail")
     private String routeLocationDetail; // 경로추천 - 상세 위치
 
     @OneToOne(fetch = FetchType.LAZY)

@@ -18,6 +18,7 @@ public class MainForumsResponseDto {
     private final String userNickname; // 작성자 닉네임
     private final Long userId; // 작성자 Id
 
+    @Builder
     public MainForumsResponseDto(Long forumId, String type, String title, String content, LocalDateTime createdAt, Integer views, String userNickname, Long userId) {
         this.forumId = forumId;
         this.type = type;

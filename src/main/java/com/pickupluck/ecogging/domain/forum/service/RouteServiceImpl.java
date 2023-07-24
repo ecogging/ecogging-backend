@@ -6,6 +6,8 @@ import com.pickupluck.ecogging.domain.forum.entity.Route;
 import com.pickupluck.ecogging.domain.forum.repository.RouteRepository;
 import com.pickupluck.ecogging.domain.plogging.dto.ReviewDTO;
 import com.pickupluck.ecogging.domain.plogging.entity.Review;
+import com.pickupluck.ecogging.domain.user.entity.User;
+import com.pickupluck.ecogging.domain.user.repository.UserRepository;
 import com.pickupluck.ecogging.util.PageInfo;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -23,6 +25,8 @@ public class RouteServiceImpl implements RouteService{
 
     private final RouteRepository routeRepository;
     private final ModelMapper modelMapper;
+
+    private final UserRepository userRepository;
 
     @Override
     public List<ForumDTO> getRoutes(Integer page, PageInfo pageInfo) throws Exception {
@@ -78,8 +82,27 @@ public class RouteServiceImpl implements RouteService{
     public ForumDTO getRouteInfo(Long id) throws Exception {
         Optional<Route> routeInfo=routeRepository.findById(id);
         if(routeInfo.isEmpty()) return null;
+
+        // 작성자 가져오기
         Route route=routeInfo.get();
-        ForumDTO getRoute=new ForumDTO(route);
+        Optional<User> writerOpt = userRepository.findById(route.getUserId());
+        User writer = writerOpt.get();
+
+        // DTO 생성
+        ForumDTO getRoute= ForumDTO.builder()
+                        .forumId(route.getId())
+                        .forumType(route.getType())
+                        .title(route.getTitle())
+                        .content(route.getContent())
+                        .views(Integer.getInteger(route.getViews()+""))
+                        .isTemp(route.getIsTemporary())
+                        .routeLocation(route.getRouteLocation())
+                        .routeLocationDetail(route.getRouteLocationDetail())
+                        .writerId(writer.getId())
+                        .writerNickname(writer.getNickname())
+                        .writerPic(writer.getProfileImageUrl())
+                        .build();
+
 
         route.setViews(route.getViews()+1);
         routeRepository.save(route);
