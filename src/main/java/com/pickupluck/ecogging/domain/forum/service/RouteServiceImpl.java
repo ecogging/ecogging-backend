@@ -79,10 +79,12 @@ public class RouteServiceImpl implements RouteService{
         Optional<Route> routeInfo=routeRepository.findById(id);
         if(routeInfo.isEmpty()) return null;
         Route route=routeInfo.get();
-        ForumDTO getRoute=new ForumDTO(route);
+//        ForumDTO getRoute=new ForumDTO.builder()
+
 
         route.setViews(route.getViews()+1);
         routeRepository.save(route);
-        return getRoute;
+//        return getRoute;
+        return null;
     }
 }

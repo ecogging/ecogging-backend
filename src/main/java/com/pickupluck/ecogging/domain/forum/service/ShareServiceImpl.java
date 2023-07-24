@@ -92,9 +92,15 @@ public class ShareServiceImpl implements ShareService {
         Optional<Share> shareInfo=shareRepository.findById(id);
         if(shareInfo.isEmpty()) return null;
         Share share=shareInfo.get();
-        ForumDTO getShare=new ForumDTO(share);
+//        ForumDTO getShare=new ForumDTO(share);
 
-        share.setViews(share.getViews()+1);
+//        ForumDTO getShare=ForumDTO.builder()
+//                .forumId(share.getId())
+//                        .views(share.getViews()+1);
+
+
+
+//        share.setViews(share.getViews()+1);
         shareRepository.save(share);
         return getShare;
     }
