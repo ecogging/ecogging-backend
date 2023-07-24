@@ -9,6 +9,7 @@ import lombok.*;
 
 @Entity
 @Getter
+@Setter
 @NoArgsConstructor
 @EqualsAndHashCode(of = "id", callSuper = false)
 public class Forum extends BaseEntity {
