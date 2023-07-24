@@ -57,8 +57,8 @@ public class EventController {
 
     @PostMapping("/myevnettemp")
     public ResponseEntity<Map<String,Object>> myEvnetTempList(@RequestBody Map<String,Object> param) {
-        Long userId = (Long)param.get("userId");
-        Integer page = (Integer)param.get("page");
+        Long userId = Long.parseLong((String) param.get("userId"));
+        Integer page = Integer.valueOf((String)param.get("page"));
         try {
             Map<String,Object> map= eventService.getMyEventTempList(userId, page);
             return new ResponseEntity<>(map, HttpStatus.OK);
@@ -70,8 +70,8 @@ public class EventController {
 
     @PostMapping("/myaeventscrap")
     public ResponseEntity<Map<String,Object>> myEventscrapList(@RequestBody Map<String,Object> param) {
-        Long userId = (Long)param.get("userId");
-        Integer page = (Integer)param.get("page");
+        Long userId = Long.parseLong((String) param.get("userId"));
+        Integer page = Integer.valueOf((String)param.get("page"));
         try {
             Map<String,Object> map= eventService.getMyEventscrapList(userId, page);
             return new ResponseEntity<>(map, HttpStatus.OK);

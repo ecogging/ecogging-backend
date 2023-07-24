@@ -45,6 +45,7 @@ public class EventServiceImpl implements EventService{
 
     private final String uploadDir = "D:/MJS/front-work/upload/";
 
+
     public void writeEvent(EventDTO eventDTO, MultipartFile file) throws Exception {
         if(file!=null && !file.isEmpty()) {
             String path="D:/MJS/front-work/upload/";
@@ -173,13 +174,15 @@ public class EventServiceImpl implements EventService{
         }
         map.put("list", list);
         PageInfo pageInfo = calcPage(eventPage.getTotalPages(), page);
+        // hasisLastPage 속성 설정
+        pageInfo.setIsLastPage(eventPage.isLast());
         map.put("pageInfo", pageInfo);
         return map;
     }
 
     @Override
     public Map<String, Object> getMyEventscrapList(Long userId, Integer page) throws Exception {
-        PageRequest pageRequest = PageRequest.of(page-1,5, Sort.by(Sort.Direction.DESC, "eventId"));
+        PageRequest pageRequest = PageRequest.of(page-1,5, Sort.by(Sort.Direction.DESC, "scrapId"));
         Page<Eventscrap> eventscrapPage = eventscrapRepository.findByUserScrap(userId, pageRequest);
 
         Map<String, Object> map = new HashMap<>();
@@ -190,6 +193,8 @@ public class EventServiceImpl implements EventService{
         }
         map.put("list", list);
         PageInfo pageInfo = calcPage(eventscrapPage.getTotalPages(), page);
+        // hasisLastPage 속성 설정
+        pageInfo.setIsLastPage(eventscrapPage.isLast());
         map.put("pageInfo", pageInfo);
         return map;
     }

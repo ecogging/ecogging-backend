@@ -47,6 +47,7 @@ public class CommonRepository {
 
         List<Event> events = jpaQueryFactory.selectFrom(event)
                 .where(event.save.eq(false).and(event.user.id.eq(user.id)))
+
                 .offset(pageRequest.getOffset())
                 .limit(pageRequest.getPageSize())
                 .orderBy(orderSpecifier)

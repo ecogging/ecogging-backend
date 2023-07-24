@@ -155,7 +155,7 @@ public class AccompanyServiceImpl implements AccompanyService {
         PageInfo pageInfo = new PageInfo();
         pageInfo.setCurPage(page);
         pageInfo.setAllPage(allPage);
-        int startPage = (page-1)/onePage*onePage+1;
+        int startPage = (page-1)/10*10+1;
         int endPage = startPage+10-1;
         if(endPage>pageInfo.getAllPage()) endPage=pageInfo.getAllPage();
         pageInfo.setStartPage(startPage);
@@ -165,7 +165,7 @@ public class AccompanyServiceImpl implements AccompanyService {
 
     @Override
     public Map<String, Object> getMyAccompanyList(Long userId, Integer page) throws Exception {
-        PageRequest pageRequest = PageRequest.of(page-1,onePage, Sort.by(Sort.Direction.DESC, "id"));
+        PageRequest pageRequest = PageRequest.of(page-1,5, Sort.by(Sort.Direction.DESC, "id"));
         Page<Accompany> accompanyPage = accompanyRepository.findByUserId(userId, pageRequest);
 
         Map<String, Object> map = new HashMap<>();
@@ -182,7 +182,7 @@ public class AccompanyServiceImpl implements AccompanyService {
 
     @Override
     public Map<String, Object> getMyAccompanyTempList(Long userId, Integer page) throws Exception {
-        PageRequest pageRequest = PageRequest.of(page-1,onePage, Sort.by(Sort.Direction.DESC, "id"));
+        PageRequest pageRequest = PageRequest.of(page-1,5, Sort.by(Sort.Direction.DESC, "id"));
         Page<Accompany> accompanyPage = accompanyRepository.findByUserIdAndSaveTrue(userId, pageRequest);
         Map<String, Object> map = new HashMap<>();
         List<AccompanyDTO> list = new ArrayList<>();
@@ -199,10 +199,8 @@ public class AccompanyServiceImpl implements AccompanyService {
     @Override
     public Map<String, Object> getMyParticipationList(Long userId, Integer page) throws Exception {
 
-        PageRequest pageRequest = null;
-        Page<Participation> participationPage = null;
-        pageRequest = PageRequest.of(page-1,onePage, Sort.by(Sort.Direction.DESC, "accompanyId"));
-        participationPage = participationRepository.findByUserId(userId, pageRequest);
+        PageRequest pageRequest = PageRequest.of(page-1,5, Sort.by(Sort.Direction.DESC, "participationId"));
+        Page<Participation> participationPage = participationRepository.findByUserId(userId, pageRequest);
 
         Map<String, Object> map = new HashMap<>();
         List<AccompanyDTO> list = new ArrayList<>();
@@ -210,7 +208,6 @@ public class AccompanyServiceImpl implements AccompanyService {
             AccompanyDTO accompanyDTO = new AccompanyDTO(participation.getAccompany());
             list.add(accompanyDTO);
         }
-
         map.put("list", list);
         PageInfo pageInfo = calcPage(participationPage.getTotalPages(), page);
         map.put("pageInfo", pageInfo);
@@ -220,7 +217,7 @@ public class AccompanyServiceImpl implements AccompanyService {
 
     @Override
     public Map<String, Object> getMyAccompanyscrapList(Long userId, Integer page) throws Exception {
-        PageRequest pageRequest = PageRequest.of(page-1,onePage, Sort.by(Sort.Direction.DESC, "accompanyId"));
+        PageRequest pageRequest = PageRequest.of(page-1,5, Sort.by(Sort.Direction.DESC, "scrapId"));
         Page<Accompanyscrap>  accompanyscrapPage = accompanyscrapRepository.findByUserId(userId, pageRequest);
 
         Map<String, Object> map = new HashMap<>();
