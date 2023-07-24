@@ -1,12 +1,16 @@
 package com.pickupluck.ecogging.domain.forum.service;
 
+import com.pickupluck.ecogging.domain.forum.dto.MainForumsResponseDto;
+import com.pickupluck.ecogging.domain.forum.entity.Forum;
 import com.pickupluck.ecogging.domain.plogging.dto.ReviewDTO;
 import com.pickupluck.ecogging.domain.forum.repository.ForumRepository;
 import com.pickupluck.ecogging.util.PageInfo;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
@@ -48,4 +52,31 @@ public class ForumServiceImpl implements ForumService{
 //        }
         return list;
     }
+
+
+    // Main Forums
+    @Override
+    @Transactional(readOnly = true)
+    public Page<MainForumsResponseDto> getMainForums(Pageable pageable) {
+
+        // 데이터 확보
+//        Page<Forum> latestForumsThree = forumRepository.findAllWithoutTemp(pageable);
+
+        // Entity -> DTO
+//        Page<MainForumsResponseDto> latestForumsToDto = latestForumsThree.map(fr -> {
+//            return MainForumsResponseDto.builder()
+//                    .forumId(fr.getId())
+//                    .type(fr.getType())
+//                    .title(fr.getTitle())
+//                    .content(fr.getContent())
+//                    .createdAt(fr.getCreatedAt())
+//                    .views(fr.getViews())
+//                    .userId(fr.getUserId())
+//                    .userNickname()
+//        });
+
+        return null;
+    }
+
+
 }
