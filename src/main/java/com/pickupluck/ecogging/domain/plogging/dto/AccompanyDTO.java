@@ -30,6 +30,7 @@ public class AccompanyDTO {
     private String nickname;
     private Long userId;
     private String email;
+    private String userPicUrl; // 프사 추가
     public AccompanyDTO(Accompany accompany) {
         this.id = accompany.getId();
         this.title = accompany.getTitle();
@@ -49,6 +50,7 @@ public class AccompanyDTO {
             this.nickname = accompany.getUser().getNickname();
             this.userId = accompany.getUser().getId();
             this.email = accompany.getUser().getEmail();
+            this.userPicUrl = accompany.getUser().getProfileImageUrl(); // 프사 추가
         }
     }
 
