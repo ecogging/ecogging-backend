@@ -40,6 +40,7 @@ public class CommentServiceImpl implements CommentService {
 
         return commentRepository.findByBoardTypeAndArticleId(boardType, id)
                 .stream()
+                .filter(comment -> !comment.isParentExist())
                 .map(CommentResponse::from)
                 .toList();
     }
@@ -50,7 +51,6 @@ public class CommentServiceImpl implements CommentService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new Exception("No user for email: " + email));
 
-        Comment parent = commentRepository.findById(request.getParentId()).orElse(null);
         Comment comment = Comment.builder()
                 .content(request.getContent())
                 .boardType(BoardType.ACCOMPANY) // 현재는 동행에만 댓글 달림
@@ -58,8 +58,17 @@ public class CommentServiceImpl implements CommentService {
                 .writer(user)
                 .build();
 
-        comment.registerParent(comment);
+        if (request.getParentId() != null) {
+            Comment parent = commentRepository
+                    .findById(request.getParentId())
+                    .orElseThrow(()-> new IllegalArgumentException("no comment for id: " + request.getParentId()));
 
+            if (parent.isParentExist()) {
+                throw new Exception("대댓글의 대댓글을 달 수 없습니다.");
+            }
+
+            comment.registerParent(parent);
+        }
         commentRepository.save(comment);
     }
 
