@@ -101,7 +101,7 @@ public class AccompanyServiceImpl implements AccompanyService {
         Optional<Participation> oparticipation = participationRepository.findByUserIdAndAccompanyId(userId,accompanyId);
         Accompany accompany = accompanyRepository.findById(accompanyId).get();
         if(oparticipation.isEmpty()) { //참여신청
-            participationRepository.save(new Participation(userId,accompanyId,false));
+            participationRepository.save(new Participation(userId,accompany,false));
             accompany.setJoincnt(accompany.getJoincnt()+1);
             accompanyRepository.save(accompany);
             return true;
