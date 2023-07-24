@@ -2,12 +2,16 @@ package com.pickupluck.ecogging.domain.forum.service;
 
 import com.pickupluck.ecogging.domain.forum.dto.ForumDTO;
 import com.pickupluck.ecogging.domain.forum.entity.Forum;
+import com.pickupluck.ecogging.domain.forum.entity.ForumFile;
 import com.pickupluck.ecogging.domain.forum.entity.Share;
 import com.pickupluck.ecogging.domain.forum.entity.Sharefile;
+import com.pickupluck.ecogging.domain.forum.repository.ForumFileRepository;
 import com.pickupluck.ecogging.domain.forum.repository.ShareFileRepository;
 import com.pickupluck.ecogging.domain.forum.repository.ShareRepository;
 import com.pickupluck.ecogging.domain.plogging.dto.ReviewDTO;
 import com.pickupluck.ecogging.domain.plogging.entity.Review;
+import com.pickupluck.ecogging.domain.user.entity.User;
+import com.pickupluck.ecogging.domain.user.repository.UserRepository;
 import com.pickupluck.ecogging.util.PageInfo;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +33,9 @@ public class ShareServiceImpl implements ShareService {
     private final ShareRepository shareRepository;
     private final ShareFileRepository shareFileRepository;
     private final ModelMapper modelMapper;
+
+    private final UserRepository userRepository;
+    private final ForumFileRepository forumFileRepository;
 
     @Override
     public List<ForumDTO> getShares(Integer page, PageInfo pageInfo) throws Exception {
@@ -92,7 +99,27 @@ public class ShareServiceImpl implements ShareService {
         Optional<Share> shareInfo=shareRepository.findById(id);
         if(shareInfo.isEmpty()) return null;
         Share share=shareInfo.get();
-//        ForumDTO getShare=new ForumDTO(share);
+
+        // 작성자
+        Optional<User> writerOpt = userRepository.findById(share.getUserId());
+        User writer = writerOpt.get();
+
+        // 첨부파일
+        Optional<ForumFile> fileOpt = forumFileRepository.findById(Long.parseLong(share.getFileId()+""));
+        ForumFile file = fileOpt.get();
+
+        // DTO 생성
+        ForumDTO getShare= ForumDTO.builder()
+                .forumId(share.getId())
+                .forumType(share.getType())
+                .title(share.getTitle())
+                .content(share.getContent())
+                .views(Integer.parseInt(share.getViews()+""))
+                .isTemp(share.getIsTemporary())
+                .fileId(file.getId())
+                .fileName(file.getFileName())
+                .filePath(file.getPath())
+                .build();
 
 //        ForumDTO getShare=ForumDTO.builder()
 //                .forumId(share.getId())
