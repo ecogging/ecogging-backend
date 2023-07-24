@@ -49,7 +49,7 @@ public class CommentResponse {
         return CommentResponse.builder()
                 .id(comment.getId())
                 .writerId(comment.getWriter().getId())
-                .writerName(comment.getWriter().getName())
+                .writerName(comment.getWriter().getNickname())
                 .content(comment.getContent())
                 .createdAt(comment.getCreatedAt())
                 .depth(comment.getDepth())
