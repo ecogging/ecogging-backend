@@ -1,11 +1,5 @@
 package com.pickupluck.ecogging.domain.forum.dto;
 
-import com.pickupluck.ecogging.domain.BaseEntity;
-import com.pickupluck.ecogging.domain.forum.entity.ForumFile;
-import com.pickupluck.ecogging.domain.forum.entity.Share;
-import com.pickupluck.ecogging.domain.plogging.entity.Accompany;
-import com.pickupluck.ecogging.domain.plogging.entity.Review;
-import com.pickupluck.ecogging.domain.user.entity.User;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -33,9 +27,13 @@ public class ForumDTO {
     private String fileName; // 첨부파일 이름
     private String filePath; // 첨부파일 경로
 
+    // 날짜
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+
     // 기본생성자
     @Builder
-    public ForumDTO(Long forumId, String forumType, Long writerId, String title, String content, Integer views, Boolean isTemp, String routeLocation, String routeLocationDetail, Long thisAccompanyId, String writerNickname, String writerPic, Long fileId, String fileName, String filePath) {
+    public ForumDTO(Long forumId, String forumType, Long writerId, String title, String content, Integer views, Boolean isTemp, String routeLocation, String routeLocationDetail, Long thisAccompanyId, String writerNickname, String writerPic, Long fileId, String fileName, String filePath, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.forumId = forumId;
         this.forumType = forumType;
         this.writerId = writerId;
@@ -51,5 +49,7 @@ public class ForumDTO {
         this.fileId = fileId;
         this.fileName = fileName;
         this.filePath = filePath;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
     }
 }

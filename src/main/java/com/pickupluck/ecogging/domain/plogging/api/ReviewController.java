@@ -2,8 +2,6 @@ package com.pickupluck.ecogging.domain.plogging.api;
 
 import com.pickupluck.ecogging.domain.plogging.dto.ReviewDTO;
 import com.pickupluck.ecogging.domain.forum.service.ForumService;
-import com.pickupluck.ecogging.domain.plogging.entity.Review;
-import com.pickupluck.ecogging.domain.plogging.service.ReviewService;
 import com.pickupluck.ecogging.util.PageInfo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +19,7 @@ import java.util.Map;
 public class ReviewController {
 
     @Autowired
-    private ReviewService reviewService;
+    private ForumService forumService;
 
 
     @GetMapping("/reviews/{page}")
@@ -31,7 +29,7 @@ public class ReviewController {
         System.out.println("reviews test");
         try {
             PageInfo pageInfo=new PageInfo();
-            List<ReviewDTO> reviews=reviewService.getReviews(page, pageInfo);
+            List<ReviewDTO> reviews=forumService.getReviews(page, pageInfo);
 
             Map<String,Object> res=new HashMap<>();
             res.put("pageInfo",pageInfo);
@@ -55,7 +53,7 @@ public class ReviewController {
 
         try {
             Map<String,Object> map=new HashMap<>();
-            ReviewDTO reviewInfo=reviewService.getReviewInfo(param.get("id"));
+            ReviewDTO reviewInfo=forumService.getReviewInfo(param.get("id"));
             map.put("reviewInfo",reviewInfo);
             return new ResponseEntity<>(map,HttpStatus.OK);
         }catch (Exception e){
@@ -76,7 +74,7 @@ public class ReviewController {
             Map<String,String> res=new HashMap<>();
             res.put("title",title);
             res.put("content",content);
-            reviewService.reviewModify(res,id);
+            forumService.reviewModify(res,id);
             return new ResponseEntity<>("리뷰 수정 완료",HttpStatus.OK);
         }catch (Exception e){
             e.printStackTrace();
@@ -93,7 +91,7 @@ public class ReviewController {
                 System.out.println("비어있음");
                 return new ResponseEntity<>("controller message : 파일이 비어있습니다.", HttpStatus.BAD_REQUEST);
             }
-            String imgfile=reviewService.reviewImgUpload(file);
+            String imgfile=forumService.reviewImgUpload(file);
 
 
             return new ResponseEntity<String>(imgfile,HttpStatus.OK);
@@ -113,7 +111,7 @@ public class ReviewController {
             Map<String,String> res=new HashMap<>();
             res.put("title",title);
             res.put("content",content);
-            reviewService.reviewWrite(res);
+            forumService.reviewWrite(res);
             return new ResponseEntity<>("controller message : 리뷰 등록 성공",HttpStatus.OK);
         }catch (Exception e){
             e.printStackTrace();
@@ -127,7 +125,7 @@ public class ReviewController {
         System.out.println("id : "+id);
         try {
             System.out.println("review del Controller");
-            reviewService.reviewDel(id);
+            forumService.reviewDel(id);
             return new ResponseEntity<>("controller message : 리뷰 등록 성공",HttpStatus.OK);
         }catch (Exception e){
             e.printStackTrace();
