@@ -2,6 +2,7 @@ package com.pickupluck.ecogging.domain.user.api;
 
 import com.pickupluck.ecogging.domain.user.dto.*;
 import com.pickupluck.ecogging.domain.user.entity.User;
+import com.pickupluck.ecogging.domain.user.entity.UserType;
 import com.pickupluck.ecogging.util.SecurityUtil;
 import com.pickupluck.ecogging.util.mail.MailService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -58,6 +59,7 @@ public class AuthController {
 
         LoginResponse loginResponse = LoginResponse.builder()
                 .token(jwt)
+                .userType(UserType.NORMAL)
                 .profileImageUrl(findUser.getProfileImageUrl())
                 .build();
 
@@ -65,7 +67,7 @@ public class AuthController {
     }
 
     @PostMapping("/auth/corporate/login")
-    public ResponseEntity<TokenDto> corporateLogin(@RequestBody UserLoginRequestDto request) {
+    public ResponseEntity<LoginResponse> corporateLogin(@RequestBody UserLoginRequestDto request) {
         String requestEmail = request.getEmail();
         String requestPassword = request.getPassword();
 
@@ -85,7 +87,13 @@ public class AuthController {
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.add(JwtFilter.AUTHORIZATION_HEADER, "Bearer " + jwt);
 
-        return new ResponseEntity<>(new TokenDto(jwt), httpHeaders, HttpStatus.OK);
+        LoginResponse loginResponse = LoginResponse.builder()
+                .token(jwt)
+                .userType(UserType.CORPORATE)
+                .profileImageUrl(findUser.getProfileImageUrl())
+                .build();
+
+        return new ResponseEntity<>(loginResponse, httpHeaders, HttpStatus.OK);
     }
 
     @PostMapping("/auth/signUp")
