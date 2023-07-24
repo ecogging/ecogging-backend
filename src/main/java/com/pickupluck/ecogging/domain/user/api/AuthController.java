@@ -36,7 +36,7 @@ public class AuthController {
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
 
     @PostMapping("/auth/login")
-    public ResponseEntity<TokenDto> login(@RequestBody UserLoginRequestDto request) {
+    public ResponseEntity<LoginResponse> login(@RequestBody UserLoginRequestDto request) {
         String requestEmail = request.getEmail();
         String requestPassword = request.getPassword();
 
@@ -56,7 +56,12 @@ public class AuthController {
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.add(JwtFilter.AUTHORIZATION_HEADER, "Bearer " + jwt);
 
-        return new ResponseEntity<>(new TokenDto(jwt), httpHeaders, HttpStatus.OK);
+        LoginResponse loginResponse = LoginResponse.builder()
+                .token(jwt)
+                .profileImageUrl(findUser.getProfileImageUrl())
+                .build();
+
+        return new ResponseEntity<>(loginResponse, httpHeaders, HttpStatus.OK);
     }
 
     @PostMapping("/auth/corporate/login")
