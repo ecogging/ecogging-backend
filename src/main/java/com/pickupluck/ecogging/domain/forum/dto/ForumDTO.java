@@ -1,6 +1,7 @@
 package com.pickupluck.ecogging.domain.forum.dto;
 
 import com.pickupluck.ecogging.domain.BaseEntity;
+import com.pickupluck.ecogging.domain.forum.entity.Route;
 import com.pickupluck.ecogging.domain.forum.entity.Share;
 import com.pickupluck.ecogging.domain.plogging.entity.Review;
 import lombok.AllArgsConstructor;
@@ -12,7 +13,7 @@ import java.time.LocalDateTime;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ForumDTO extends BaseEntity {
+public class ForumDTO {
 
     private long id;
     private String type;
@@ -41,5 +42,19 @@ public class ForumDTO extends BaseEntity {
         this.routeLocDetail = share.getRouteLocationDetail();
         this.accompanyId = share.getAccompanyId();
     }
-    
+
+    public ForumDTO(Route route) {
+        this.id = route.getId();
+        this.type = route.getType();
+        this.title = route.getTitle();
+        this.content = route.getContent();
+        this.createdAt = route.getCreatedAt();
+        this.views = route.getViews();
+        this.fileId = route.getFileId();
+        this.isTemporary = route.getIsTemporary();
+        this.userId = route.getUserId();
+        this.routeLoc = route.getRouteLocation();
+        this.routeLocDetail = route.getRouteLocationDetail();
+        this.accompanyId = route.getAccompanyId();
+    }
 }
