@@ -39,6 +39,6 @@ public interface ForumRepository extends JpaRepository<Forum,Long> {
 
 
     // Main Forums
-    @Query("SELECT f FROM Forum f WHERE f.isTemporary = false")
+    @Query("SELECT f FROM Forum f WHERE f.isTemporary = false AND (f.type = '경로' OR f.type = '나눔')")
     Page<Forum> findAllWithoutTemp(Pageable pageable);
 }

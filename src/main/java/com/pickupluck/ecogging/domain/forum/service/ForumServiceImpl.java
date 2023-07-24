@@ -461,22 +461,23 @@ public class ForumServiceImpl implements ForumService{
     public Page<MainForumsResponseDto> getMainForums(Pageable pageable) {
 
         // 데이터 확보
-//        Page<Forum> latestForumsThree = forumRepository.findAllWithoutTemp(pageable);
+        Page<Forum> latestForumsThree = forumRepository.findAllWithoutTemp(pageable);
 
         // Entity -> DTO
-//        Page<MainForumsResponseDto> latestForumsToDto = latestForumsThree.map(fr -> {
-//            return MainForumsResponseDto.builder()
-//                    .forumId(fr.getId())
-//                    .type(fr.getType())
-//                    .title(fr.getTitle())
-//                    .content(fr.getContent())
-//                    .createdAt(fr.getCreatedAt())
-//                    .views(fr.getViews())
-//                    .userId(fr.getUserId())
-//                    .userNickname()
-//        });
+        Page<MainForumsResponseDto> latestForumsToDto = latestForumsThree.map(fr -> {
+            return MainForumsResponseDto.builder()
+                    .forumId(fr.getId())
+                    .type(fr.getType())
+                    .title(fr.getTitle())
+                    .content(fr.getContent())
+                    .createdAt(fr.getCreatedAt())
+                    .views(fr.getViews())
+                    .writerId(fr.getWriter().getId())
+                    .writerNickname(fr.getWriter().getNickname())
+                    .build();
+        });
 
-        return null;
+        return latestForumsToDto;
     }
 
 
