@@ -6,10 +6,10 @@ import jakarta.persistence.Entity;
 
 @Entity
 public class Route extends Forum {
-
-    @Column(name="route_location")
-    private String routeLocation;
-
-    @Column(name="route_location_detail")
-    private String routeLocationDetail;
+//
+//    @Column(name="route_location")
+//    private String routeLocation;
+//
+//    @Column(name="route_location_detail")
+//    private String routeLocationDetail;
 }

@@ -1,5 +1,4 @@
 package com.pickupluck.ecogging.domain.plogging.repository;
-
 import com.pickupluck.ecogging.domain.plogging.entity.Event;
 import com.pickupluck.ecogging.domain.plogging.entity.QEvent;
 import com.querydsl.core.types.OrderSpecifier;
