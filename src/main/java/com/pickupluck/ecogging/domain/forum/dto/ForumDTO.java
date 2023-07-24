@@ -118,4 +118,5 @@ public class ForumDTO {
         this.filePath = filePath;
         this.forumIdForReview = forumIdForReview;
     }
+  
 }
