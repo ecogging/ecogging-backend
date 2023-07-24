@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface CommentRepository extends JpaRepository<Comment, Long> {
 
-    List<Comment> findByBoardTypeAndArticleId(BoardType boardType, Integer articleId);
+    List<Comment> findByBoardTypeAndArticleId(BoardType boardType, Long articleId);
 
     List<Comment> findByWriter(User Writer);
 }
