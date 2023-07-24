@@ -7,10 +7,9 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
-@Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ReviewfileDTO extends BaseEntity {
+public class ReviewfileDTO {
     private Long id;
     private String fileName;
     private LocalDateTime createdAt;
