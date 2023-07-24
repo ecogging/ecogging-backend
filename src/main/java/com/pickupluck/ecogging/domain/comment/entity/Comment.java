@@ -38,7 +38,7 @@ public class Comment extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private BoardType boardType;
 
-    private Integer articleId;
+    private Long articleId;
 
     private Boolean isDeleted = false;
 
@@ -47,7 +47,7 @@ public class Comment extends BaseEntity {
     private User writer;
 
     @Builder
-    public Comment(String content, BoardType boardType, Integer articleId, User writer) {
+    public Comment(String content, BoardType boardType, Long articleId, User writer) {
         this.content = content;
         this.boardType = boardType;
         this.articleId = articleId;
