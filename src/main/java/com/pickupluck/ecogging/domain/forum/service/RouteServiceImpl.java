@@ -106,6 +106,7 @@ public class RouteServiceImpl implements RouteService{
 
         route.setViews(route.getViews()+1);
         routeRepository.save(route);
-        return getRoute;
+//        return getRoute;
+        return null;
     }
 }

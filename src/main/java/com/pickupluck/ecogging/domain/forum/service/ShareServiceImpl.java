@@ -121,7 +121,13 @@ public class ShareServiceImpl implements ShareService {
                 .filePath(file.getPath())
                 .build();
 
-        share.setViews(share.getViews()+1);
+//        ForumDTO getShare=ForumDTO.builder()
+//                .forumId(share.getId())
+//                        .views(share.getViews()+1);
+
+
+
+//        share.setViews(share.getViews()+1);
         shareRepository.save(share);
         return getShare;
     }

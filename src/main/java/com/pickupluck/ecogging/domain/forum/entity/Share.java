@@ -33,7 +33,7 @@ public class Share{
     private LocalDateTime createdAt;
 
     @Column
-    private long views;
+    private Integer views;
 
     @Column(name="file_id")
     private Integer fileId;
