@@ -1,6 +1,7 @@
 package com.pickupluck.ecogging.domain.plogging.entity;
 
 import com.pickupluck.ecogging.domain.BaseEntity;
+import com.pickupluck.ecogging.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -23,19 +24,32 @@ public class Event extends BaseEntity {
     @Column
     private LocalDate meetingDate;
     @Column
+    private LocalDate endDate;
+    @Column
+    private  String corpName;
+    @Column
     private Boolean active;
-    @Column
+    @Column(columnDefinition = "integer default 0", nullable = false)
     private Integer views;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="user_id")
+    private User user;
+
     @Column
-    private Integer save;
-    @Column
-    private Integer userId;
-    @Column
-    private Integer fileId;
+    private Long fileId;
     @Column
     private  String location;
     @Column
     private  String explanation;
+    @Column
+    private  Boolean save;
+    @Column
+    private String management;
+
+//    @ManyToOne
+//    @JoinColumn(name = "fileId")
+//    private File file;
 
     @Override
     public String toString() {
@@ -44,28 +58,35 @@ public class Event extends BaseEntity {
                 ", title='" + title + '\'' +
                 ", content='" + content + '\'' +
                 ", meetingDate=" + meetingDate +
+                ", endDate=" + endDate +
+                ", corpName='" + corpName + '\'' +
                 ", active=" + active +
                 ", views=" + views +
-                ", save=" + save +
-                ", userId=" + userId +
+                ", userId=" + user.getId() +
                 ", fileId=" + fileId +
                 ", location='" + location + '\'' +
                 ", explanation='" + explanation + '\'' +
+                ", save=" + save +
                 ", createdAt=" + createdAt +
                 ", updatedAt=" + updatedAt +
+                ", management=" + management +
                 '}';
     }
 
-    public Event(String title, String content, LocalDate meetingDate, Boolean active, Integer views, Integer save, Integer userId, Integer fileId, String location, String explanation) {
+    public Event(String title, String content, LocalDate meetingDate, LocalDate endDate, String corpName, Boolean active,
+                 Integer views, User user, Long fileId, String location, String explanation, Boolean save, String management) {
         this.title = title;
         this.content = content;
         this.meetingDate = meetingDate;
+        this.endDate = endDate;
+        this.corpName = corpName;
         this.active = active;
         this.views = views;
-        this.save = save;
-        this.userId = userId;
+        this.user =user;
         this.fileId = fileId;
         this.location = location;
         this.explanation = explanation;
+        this.save = save;
+        this.management = management;
     }
 }

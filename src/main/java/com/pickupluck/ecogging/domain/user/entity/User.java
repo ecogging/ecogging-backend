@@ -1,5 +1,7 @@
 package com.pickupluck.ecogging.domain.user.entity;
 
+import com.pickupluck.ecogging.domain.user.dto.CorporateProfileModifyRequest;
+import com.pickupluck.ecogging.domain.user.dto.UserProfileModifyRequest;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
@@ -9,9 +11,10 @@ import com.pickupluck.ecogging.domain.BaseEntity;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.springframework.util.StringUtils.hasText;
+
 @Entity
 @Getter
-@ToString
 @NoArgsConstructor
 @EqualsAndHashCode(of="id", callSuper = false)
 public class User extends BaseEntity {
@@ -31,10 +34,13 @@ public class User extends BaseEntity {
 
     private String nickname;
 
-    private String tel;
+    private String telephone;
 
-    @Column(name = "noti_yn")
     private String notiYn;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "corporate_id")
+    private Corporate corporate;
 
     @Enumerated(EnumType.STRING)
     private LoginType loginType;
@@ -42,15 +48,57 @@ public class User extends BaseEntity {
     @OneToMany(mappedBy = "user")
     private List<Authority> authorities = new ArrayList<>();
 
+    private String profileImageUrl;
+
     @Builder
     public User(String email, String name, String password, String nickname,
-                String tel, String notiYn, LoginType loginType) {
+                String telephone, String notiYn, LoginType loginType, String profileImageUrl) {
         this.email = email;
         this.name = name;
         this.password = password;
         this.nickname = nickname;
-        this.tel = tel;
+        this.telephone = telephone;
         this.notiYn = notiYn;
         this.loginType = loginType;
+        this.profileImageUrl = profileImageUrl;
+    }
+
+    public void updateNotiYn(String notiYn) {
+        if (hasText(notiYn)) {
+            this.notiYn = notiYn;
+        }
+    }
+
+    @Override
+    public String toString() {
+        return String.format("[%s, %s, %s, %s, %s]", id, email, name, nickname, telephone);
+    }
+
+    public void changeProfileImageUrl(String imageUrl) {
+        if (hasText(imageUrl)) {
+            this.profileImageUrl = imageUrl;
+        }
+    }
+
+    public void modifyProfile(String profileImageUrl, UserProfileModifyRequest userInfoModifyRequest) {
+        this.email = userInfoModifyRequest.getEmail();
+        this.name = userInfoModifyRequest.getName();
+        this.nickname = userInfoModifyRequest.getNickname();
+        this.telephone = userInfoModifyRequest.getTelephone();
+        changeProfileImageUrl(profileImageUrl);
+    }
+
+    public void modifyCorporateProfile(String profileImageUrl, CorporateProfileModifyRequest request) {
+        this.email = request.getEmail();
+        this.nickname = request.getNickname();
+        this.telephone = request.getTelephone();
+        this.corporate.modifyInformation(request);
+
+        changeProfileImageUrl(profileImageUrl);
+    }
+
+    public void registerCorporate(Corporate corporate) {
+        corporate.registerManager(this);
+        this.corporate = corporate;
     }
 }

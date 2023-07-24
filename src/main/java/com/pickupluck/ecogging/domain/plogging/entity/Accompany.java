@@ -2,6 +2,10 @@ package com.pickupluck.ecogging.domain.plogging.entity;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.pickupluck.ecogging.domain.user.entity.Authority;
 import jakarta.persistence.*;
 
 import lombok.*;
@@ -15,8 +19,7 @@ import org.hibernate.annotations.DynamicInsert;
 @Getter
 @Setter
 @NoArgsConstructor
-@EqualsAndHashCode(of="id", callSuper = false)
-@ToString(exclude = "writer")
+@ToString(exclude = "user")
 @DynamicInsert
 public class Accompany extends BaseEntity {
 
@@ -50,9 +53,9 @@ public class Accompany extends BaseEntity {
     @ColumnDefault("0")
     private  Integer joincnt;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User writer;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "userId")
+    private User user;
 
     @Builder
     public Accompany(String title, String content, LocalDate meetingDate, LocalTime meetingTime, Integer numOfPeople, Boolean active, Integer views, Boolean save, User writer, String location, String locationDetail) {
@@ -64,7 +67,7 @@ public class Accompany extends BaseEntity {
         this.active = active;
         this.views = views;
         this.save = save;
-        this.writer = writer;
+        this.user = writer;
         this.location = location;
         this.locationDetail = locationDetail;
     }

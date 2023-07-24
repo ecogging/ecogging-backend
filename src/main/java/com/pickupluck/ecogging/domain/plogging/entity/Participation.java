@@ -1,5 +1,6 @@
 package com.pickupluck.ecogging.domain.plogging.entity;
 
+import com.pickupluck.ecogging.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,8 +16,7 @@ public class Participation {
 
     @Column
     private Long userId;
-    @Column
-    private Long accompanyId;
+
     @Column
     private Boolean confirm;
 
@@ -25,14 +25,18 @@ public class Participation {
         return "Participation{" +
                 "participationId=" + participationId +
                 ", userId=" + userId +
-                ", accompanyId=" + accompanyId +
+                ", accompanyId=" + getAccompany().getId() +
                 ", confirm=" + confirm +
                 '}';
     }
 
     public Participation(Long userId, Long accompanyId, Boolean confirm) {
         this.userId = userId;
-        this.accompanyId = accompanyId;
+        this.accompany.setId(accompanyId);
         this.confirm = confirm;
     }
+
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "accompanyId")
+    private Accompany accompany;
 }

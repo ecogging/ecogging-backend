@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+@Entity
 @Getter
 @Setter
 @NoArgsConstructor
@@ -17,7 +18,7 @@ public class Scrap extends BaseEntity {
     private Integer scrapId;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name="userId")
+    @JoinColumn(name="user_id")
     private User userScrap;
 
     @OneToOne(fetch = FetchType.EAGER)

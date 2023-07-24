@@ -3,12 +3,13 @@ package com.pickupluck.ecogging.domain.file.entity;
 import com.pickupluck.ecogging.domain.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Entity
+@Entity(name = "File")
 @Getter
+@Setter
 @NoArgsConstructor
 public class File extends BaseEntity {
 
@@ -24,4 +25,24 @@ public class File extends BaseEntity {
     private String fullPath;
 
     private Long size;
+
+    public String getOriginName() {
+        return this.originName;
+    }
+
+    @Override
+    public String toString() {
+        return "File{" +
+                "originName='" + originName + '\'' +
+                ", fullPath='" + fullPath + '\'' +
+                ", size=" + size +
+                '}';
+    }
+
+    public File(String originName, String fullPath, Long size) {
+        this.originName = originName;
+        this.fullPath = fullPath;
+        this.size = size;
+    }
+
 }

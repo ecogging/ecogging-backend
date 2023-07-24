@@ -1,5 +1,8 @@
 package com.pickupluck.ecogging.domain.plogging.api;
 
+import com.pickupluck.ecogging.domain.notification.dto.NotificationSaveDto;
+import com.pickupluck.ecogging.domain.notification.entity.NotificationType;
+import com.pickupluck.ecogging.domain.notification.service.NotificationService;
 import com.pickupluck.ecogging.domain.plogging.dto.AccompanyDTO;
 import com.pickupluck.ecogging.domain.plogging.service.AccompanyService;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +21,9 @@ public class AccompanyController {
 
     @Autowired
     private AccompanyService accompanyService;
+
+    @Autowired
+    private NotificationService notificationService;
 
     @GetMapping("/accompanies/{page}")
     public ResponseEntity<Map<String,Object>> accompanyList(@PathVariable Integer page,
@@ -68,10 +74,12 @@ public class AccompanyController {
             Map<String,Object> map = new HashMap<>();
             AccompanyDTO accompanyDTO = accompanyService.getAccompany(param.get("accompanyId"));
             map.put("accompany", accompanyDTO);
-            Boolean isParticipation = accompanyService.isParticipation(param.get("userId"),param.get("accompanyId"));
-            map.put("isParticipation", isParticipation);
-            Boolean isAccompanyscrap = accompanyService.isAccompanyScrap(param.get("userId"),param.get("accompanyId"));
-            map.put("isAccompanyscrap", isAccompanyscrap);
+            if(param.get("userId")!=null) {
+                Boolean isParticipation = accompanyService.isParticipation(param.get("userId"), param.get("accompanyId"));
+                map.put("isParticipation", isParticipation);
+                Boolean isAccompanyscrap = accompanyService.isAccompanyScrap(param.get("userId"), param.get("accompanyId"));
+                map.put("isAccompanyscrap", isAccompanyscrap);
+            }
             return new ResponseEntity<>(map, HttpStatus.OK);
         } catch (Exception e) {
             e.printStackTrace();
@@ -109,6 +117,58 @@ public class AccompanyController {
         try {
             Boolean isScrap =  accompanyService.toggleAccompanyScrap(param.get("userId"), param.get("accompanyId"));
             return new ResponseEntity<>(isScrap, HttpStatus.OK);
+        } catch(Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PostMapping("/myaccompanies")
+    public ResponseEntity<Map<String,Object>> myAccompanyList(@RequestBody Map<String,Object> param) {
+        Long userId = (Long)param.get("userId");
+        Integer page = (Integer)param.get("page");
+        try {
+            Map<String,Object> map= accompanyService.getMyAccompanyList(userId, page);
+            return new ResponseEntity<>(map, HttpStatus.OK);
+        } catch(Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PostMapping("/myaccompaniestemp")
+    public ResponseEntity<Map<String,Object>> myAccompanyTempList(@RequestBody Map<String,Object> param) {
+        Long userId = (Long)param.get("userId");
+        Integer page = (Integer)param.get("page");
+        try {
+            Map<String,Object> map= accompanyService.getMyAccompanyTempList(userId, page);
+            return new ResponseEntity<>(map, HttpStatus.OK);
+        } catch(Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PostMapping("/myparticipations")
+    public ResponseEntity<Map<String,Object>> myParticipationList(@RequestBody Map<String,Object> param) {
+        Long userId = (Long)param.get("userId");
+        Integer page = (Integer)param.get("page");
+        try {
+            Map<String,Object> map= accompanyService.getMyParticipationList(userId, page);
+            return new ResponseEntity<>(map, HttpStatus.OK);
+        } catch(Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PostMapping("/myaccompaniesscrap")
+    public ResponseEntity<Map<String,Object>> myAccompanyscrapList(@RequestBody Map<String,Object> param) {
+        Long userId = (Long)param.get("userId");
+        Integer page = (Integer)param.get("page");
+        try {
+            Map<String,Object> map= accompanyService.getMyAccompanyscrapList(userId, page);
+            return new ResponseEntity<>(map, HttpStatus.OK);
         } catch(Exception e) {
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

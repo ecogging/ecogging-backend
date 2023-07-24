@@ -9,28 +9,28 @@ import com.pickupluck.ecogging.domain.scrap.entity.Accompanyscrap;
 import com.pickupluck.ecogging.domain.scrap.repository.AccompanyscrapRepository;
 import com.pickupluck.ecogging.domain.user.entity.User;
 import com.pickupluck.ecogging.domain.user.repository.UserRepository;
+import com.pickupluck.ecogging.util.PageInfo;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.*;
 
-
 @Service
 @RequiredArgsConstructor
 public class AccompanyServiceImpl implements AccompanyService {
 
     private final AccompanyRepository accompanyRepository;
-
     private final ParticipationRepository participationRepository;
     private final AccompanyscrapRepository accompanyscrapRepository;
     private final UserRepository userRepository;
-
     private final ModelMapper modelMapper;
+    private final Integer onePage = 10;
 
     @Override
     public Map<String, Object> getAccompanyList(Integer page, String orderby) throws Exception {
@@ -62,7 +62,7 @@ public class AccompanyServiceImpl implements AccompanyService {
         Optional<User> user = userRepository.findById(accompanyDTO.getUserId());
         Accompany accompany = modelMapper.map(accompanyDTO, Accompany.class);
         if(user.isPresent()) {
-            accompany.setWriter(user.get());
+            accompany.setUser(user.get());
         }
         accompany.setSave(temp==1);
         System.out.println(accompany);
@@ -136,5 +136,106 @@ public class AccompanyServiceImpl implements AccompanyService {
             accompanyscrapRepository.deleteById(accompanyscrap.get().getScrapId());
             return false;
         }
+    }
+
+    @Override
+    public Map<String, Object> getMainAccompanyList() throws Exception {
+        Map<String, Object> map = new HashMap<>();
+        List<AccompanyDTO> list = new ArrayList<>();
+
+        List<Accompany> listLatest = accompanyRepository.findTop3ByOrderByCreatedAtDesc(); // 상위 3개의 데이터 가져오기
+
+        for (Accompany accomp : listLatest) { // Accompany -> AccompanyDTO로 변환해서 List로 만들어주고
+            AccompanyDTO accompanyDTO = new AccompanyDTO(accomp);
+            list.add(accompanyDTO);
+        }
+        map.put("list", list); // list통째로 map에 'list' key : 리스트 value 로 넣어서 리턴
+        return map;
+    }
+
+    private PageInfo calcPage(Integer allPage, Integer page) {
+        PageInfo pageInfo = new PageInfo();
+        pageInfo.setCurPage(page);
+        pageInfo.setAllPage(allPage);
+        int startPage = (page-1)/onePage*onePage+1;
+        int endPage = startPage+10-1;
+        if(endPage>pageInfo.getAllPage()) endPage=pageInfo.getAllPage();
+        pageInfo.setStartPage(startPage);
+        pageInfo.setEndPage(endPage);
+        return pageInfo;
+    }
+
+    @Override
+    public Map<String, Object> getMyAccompanyList(Long userId, Integer page) throws Exception {
+        PageRequest pageRequest = PageRequest.of(page-1,onePage, Sort.by(Sort.Direction.DESC, "id"));
+        Page<Accompany> accompanyPage = accompanyRepository.findByUserId(userId, pageRequest);
+
+        Map<String, Object> map = new HashMap<>();
+        List<AccompanyDTO> list = new ArrayList<>();
+        for(Accompany accompany : accompanyPage.getContent()){
+            AccompanyDTO accompanyDTO = new AccompanyDTO(accompany);
+            list.add(accompanyDTO);
+        }
+        map.put("list", list);
+        PageInfo pageInfo = calcPage(accompanyPage.getTotalPages(), page);
+        map.put("pageInfo", pageInfo);
+        return map;
+    }
+
+    @Override
+    public Map<String, Object> getMyAccompanyTempList(Long userId, Integer page) throws Exception {
+        PageRequest pageRequest = PageRequest.of(page-1,onePage, Sort.by(Sort.Direction.DESC, "id"));
+        Page<Accompany> accompanyPage = accompanyRepository.findByUserIdAndSaveTrue(userId, pageRequest);
+        Map<String, Object> map = new HashMap<>();
+        List<AccompanyDTO> list = new ArrayList<>();
+        for(Accompany accompany : accompanyPage.getContent()){
+            AccompanyDTO accompanyDTO = new AccompanyDTO(accompany);
+            list.add(accompanyDTO);
+        }
+        map.put("list", list);
+        PageInfo pageInfo = calcPage(accompanyPage.getTotalPages(), page);
+        map.put("pageInfo", pageInfo);
+        return map;
+    }
+
+    @Override
+    public Map<String, Object> getMyParticipationList(Long userId, Integer page) throws Exception {
+
+        PageRequest pageRequest = null;
+        Page<Participation> participationPage = null;
+        pageRequest = PageRequest.of(page-1,onePage, Sort.by(Sort.Direction.DESC, "accompanyId"));
+        participationPage = participationRepository.findByUserId(userId, pageRequest);
+
+        Map<String, Object> map = new HashMap<>();
+        List<AccompanyDTO> list = new ArrayList<>();
+        for(Participation participation : participationPage.getContent()){
+            AccompanyDTO accompanyDTO = new AccompanyDTO(participation.getAccompany());
+            list.add(accompanyDTO);
+        }
+
+        map.put("list", list);
+        PageInfo pageInfo = calcPage(participationPage.getTotalPages(), page);
+        map.put("pageInfo", pageInfo);
+
+        return map;
+    }
+
+    @Override
+    public Map<String, Object> getMyAccompanyscrapList(Long userId, Integer page) throws Exception {
+        PageRequest pageRequest = PageRequest.of(page-1,onePage, Sort.by(Sort.Direction.DESC, "accompanyId"));
+        Page<Accompanyscrap>  accompanyscrapPage = accompanyscrapRepository.findByUserId(userId, pageRequest);
+
+        Map<String, Object> map = new HashMap<>();
+        List<AccompanyDTO> list = new ArrayList<>();
+        for(Accompanyscrap accompanyscrap : accompanyscrapPage.getContent()){
+            AccompanyDTO accompanyDTO = new AccompanyDTO(accompanyscrap.getAccompany());
+            list.add(accompanyDTO);
+        }
+
+        map.put("list", list);
+        PageInfo pageInfo = calcPage(accompanyscrapPage.getTotalPages(), page);
+        map.put("pageInfo", pageInfo);
+
+        return map;
     }
 }
