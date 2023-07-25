@@ -52,8 +52,9 @@ public class EventServiceImpl implements EventService{
 
     public void writeEvent(EventDTO eventDTO, MultipartFile file) throws Exception {
         if(file!=null && !file.isEmpty()) {
-            String path="D:/MJS/front-work/upload/";
-//            String path="C:/JSR/front-work/upload/"; dongur2 임시 경로
+//            String path="D:/MJS/front-work/upload/";
+//            dongur2 임시 경로
+            String path="C:/JSR/front-work/upload/";
             String originName = file.getOriginalFilename();
             Long size = file.getSize();
             String fullPath = path+originName;
@@ -201,8 +202,9 @@ public class EventServiceImpl implements EventService{
     }
 
     public void readFile(Long fileId, OutputStream out) throws Exception {
-        String path="D:/MJS/front-work/upload/";
-//        String path="C:/JSR/front-work/upload/"; dongur2 임시 경로
+//        String path="D:/MJS/front-work/upload/";
+//        dongur2 임시 경로
+        String path="C:/JSR/front-work/upload/";
         Optional<File> ofile = fileRepository.findById(fileId);
         if(ofile.isPresent()) {
             String fileName = ofile.get().getOriginName();
@@ -220,8 +222,9 @@ public class EventServiceImpl implements EventService{
     @Override
     public void modifyEvent(EventDTO eventDTO, MultipartFile file) throws Exception {
         if(file!=null && !file.isEmpty()) {
-            String path="D:/MJS/front-work/upload/";
-//            String path="C:/JSR/front-work/upload/"; dongur2 임시 경로
+//            String path="D:/MJS/front-work/upload/";
+//            dongur2 임시 경로
+            String path="C:/JSR/front-work/upload/";
             String originName = file.getOriginalFilename();
             Long size = file.getSize();
             String fullPath = path+originName;
