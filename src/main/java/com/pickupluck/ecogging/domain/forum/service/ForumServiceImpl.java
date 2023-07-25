@@ -1,17 +1,22 @@
 package com.pickupluck.ecogging.domain.forum.service;
 
+import com.pickupluck.ecogging.domain.forum.dto.ForumDTO;
+import com.pickupluck.ecogging.domain.forum.entity.Forum;
 import com.pickupluck.ecogging.domain.plogging.dto.ReviewDTO;
 import com.pickupluck.ecogging.domain.forum.repository.ForumRepository;
 import com.pickupluck.ecogging.util.PageInfo;
 import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Transactional
@@ -26,12 +31,7 @@ public class ForumServiceImpl implements ForumService{
     public List<ReviewDTO> getReviews(Integer page, PageInfo pageInfo) throws Exception{
 //        List<Forum> list=forumRepository.findAll();
         PageRequest pageRequest=PageRequest.of(page-1, 10, Sort.by(Sort.Direction.DESC,"forumId"));
-
-
         //Page<Forum> pages=forumRepository.findRequest(pageRequest);
-
-
-
         //pageInfo.setAllPage(pages.getTotalPages());
         pageInfo.setCurPage(page);
         int startPage=(page-1)/5*5+1;
@@ -47,5 +47,38 @@ public class ForumServiceImpl implements ForumService{
 //            list.add(modelMapper.map(forum, ForumDto.class));
 //        }
         return list;
+    }
+
+    @Override
+    public Map<String, Object> getMyForumList(Long userId, Integer page, String order) throws Exception {
+        Sort.Direction sort = Sort.Direction.DESC;
+        if(order.equals("old")) {
+            sort = Sort.Direction.ASC;
+        }
+        PageRequest pageRequest=PageRequest.of(page-1, 10, Sort.by(sort,"forumId"));
+        Page<Forum> pages=forumRepository.findByUserId(userId, pageRequest);
+
+        Map<String,Object> map = new HashMap<>();
+        List<ForumDTO> list=new ArrayList<>();
+        for(Forum forum:pages.getContent()){
+            list.add(modelMapper.map(forum, ForumDTO.class));
+        }
+
+        map.put("list", list);
+
+        PageInfo pageInfo = new PageInfo();
+        pageInfo.setAllPage(pages.getTotalPages());
+        pageInfo.setCurPage(page);
+        int startPage=(page-1)/10*10+1;
+        int endPage=startPage+10-1;
+        if(endPage>pageInfo.getAllPage()){
+            endPage=pageInfo.getAllPage();
+        }
+        pageInfo.setStartPage(startPage);
+        pageInfo.setEndPage(endPage);
+
+        map.put("pageInfo", pageInfo);
+        return map;
+
     }
 }

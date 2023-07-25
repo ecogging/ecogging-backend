@@ -13,4 +13,6 @@ import java.util.List;
 @Repository
 public interface ForumRepository extends JpaRepository<Forum,Long> {
 
+    Page<Forum> findByUserId(Long userId, PageRequest pageRequest);
+
 }
