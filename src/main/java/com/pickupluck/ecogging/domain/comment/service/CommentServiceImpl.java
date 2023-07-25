@@ -65,10 +65,10 @@ public class CommentServiceImpl implements CommentService {
     @Transactional
     public void save(CommentSaveRequest request) throws Exception {
         final String email = SecurityUtil.getCurrentUsername().orElse("");
-        User user = userRepository.findByEmail(email)
+        final User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new Exception("No user for email: " + email));
 
-        Comment comment = Comment.builder()
+        final Comment comment = Comment.builder()
                 .content(request.getContent())
                 .boardType(BoardType.ACCOMPANY) // 현재는 동행에만 댓글 달림
                 .articleId(request.getArticleId())
@@ -76,7 +76,7 @@ public class CommentServiceImpl implements CommentService {
                 .build();
 
         if (request.getParentId() != null) {
-            Comment parent = commentRepository
+            final Comment parent = commentRepository
                     .findById(request.getParentId())
                     .orElseThrow(()-> new IllegalArgumentException("no comment for id: " + request.getParentId()));
 
@@ -89,21 +89,21 @@ public class CommentServiceImpl implements CommentService {
         commentRepository.save(comment);
 
         // notification
-        boolean isReply = comment.isParentExist();
-        AccompanyDTO target = accompanyService.getAccompany(comment.getArticleId());
+        final boolean isReply = comment.isParentExist();
+        final AccompanyDTO target = accompanyService.getAccompany(comment.getArticleId());
 
         // 대댓글일 경우, 부모댓글 작성자. 댓글일 경우 글 작성자
-        Long notiReceiverId = isReply ? comment.getParent().getId() : target.getUserId();
+        final Long notiReceiverId = isReply ? comment.getParent().getWriter().getId() : target.getUserId();
 
         // 댓글 작성자
-        Long notiSenderId = user.getId();
+        final Long notiSenderId = user.getId();
         // 게시글 아이디
-        Long notiTargetId = target.getId();
+        final Long notiTargetId = target.getId();
 
         // 댓글일 경우, 글 제목. 대댓글일경우 없음
-        String notiDetail = isReply ? "" : target.getTitle();
-        NotificationType notiType = isReply ? NotificationType.REPLYCOMMENT : NotificationType.COMMENT;
-        BoardType notiBoardType = comment.getBoardType();
+        final String notiDetail = isReply ? "" : target.getTitle();
+        final NotificationType notiType = isReply ? NotificationType.REPLYCOMMENT : NotificationType.COMMENT;
+        final BoardType notiBoardType = comment.getBoardType();
 
         notificationService.createNotification(
                 NotificationSaveDto.builder()

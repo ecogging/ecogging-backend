@@ -68,6 +68,7 @@ public class NotificationServiceImpl implements NotificationService {
                                         .build();
 
         notificationRepository.save(notification);
+        log.info("알림 생성{} -> {} at {}",sender.getId(), receiver.getId(), notificationSaveDto.getType().getName());
     }
 
     public void deleteNotification(Long id) {
