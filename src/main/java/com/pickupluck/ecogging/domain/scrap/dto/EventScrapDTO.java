@@ -9,17 +9,17 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class EventScrapDTO {
-    private Integer scrapId;
+    private Long scrapId;
     private Long userId;
     private Integer eventId;
 
     public EventScrapDTO(Eventscrap eventscrap) {
         this.scrapId = eventscrap.getScrapId();
-        this.userId = eventscrap.getUserScrap().getId();
-        this.eventId = eventscrap.getEventScrap().getEventId();
+        this.userId = eventscrap.getUser().getId();
+        this.eventId = eventscrap.getEvent().getEventId();
     }
 
-    public EventScrapDTO(Integer scrapId, Long userId, Integer eventId) {
+    public EventScrapDTO(Long scrapId, Long userId, Integer eventId) {
         this.scrapId = scrapId;
         this.userId = userId;
         this.eventId = eventId;

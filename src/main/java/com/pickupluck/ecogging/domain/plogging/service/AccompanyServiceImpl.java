@@ -166,7 +166,7 @@ public class AccompanyServiceImpl implements AccompanyService {
     @Override
     public Map<String, Object> getMyAccompanyList(Long userId, Integer page) throws Exception {
         PageRequest pageRequest = PageRequest.of(page-1,5, Sort.by(Sort.Direction.DESC, "id"));
-        Page<Accompany> accompanyPage = accompanyRepository.findByUserId(userId, pageRequest);
+        Page<Accompany> accompanyPage = accompanyRepository.findByUserIdAndSaveFalse(userId, pageRequest);
 
         Map<String, Object> map = new HashMap<>();
         List<AccompanyDTO> list = new ArrayList<>();

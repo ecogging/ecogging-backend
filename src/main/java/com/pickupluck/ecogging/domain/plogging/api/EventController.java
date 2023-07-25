@@ -55,8 +55,8 @@ public class EventController {
         }
     }
 
-    @PostMapping("/myevnettemp")
-    public ResponseEntity<Map<String,Object>> myEvnetTempList(@RequestBody Map<String,Object> param) {
+    @PostMapping("/myeventtemp")
+    public ResponseEntity<Map<String,Object>> myEventTempList(@RequestBody Map<String,Object> param) {
         Long userId = Long.parseLong((String) param.get("userId"));
         Integer page = Integer.valueOf((String)param.get("page"));
         try {

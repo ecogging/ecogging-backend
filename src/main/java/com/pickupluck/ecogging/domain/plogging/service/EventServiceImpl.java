@@ -77,7 +77,7 @@ public class EventServiceImpl implements EventService{
     }
     @Override
     public List<EventDTO> getEventList(Integer page, PageInfo pageInfo,  String sorttype) throws Exception {
-        PageRequest pageRequest = PageRequest.of(page-1, 5);
+        PageRequest pageRequest = PageRequest.of(page-1, 8);
         Boolean save = null;
         Date endDate = null;
 
@@ -148,7 +148,7 @@ public class EventServiceImpl implements EventService{
     @Override
     public Map<String, Object> getMyEventList(Long userId, Integer page) throws Exception {
         PageRequest pageRequest = PageRequest.of(page-1,5, Sort.by(Sort.Direction.DESC, "eventId"));
-        Page<Event> eventPage = eventRepository.findByUserId(userId, pageRequest);
+        Page<Event> eventPage = eventRepository.findByUserIdAndSaveFalse(userId, pageRequest);
 
         Map<String, Object> map = new HashMap<>();
         List<EventDTO> list = new ArrayList<>();
@@ -174,8 +174,6 @@ public class EventServiceImpl implements EventService{
         }
         map.put("list", list);
         PageInfo pageInfo = calcPage(eventPage.getTotalPages(), page);
-        // hasisLastPage 속성 설정
-        pageInfo.setIsLastPage(eventPage.isLast());
         map.put("pageInfo", pageInfo);
         return map;
     }
@@ -183,18 +181,16 @@ public class EventServiceImpl implements EventService{
     @Override
     public Map<String, Object> getMyEventscrapList(Long userId, Integer page) throws Exception {
         PageRequest pageRequest = PageRequest.of(page-1,5, Sort.by(Sort.Direction.DESC, "scrapId"));
-        Page<Eventscrap> eventscrapPage = eventscrapRepository.findByUserScrap(userId, pageRequest);
+        Page<Eventscrap> eventscrapPage = eventscrapRepository.findByUserId(userId, pageRequest);
 
         Map<String, Object> map = new HashMap<>();
         List<EventDTO> list = new ArrayList<>();
         for(Eventscrap eventscrap : eventscrapPage.getContent()){
-            EventDTO eventDTO = new EventDTO(eventscrap.getEventScrap());
+            EventDTO eventDTO = new EventDTO(eventscrap.getEvent());
             list.add(eventDTO);
         }
         map.put("list", list);
         PageInfo pageInfo = calcPage(eventscrapPage.getTotalPages(), page);
-        // hasisLastPage 속성 설정
-        pageInfo.setIsLastPage(eventscrapPage.isLast());
         map.put("pageInfo", pageInfo);
         return map;
     }
@@ -263,16 +259,16 @@ public class EventServiceImpl implements EventService{
     public Boolean isEventScrap(Long userId, Integer eventId) throws Exception {
         User user = userRepository.findById(userId).get();
         Event event = eventRepository.findById(eventId).get();
-        Optional<Eventscrap> eventscrap = eventscrapRepository.findByUserScrapAndEventScrap(user,event);
+        Optional<Eventscrap> eventscrap = eventscrapRepository.findByUserAndEvent(user,event);
         if (eventscrap.isPresent()) return true;
           else return false;
     }
 
     @Override
     public Boolean toggleEventScrap(Long userId, Long eventId) throws Exception {
-        User user = userRepository.findById(userId).orElseThrow(() -> new Exception("User not found"));
-        Event event = eventRepository.findById(Math.toIntExact(eventId)).orElseThrow(() -> new Exception("Event not found"));
-        Optional<Eventscrap> eventscrap = eventscrapRepository.findByUserScrapAndEventScrap(user, event);
+        User user = userRepository.findById(userId).get();
+        Event event = eventRepository.findById(Math.toIntExact(eventId)).get();
+        Optional<Eventscrap> eventscrap = eventscrapRepository.findByUserAndEvent(user, event);
 
         if(eventscrap.isEmpty()) {
             eventscrapRepository.save(new Eventscrap(null, user, event));

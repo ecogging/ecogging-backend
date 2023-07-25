@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
-public interface EventscrapRepository extends JpaRepository<Eventscrap, Integer> {
-    Optional<Eventscrap> findByUserScrapAndEventScrap(User user, Event event);
-    Page<Eventscrap> findByUserScrap(Long userId, PageRequest paging);
+public interface EventscrapRepository extends JpaRepository<Eventscrap, Long> {
+    Optional<Eventscrap> findByUserAndEvent(User user, Event event);
+    Page<Eventscrap> findByUserId(Long userId, PageRequest paging);
 }
