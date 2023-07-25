@@ -57,7 +57,7 @@ public class CommentServiceImpl implements CommentService {
                 .stream()
                 .filter(comment -> !comment.isParentExist())
                 .map(CommentResponse::from)
-                .sorted(Comparator.comparing(CommentResponse::getCreatedAt).reversed())
+                .sorted(Comparator.comparing(CommentResponse::getCreatedAt))
                 .toList();
     }
 

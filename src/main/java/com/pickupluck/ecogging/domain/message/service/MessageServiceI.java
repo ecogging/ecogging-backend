@@ -7,6 +7,9 @@ import com.pickupluck.ecogging.domain.message.entity.MessageRoom;
 import com.pickupluck.ecogging.domain.message.entity.VisibilityState;
 import com.pickupluck.ecogging.domain.message.repository.MessageRepository;
 import com.pickupluck.ecogging.domain.message.repository.MessageRoomRepository;
+import com.pickupluck.ecogging.domain.notification.dto.NotificationSaveDto;
+import com.pickupluck.ecogging.domain.notification.entity.NotificationType;
+import com.pickupluck.ecogging.domain.notification.service.NotificationService;
 import com.pickupluck.ecogging.domain.user.entity.User;
 import com.pickupluck.ecogging.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +27,8 @@ public class MessageServiceI implements MessageService{
     private final MessageRoomRepository messageRoomRepository;
     private final MessageRepository messageRepository;
     private final UserRepository userRepository;
+
+    private final NotificationService notificationService;
 
     // 1. 쪽지 전송
     @Override
@@ -49,6 +54,25 @@ public class MessageServiceI implements MessageService{
         // Message Entity -> Repo 저장
         messageRepository.save(message);
         System.out.println("쪽지 전송 완료!!!! ^_______________^ //// ");
+
+        // notification
+        // 발송: 쪽지 발송자
+        final Long notiSenderId = message.getSender().getId();
+        // 수신: 쪽지 수신자
+        final Long notiReceiverId = message.getReceiver().getId();
+        // 타겟은 메시지룸 아이디
+        final Long notiTargetId = message.getMessageRoom().getId();
+        // 디테일 없음
+        final NotificationType notiType = NotificationType.MESSAGE;
+
+        notificationService.createNotification(
+                NotificationSaveDto.builder()
+                        .receiverId(notiReceiverId)
+                        .targetId(notiTargetId)
+                        .senderId(notiSenderId)
+                        .type(notiType)
+                        .build()
+        );
     }
 
     // 2. 쪽지 조회
