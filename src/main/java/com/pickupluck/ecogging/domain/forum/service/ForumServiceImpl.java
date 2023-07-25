@@ -1,8 +1,6 @@
 package com.pickupluck.ecogging.domain.forum.service;
 
-import com.pickupluck.ecogging.domain.forum.dto.ForumDTO;
-import com.pickupluck.ecogging.domain.forum.dto.MainForumsResponseDto;
-import com.pickupluck.ecogging.domain.forum.dto.MyForumShareResponseDto;
+import com.pickupluck.ecogging.domain.forum.dto.*;
 import com.pickupluck.ecogging.domain.forum.entity.Forum;
 import com.pickupluck.ecogging.domain.forum.dto.MainForumsResponseDto;
 import com.pickupluck.ecogging.domain.forum.entity.ForumFile;
@@ -519,7 +517,8 @@ public class ForumServiceImpl implements ForumService{
     public Page<MyForumShareResponseDto> getMyShares(Long userId, Pageable pageable) {
 
         // 데이터 확보
-        Page<Forum> mySharesEntity = forumRepository.findAllByUserIdAndType(userId, pageable);
+        String thisType = "나눔";
+        Page<Forum> mySharesEntity = forumRepository.findAllByUserIdAndType(userId, pageable, thisType);
 
         // Entity -> DTO
         Page<MyForumShareResponseDto> mySharesDto = mySharesEntity.map(share -> {
@@ -554,5 +553,29 @@ public class ForumServiceImpl implements ForumService{
         });
 
         return mySharesDto;
+    }
+
+    // MyForum(ROUTE) ----------------------------------------------------------------------------
+    @Override
+    @Transactional(readOnly = true)
+    public Page<MyForumRouteResponseDto> getMyRoutes(Long userId, Pageable pageable) {
+
+        // 데이터 확보
+        String thisType = "경로";
+        Page<Forum> myRoutesEntity = forumRepository.findAllByUserIdAndType(userId, pageable, thisType);
+
+        // Entity -> DTO
+        Page<MyForumRouteResponseDto> myRouteDto = myRoutesEntity.map(route -> {
+            return MyForumRouteResponseDto.builder()
+                    .forumId(route.getId())
+                    .title(route.getTitle())
+                    .content(route.getContent())
+                    .createdAt(route.getCreatedAt())
+                    .views(route.getViews())
+                    .location(route.getRouteLocation())
+                    .build();
+        });
+
+        return myRouteDto;
     }
 }

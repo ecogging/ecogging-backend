@@ -1,5 +1,6 @@
 package com.pickupluck.ecogging.domain.forum.api;
 
+import com.pickupluck.ecogging.domain.forum.dto.MyForumRouteResponseDto;
 import com.pickupluck.ecogging.domain.forum.dto.MyForumShareResponseDto;
 import com.pickupluck.ecogging.domain.forum.service.ForumService;
 import lombok.RequiredArgsConstructor;
@@ -25,20 +26,38 @@ public class MyForumController {
 
     private final ForumService forumService;
 
+    // 내가 작성한 나눔
     @GetMapping("/mypage/{userId}/shares")
-    public ResponseEntity<Map<String, Object>> getMyShares (@PathVariable("userId")Long userId,
-                                                            @PageableDefault(size = 5, sort = "createdAt", direction = Sort.Direction.DESC) final Pageable pageable) {
+    public ResponseEntity<Map<String, Object>> getMyShares(@PathVariable("userId") Long userId,
+                                                           @PageableDefault(size = 5, sort = "createdAt", direction = Sort.Direction.DESC) final Pageable pageable) {
         // DB에서 최신순 5개 글 확보
         Page<MyForumShareResponseDto> myShares = forumService.getMyShares(userId, pageable);
-        if(myShares.isEmpty()) {
-            System.out.println("없음$$$$$$$$$$$$$$$$$$$$");
+        if (myShares.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
         Map<String, Object> responseBody = new HashMap<>();
-        responseBody.put("msg", "MYFORUM 후기 조회 완료");
+        responseBody.put("msg", "MYFORUM 나눔 조회 완료");
         responseBody.put("data", myShares.getContent());
 
         return ResponseEntity.ok(responseBody);
     }
+
+    // 내가 작성한 경로추천
+    @GetMapping("/mypage/{userId}/recommendations")
+    public ResponseEntity<Map<String, Object>> getMyRoutes(@PathVariable("userId") Long userId,
+                                                           @PageableDefault(size = 5, sort = "createdAt", direction = Sort.Direction.DESC) final Pageable pageable) {
+        // DB에서 최신순 5개 글 확보
+        Page<MyForumRouteResponseDto> myRoutes = forumService.getMyRoutes(userId, pageable);
+        if (myRoutes.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        Map<String, Object> responseBody = new HashMap<>();
+        responseBody.put("msg", "MYFORUM 경로추천 조회 완료");
+        responseBody.put("data", myRoutes.getContent());
+
+        return ResponseEntity.ok(responseBody);
+    }
+
 }

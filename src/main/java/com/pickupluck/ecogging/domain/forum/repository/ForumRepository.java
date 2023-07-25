@@ -43,7 +43,7 @@ public interface ForumRepository extends JpaRepository<Forum,Long> {
     Page<Forum> findAllWithoutTemp(Pageable pageable);
 
     // My Forums -------------------------------------------------------------------------------------
-    @Query("SELECT s FROM Forum s WHERE s.isTemporary = false AND s.type = '나눔' AND s.writer.id = :userId")
-    Page<Forum> findAllByUserIdAndType(@Param("userId")Long userId, Pageable pageable);
+    @Query("SELECT s FROM Forum s WHERE s.isTemporary = false AND s.type = :type AND s.writer.id = :userId")
+    Page<Forum> findAllByUserIdAndType(@Param("userId")Long userId, Pageable pageable, @Param("type")String type);
 }
 

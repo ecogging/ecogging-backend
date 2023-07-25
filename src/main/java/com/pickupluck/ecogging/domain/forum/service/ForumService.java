@@ -2,6 +2,7 @@ package com.pickupluck.ecogging.domain.forum.service;
 
 import com.pickupluck.ecogging.domain.forum.dto.ForumDTO;
 import com.pickupluck.ecogging.domain.forum.dto.MainForumsResponseDto;
+import com.pickupluck.ecogging.domain.forum.dto.MyForumRouteResponseDto;
 import com.pickupluck.ecogging.domain.forum.dto.MyForumShareResponseDto;
 import com.pickupluck.ecogging.domain.plogging.dto.ReviewDTO;
 import com.pickupluck.ecogging.util.PageInfo;
@@ -51,6 +52,7 @@ public interface ForumService{
     // Main Forums ------------------------------------------------------------
     Page<MainForumsResponseDto> getMainForums(Pageable pageable);
 
-    // MyForum(SHARE)  --------------------------------------------------------
+    // MyForum(SHARE, ROUTE)  --------------------------------------------------------
     Page<MyForumShareResponseDto> getMyShares(Long userId, Pageable pageable);
+    Page<MyForumRouteResponseDto> getMyRoutes(Long userId, Pageable pageable);
 }
