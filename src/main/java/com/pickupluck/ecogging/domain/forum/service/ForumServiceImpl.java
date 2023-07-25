@@ -33,7 +33,6 @@ import java.util.*;
 @Transactional
 public class ForumServiceImpl implements ForumService{
 
-
     @Autowired
     AccompanyRepository accompanyRepository;
     @Autowired
@@ -558,11 +557,15 @@ public class ForumServiceImpl implements ForumService{
     // MyForum(ROUTE) ----------------------------------------------------------------------------
     @Override
     @Transactional(readOnly = true)
-    public Page<MyForumRouteResponseDto> getMyRoutes(Long userId, Pageable pageable) {
+    public Map<String, Object> getMyRoutes(Long userId, Pageable pageable) {
 
-        // 데이터 확보
+        // 조건에 맞는 데이터 확보 ( 조건: 5개, 최신순 )
         String thisType = "경로";
         Page<Forum> myRoutesEntity = forumRepository.findAllByUserIdAndType(userId, pageable, thisType);
+
+        // 쿼리에 맞는 모든 데이터 확보 -> 전체 개수 확보 ( 전체 페이지 개수 위함 )
+        List<Forum> allMyRoutes = forumRepository.findAllByUserIdAndType(userId, thisType);
+        int count = allMyRoutes.size();
 
         // Entity -> DTO
         Page<MyForumRouteResponseDto> myRouteDto = myRoutesEntity.map(route -> {
@@ -576,6 +579,12 @@ public class ForumServiceImpl implements ForumService{
                     .build();
         });
 
-        return myRouteDto;
+        // 결과 담아서 넘기는 맵
+        Map<String, Object> result = new HashMap<>();
+        result.put("res", myRouteDto); // 해당 페이지에 띄울 글 목록
+        result.put("all", count); // 페이징을 위한 전체 데이터 개수
+
+        return result;
     }
+
 }

@@ -54,5 +54,7 @@ public interface ForumService{
 
     // MyForum(SHARE, ROUTE)  --------------------------------------------------------
     Page<MyForumShareResponseDto> getMyShares(Long userId, Pageable pageable);
-    Page<MyForumRouteResponseDto> getMyRoutes(Long userId, Pageable pageable);
+//    Page<MyForumRouteResponseDto> getMyRoutes(Long userId, Pageable pageable);
+    Map<String, Object> getMyRoutes(Long userId, Pageable pageable);
+
 }

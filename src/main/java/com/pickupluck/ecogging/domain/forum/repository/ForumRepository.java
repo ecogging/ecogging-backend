@@ -45,5 +45,9 @@ public interface ForumRepository extends JpaRepository<Forum,Long> {
     // My Forums -------------------------------------------------------------------------------------
     @Query("SELECT s FROM Forum s WHERE s.isTemporary = false AND s.type = :type AND s.writer.id = :userId")
     Page<Forum> findAllByUserIdAndType(@Param("userId")Long userId, Pageable pageable, @Param("type")String type);
+
+    // ** 페이징 위한 데이터 전체 개수 구하기 위한 리스트
+    @Query("SELECT s FROM Forum s WHERE s.isTemporary = false AND s.type = :type AND s.writer.id = :userId")
+    List<Forum> findAllByUserIdAndType(@Param("userId")Long userId, @Param("type")String type);
 }
 
