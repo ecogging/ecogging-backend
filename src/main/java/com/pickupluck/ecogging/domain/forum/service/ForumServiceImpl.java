@@ -1,8 +1,8 @@
 package com.pickupluck.ecogging.domain.forum.service;
 
 import com.pickupluck.ecogging.domain.forum.dto.ForumDTO;
-import com.pickupluck.ecogging.domain.forum.dto.MainForumsResponseDto;
 import com.pickupluck.ecogging.domain.forum.entity.Forum;
+import com.pickupluck.ecogging.domain.forum.dto.MainForumsResponseDto;
 import com.pickupluck.ecogging.domain.forum.entity.ForumFile;
 import com.pickupluck.ecogging.domain.forum.repository.ForumFileRepository;
 import com.pickupluck.ecogging.domain.forum.repository.ForumRepository;
@@ -22,7 +22,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.io.File;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
@@ -70,7 +75,7 @@ public class ForumServiceImpl implements ForumService{
             sort = Sort.Direction.ASC;
         }
         PageRequest pageRequest=PageRequest.of(page-1, 10, Sort.by(sort,"forumId"));
-        Page<Forum> pages=forumRepository.findByUserId(userId, pageRequest);
+        Page<Forum> pages=forumRepository.findAllByWriterId(userId, pageRequest);
 
         Map<String,Object> map = new HashMap<>();
         List<ForumDTO> list=new ArrayList<>();
@@ -95,6 +100,7 @@ public class ForumServiceImpl implements ForumService{
         return map;
 
     }
+
     // RouteServiceImpl ---------------------------------------------------------------------------------
 
     @Override
