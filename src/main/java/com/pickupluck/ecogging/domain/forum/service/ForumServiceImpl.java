@@ -1,14 +1,11 @@
 package com.pickupluck.ecogging.domain.forum.service;
 
 import com.pickupluck.ecogging.domain.forum.dto.ForumDTO;
-<<<<<<< HEAD
 import com.pickupluck.ecogging.domain.forum.entity.Forum;
-=======
 import com.pickupluck.ecogging.domain.forum.dto.MainForumsResponseDto;
 import com.pickupluck.ecogging.domain.forum.entity.Forum;
 import com.pickupluck.ecogging.domain.forum.entity.ForumFile;
 import com.pickupluck.ecogging.domain.forum.repository.ForumFileRepository;
->>>>>>> 25c153e7cbfa3a3d17b5b538615332e085fd56bc
 import com.pickupluck.ecogging.domain.plogging.dto.ReviewDTO;
 import com.pickupluck.ecogging.domain.forum.repository.ForumRepository;
 import com.pickupluck.ecogging.domain.plogging.repository.AccompanyRepository;
@@ -26,16 +23,13 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-<<<<<<< HEAD
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-=======
 import java.io.File;
 import java.time.LocalDateTime;
 import java.util.*;
->>>>>>> 25c153e7cbfa3a3d17b5b538615332e085fd56bc
 
 @Service
 @Transactional
@@ -75,7 +69,6 @@ public class ForumServiceImpl implements ForumService{
         return list;
     }
 
-<<<<<<< HEAD
     @Override
     public Map<String, Object> getMyForumList(Long userId, Integer page, String order) throws Exception {
         Sort.Direction sort = Sort.Direction.DESC;
@@ -83,7 +76,7 @@ public class ForumServiceImpl implements ForumService{
             sort = Sort.Direction.ASC;
         }
         PageRequest pageRequest=PageRequest.of(page-1, 10, Sort.by(sort,"forumId"));
-        Page<Forum> pages=forumRepository.findByUserId(userId, pageRequest);
+        Page<Forum> pages=forumRepository.findAllByWriterId(userId, pageRequest);
 
         Map<String,Object> map = new HashMap<>();
         List<ForumDTO> list=new ArrayList<>();
@@ -108,7 +101,7 @@ public class ForumServiceImpl implements ForumService{
         return map;
 
     }
-=======
+
     // RouteServiceImpl ---------------------------------------------------------------------------------
 
     @Override
@@ -520,6 +513,4 @@ public class ForumServiceImpl implements ForumService{
         return latestForumsToDto;
     }
 
-
->>>>>>> 25c153e7cbfa3a3d17b5b538615332e085fd56bc
 }
