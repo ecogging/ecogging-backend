@@ -57,8 +57,18 @@ public interface MessageRoomRepository extends JpaRepository<MessageRoom, Long> 
                     + "or (visible_to='ONLY_INITIAL_SENDER' and initial_sender_id =:id))")
     Page<MessageRoomsWithLastMessages> findMessageRoomsAndLastMessagesByUserId(@Param("id") Long userId, Pageable pageable);
 
-    @Query(
-            value = "select m from Message m join fetch m.messageRoom join fetch m.sender where m.messageRoom.id=:id",
-            countQuery = "select count(m) from Message m where m.id=:id")
+
+    @Query("select m from Message m join fetch m.messageRoom join fetch m.sender where m.messageRoom.id=:id")
     Page<Message> findMessagesByMessageRoomId(@Param("id") Long messageRoomId, Pageable pageable);
+
+
+    // 내가 SENDER / RECEVIER 일 경우에 따른 쪽지함 복원
+    @Query("select m from Message m join fetch m.messageRoom join fetch m.sender where m.messageRoom.id=:id AND (m.visibilityTo='BOTH' OR m.visibilityTo='ONLY_INITIAL_SENDER')")
+    Page<Message> findMessagesByMessageRoomIdAndSender(@Param("id") Long messageRoomId, Pageable pageable);
+    @Query("select m from Message m join fetch m.messageRoom join fetch m.sender where m.messageRoom.id=:id AND (m.visibilityTo='BOTH' OR m.visibilityTo='ONLY_INITIAL_RECEIVER')")
+    Page<Message> findMessagesByMessageRoomIdAndReceiver(@Param("id") Long messageRoomId, Pageable pageable);
+
 }
+
+
+

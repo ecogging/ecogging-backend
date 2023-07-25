@@ -30,6 +30,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -90,8 +91,6 @@ public class MessageRoomServiceI implements MessageRoomService {
             throw new InvalidRequestStateException("**자기 자신에게 쪽지를 보낼 수 없음");
         }
 
-        System.out.println("##saveMessageRoom() 함수 진입 완료");
-
         User sender = userRepository.findById(curId).get();
         User receiver = userRepository.findById(contactId).get();
 
@@ -104,8 +103,6 @@ public class MessageRoomServiceI implements MessageRoomService {
         // 생성한 MessageRoom Entity -> Repository에 저장
         MessageRoom savedMessageRoom = messageRoomRepository.save(messageRoom);
 
-        System.out.println("MsgRoom Entity 생성 저장 완료");
-
         // Message Entity 생성
         Message message = Message.builder()
                 .messageRoom(savedMessageRoom)
@@ -117,7 +114,6 @@ public class MessageRoomServiceI implements MessageRoomService {
 
         // 생성한 Message Entity -> Repository에 저장
         messageRepository.save(message);
-        System.out.println("Msg Entity 생성 저장 완료");
 
         // notification
         // 발송: 쪽지 발송자
@@ -153,24 +149,15 @@ public class MessageRoomServiceI implements MessageRoomService {
         Page<MessageRoomsWithLastMessages> messageRooms = messageRoomRepository.findMessageRoomsAndLastMessagesByUserId(
                 currentUser.getId(), pageable);
 
-        System.out.println("=======================쪽지방 가져오기===============");
-        System.out.println(messageRooms);
-
         // map을 이용해 Page 내용 변환
         // userId와 msgRoom의 initialSenderId를 비교
         // -> 둘이 같으면 initialSenderId를 contactId로 설정
         // -> 같지 않으면 initialReceiverId를 contactId로 설정
         Page<MessageRoomListResponseDto> responses = messageRooms.map(messageRoom -> {
-            System.out.println(messageRoom.getMessageRoomId());
-            System.out.println(messageRoom.getContent());
             Long contactId =
                     (userId == messageRoom.getInitialSenderId().longValue()) ?
                             messageRoom.getInitialReceiverId().longValue()
                             : messageRoom.getInitialSenderId().longValue();
-            System.out.println("userID     " + userId);
-            System.out.println("InitialSender  " + messageRoom.getInitialSenderId().longValue());
-            System.out.println("InitialReceiver  " + messageRoom.getInitialReceiverId().longValue());
-            System.out.println("********최종상대:   " + contactId);
 
             User contact = userRepository.findById(contactId).get();
 
@@ -200,10 +187,19 @@ public class MessageRoomServiceI implements MessageRoomService {
 
         // 페이징
         Pageable pageable = PageRequest.of(0, 10, Sort.by("createdAt").descending());
-        Page<Message> messages = messageRoomRepository.findMessagesByMessageRoomId(
-                messageRoom.getId(), pageable);
-        System.out.println("=============================GETMESSAGEvROOOOOOOM!!!!!!!!!!!!");
-        System.out.println(messages);
+//        Page<Message> messages = messageRoomRepository.findMessagesByMessageRoomId(
+//                messageRoom.getId(), pageable);
+
+        Page<Message> messages = null;
+        // 현재 유저가 initialSENDER
+        if(messageRoom.getInitialSender().getId() == userId) {
+            messages = messageRoomRepository.findMessagesByMessageRoomIdAndSender(
+                    messageRoom.getId(), pageable);
+        } else {
+            messages = messageRoomRepository.findMessagesByMessageRoomIdAndReceiver(
+                    messageRoom.getId(), pageable);
+        }
+
         User contact =
                 (currentUser.getId() == messageRoom.getInitialSender().getId()) ?
                 messageRoom.getInitialReceiver() : messageRoom.getInitialSender();
@@ -223,14 +219,21 @@ public class MessageRoomServiceI implements MessageRoomService {
         User currentUser = userRepository.findById(userId).get();
         // 쪽지함 조회
         MessageRoom messageRoom = messageRoomRepository.findById(messageRoomId).get();
+        // 쪽지함에 포함된 쪽지목록 조회
+        List<Message> messagesInTheRoom = messageRepository.findAllByMessageRoomId(messageRoomId);
 
         // 삭제 권한 확인
         checkUserAuthority(currentUser, messageRoom);
 
-        // 삭제상태 수정
+        // 삭제상태 수정 -- MessageRoom
         VisibilityState visibilityState = isInitialSender(currentUser, messageRoom) ?
                 VisibilityState.ONLY_INITIAL_RECEIVER : VisibilityState.ONLY_INITIAL_SENDER;
         messageRoom.changeVisibilityTo(visibilityState);
+
+        // 삭제상태 수정 -- Message ( 쪽지함과 연동 )
+        for (Message m : messagesInTheRoom) {
+            m.changeVisibilityTo(visibilityState);
+        }
     }
 
     // 쪽지함 삭제한 사람인지 확인
