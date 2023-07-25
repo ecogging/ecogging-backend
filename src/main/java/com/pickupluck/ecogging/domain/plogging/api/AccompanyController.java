@@ -82,6 +82,7 @@ public class AccompanyController {
                 map.put("isParticipation", isParticipation);
                 Boolean isAccompanyscrap = accompanyService.isAccompanyScrap(param.get("userId"), param.get("accompanyId"));
                 map.put("isAccompanyscrap", isAccompanyscrap);
+                // todo: comment
             }
             return new ResponseEntity<>(map, HttpStatus.OK);
         } catch (Exception e) {
