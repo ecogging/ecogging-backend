@@ -1,5 +1,7 @@
 package com.pickupluck.ecogging.domain.plogging.api;
 
+import com.pickupluck.ecogging.domain.forum.dto.ForumDTO;
+import com.pickupluck.ecogging.domain.forum.service.ForumService;
 import com.pickupluck.ecogging.domain.comment.dto.CommentResponse;
 import com.pickupluck.ecogging.domain.comment.service.CommentService;
 import com.pickupluck.ecogging.domain.notification.service.NotificationService;
@@ -23,6 +25,9 @@ public class AccompanyController {
     private final NotificationService notificationService;
 
     private final CommentService commentService;
+
+    @Autowired
+    private ForumService forumService;
 
     @GetMapping("/accompanies/{page}")
     public ResponseEntity<Map<String,Object>> accompanyList(@PathVariable Integer page,
@@ -173,6 +178,20 @@ public class AccompanyController {
             Map<String,Object> map= accompanyService.getMyAccompanyscrapList(userId, page);
             return new ResponseEntity<>(map, HttpStatus.OK);
         } catch(Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PostMapping("/myforum")
+    public ResponseEntity<Map<String,Object>> getMyForum(@RequestBody Map<String,Object> param) {
+        Long userId = (Long)param.get("userId");
+        Integer page = (Integer)param.get("page");
+        String order = (String)param.get("order");
+        try {
+            Map<String, Object> res = forumService.getMyForumList(userId, page, order);
+            return new ResponseEntity<>(res, HttpStatus.OK);
+        } catch (Exception e) {
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }

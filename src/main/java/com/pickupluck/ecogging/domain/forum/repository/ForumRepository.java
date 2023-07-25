@@ -16,6 +16,10 @@ import java.util.List;
 
 public interface ForumRepository extends JpaRepository<Forum,Long> {
 
+<<<<<<< HEAD
+    Page<Forum> findByUserId(Long userId, PageRequest pageRequest);
+
+=======
     // RouteRepository 에서 옮겨온거 -- 메서드 이름 중복이라 ForRoute, ForShare 붙였어요
     Page<Forum> findAllByType(String type, PageRequest pageRequest, Sort sortByCreateAtDesc);
 
@@ -41,4 +45,5 @@ public interface ForumRepository extends JpaRepository<Forum,Long> {
     // Main Forums
     @Query("SELECT f FROM Forum f WHERE f.isTemporary = false AND (f.type = '경로' OR f.type = '나눔')")
     Page<Forum> findAllWithoutTemp(Pageable pageable);
+>>>>>>> 25c153e7cbfa3a3d17b5b538615332e085fd56bc
 }

@@ -13,6 +13,9 @@ import java.util.Map;
 
 public interface ForumService{
     List<ReviewDTO> getReviews(Integer page, PageInfo pageInfo) throws Exception;
+<<<<<<< HEAD
+    Map<String,Object> getMyForumList(Long userId, Integer page, String order) throws Exception;
+=======
 
     // RouteService ----------------------------------------------------------
     List<ForumDTO> getRoutes(Integer page, PageInfo pageInfo) throws Exception;
@@ -47,4 +50,5 @@ public interface ForumService{
 
     // Main Forums ------------------------------------------------------------
     Page<MainForumsResponseDto> getMainForums(Pageable pageable);
+>>>>>>> 25c153e7cbfa3a3d17b5b538615332e085fd56bc
 }

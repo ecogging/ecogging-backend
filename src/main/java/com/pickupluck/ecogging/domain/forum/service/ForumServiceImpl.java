@@ -1,10 +1,14 @@
 package com.pickupluck.ecogging.domain.forum.service;
 
 import com.pickupluck.ecogging.domain.forum.dto.ForumDTO;
+<<<<<<< HEAD
+import com.pickupluck.ecogging.domain.forum.entity.Forum;
+=======
 import com.pickupluck.ecogging.domain.forum.dto.MainForumsResponseDto;
 import com.pickupluck.ecogging.domain.forum.entity.Forum;
 import com.pickupluck.ecogging.domain.forum.entity.ForumFile;
 import com.pickupluck.ecogging.domain.forum.repository.ForumFileRepository;
+>>>>>>> 25c153e7cbfa3a3d17b5b538615332e085fd56bc
 import com.pickupluck.ecogging.domain.plogging.dto.ReviewDTO;
 import com.pickupluck.ecogging.domain.forum.repository.ForumRepository;
 import com.pickupluck.ecogging.domain.plogging.repository.AccompanyRepository;
@@ -22,9 +26,16 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+<<<<<<< HEAD
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+=======
 import java.io.File;
 import java.time.LocalDateTime;
 import java.util.*;
+>>>>>>> 25c153e7cbfa3a3d17b5b538615332e085fd56bc
 
 @Service
 @Transactional
@@ -46,12 +57,7 @@ public class ForumServiceImpl implements ForumService{
     public List<ReviewDTO> getReviews(Integer page, PageInfo pageInfo) throws Exception{
 //        List<Forum> list=forumRepository.findAll();
         PageRequest pageRequest=PageRequest.of(page-1, 10, Sort.by(Sort.Direction.DESC,"forumId"));
-
-
         //Page<Forum> pages=forumRepository.findRequest(pageRequest);
-
-
-
         //pageInfo.setAllPage(pages.getTotalPages());
         pageInfo.setCurPage(page);
         int startPage=(page-1)/5*5+1;
@@ -69,6 +75,40 @@ public class ForumServiceImpl implements ForumService{
         return list;
     }
 
+<<<<<<< HEAD
+    @Override
+    public Map<String, Object> getMyForumList(Long userId, Integer page, String order) throws Exception {
+        Sort.Direction sort = Sort.Direction.DESC;
+        if(order.equals("old")) {
+            sort = Sort.Direction.ASC;
+        }
+        PageRequest pageRequest=PageRequest.of(page-1, 10, Sort.by(sort,"forumId"));
+        Page<Forum> pages=forumRepository.findByUserId(userId, pageRequest);
+
+        Map<String,Object> map = new HashMap<>();
+        List<ForumDTO> list=new ArrayList<>();
+        for(Forum forum:pages.getContent()){
+            list.add(modelMapper.map(forum, ForumDTO.class));
+        }
+
+        map.put("list", list);
+
+        PageInfo pageInfo = new PageInfo();
+        pageInfo.setAllPage(pages.getTotalPages());
+        pageInfo.setCurPage(page);
+        int startPage=(page-1)/10*10+1;
+        int endPage=startPage+10-1;
+        if(endPage>pageInfo.getAllPage()){
+            endPage=pageInfo.getAllPage();
+        }
+        pageInfo.setStartPage(startPage);
+        pageInfo.setEndPage(endPage);
+
+        map.put("pageInfo", pageInfo);
+        return map;
+
+    }
+=======
     // RouteServiceImpl ---------------------------------------------------------------------------------
 
     @Override
@@ -481,4 +521,5 @@ public class ForumServiceImpl implements ForumService{
     }
 
 
+>>>>>>> 25c153e7cbfa3a3d17b5b538615332e085fd56bc
 }
