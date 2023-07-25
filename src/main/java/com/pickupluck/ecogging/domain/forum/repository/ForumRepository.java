@@ -1,9 +1,6 @@
 package com.pickupluck.ecogging.domain.forum.repository;
 
-import com.pickupluck.ecogging.domain.forum.dto.MainForumsResponseDto;
 import com.pickupluck.ecogging.domain.forum.entity.Forum;
-import com.querydsl.jpa.impl.JPAQueryFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -12,10 +9,12 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-
 import java.util.List;
 
 public interface ForumRepository extends JpaRepository<Forum,Long> {
+
+    @Query ("SELECT r FROM Forum r WHERE r.isTemporary = false AND r.type = '후기' AND r.writer.id = :userId")
+    Page<Forum> findAllByWriterId(Long userId, PageRequest pageRequest);
 
     // RouteRepository 에서 옮겨온거 -- 메서드 이름 중복이라 ForRoute, ForShare 붙였어요
     Page<Forum> findAllByType(String type, PageRequest pageRequest, Sort sortByCreateAtDesc);

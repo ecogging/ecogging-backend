@@ -15,6 +15,8 @@ import java.util.Map;
 public interface ForumService{
     List<ReviewDTO> getReviews(Integer page, PageInfo pageInfo) throws Exception;
 
+    Map<String,Object> getMyForumList(Long userId, Integer page, String order) throws Exception;
+
     // RouteService ----------------------------------------------------------
     List<ForumDTO> getRoutes(Integer page, PageInfo pageInfo) throws Exception;
     void routeWrite(Map<String, String> res) throws Exception;

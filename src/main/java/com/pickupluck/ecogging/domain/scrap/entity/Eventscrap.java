@@ -17,13 +17,13 @@ import lombok.Setter;
 public class Eventscrap extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer scrapId;
+    private Long scrapId;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name="user_id")
-    private User userScrap;
+    private User user;
 
     @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name="eventId")
-    private Event eventScrap;
+    private Event event;
 }
