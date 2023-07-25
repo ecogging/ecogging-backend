@@ -33,16 +33,23 @@ public class MyForumController {
     // 내가 작성한 나눔
     @GetMapping("/mypage/{userId}/shares")
     public ResponseEntity<Map<String, Object>> getMyShares(@PathVariable("userId") Long userId,
-                                                           @PageableDefault(size = 5, sort = "createdAt", direction = Sort.Direction.DESC) final Pageable pageable) {
-        // DB에서 최신순 5개 글 확보
-        Page<MyForumShareResponseDto> myShares = forumService.getMyShares(userId, pageable);
+                                                           @RequestParam("pageNo") int pageNo) {
+
+        pageNo = pageNo==0 ? 0 : (pageNo-1); // -> 프론트: 1부터 시작 BUT Page: 0부터 시작 -> Page에 맞춰주기
+        Pageable pageable = PageRequest.of(pageNo, 5, Sort.by("createdAt").descending()); // Pageable 객체 조건 맞춰 생성
+
+        // DB에서 최신순 5개 글 , 전체 데이터 개수 확보
+        Map<String, Object> myShareMap = forumService.getMyShares(userId, pageable);
+        Page<MyForumShareResponseDto> myShares = (Page<MyForumShareResponseDto>)myShareMap.get("res");
         if (myShares.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+        int all = (int)myShareMap.get("all");
 
         Map<String, Object> responseBody = new HashMap<>();
         responseBody.put("msg", "MYFORUM 나눔 조회 완료");
         responseBody.put("data", myShares.getContent());
+        responseBody.put("allCount", all); // 전체 데이터 개수 같이 넘겨주기
 
         return ResponseEntity.ok(responseBody);
     }
@@ -50,13 +57,13 @@ public class MyForumController {
     // 내가 작성한 경로추천
     @GetMapping("/mypage/{userId}/recommendations")
     public ResponseEntity<Map<String, Object>> getMyRoutes(@PathVariable("userId") Long userId,
-//                                                           @PageableDefault(size = 5, sort = "createdAt", direction = Sort.Direction.DESC) final Pageable pageable
                                                            @RequestParam("pageNo") int pageNo
     ) {
+
         pageNo = pageNo==0 ? 0 : (pageNo-1); // -> 프론트: 1부터 시작 BUT Page: 0부터 시작 -> Page에 맞춰주기
         Pageable pageable = PageRequest.of(pageNo, 5, Sort.by("createdAt").descending()); // Pageable 객체 조건 맞춰 생성
 
-        // DB에서 최신순 5개 글 확보
+        // DB에서 최신순 5개 글, 전체 데이터 개수 확보
         Map<String, Object> myRouteMap = forumService.getMyRoutes(userId, pageable);
         Page<MyForumRouteResponseDto> myRoutes = ( Page<MyForumRouteResponseDto> )myRouteMap.get("res");
         if (myRoutes.isEmpty()) {
