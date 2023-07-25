@@ -1,7 +1,7 @@
 package com.pickupluck.ecogging.domain.plogging.api;
 
-import com.pickupluck.ecogging.domain.notification.dto.NotificationSaveDto;
-import com.pickupluck.ecogging.domain.notification.entity.NotificationType;
+import com.pickupluck.ecogging.domain.comment.service.CommentService;
+import com.pickupluck.ecogging.domain.forum.service.ForumService;
 import com.pickupluck.ecogging.domain.notification.service.NotificationService;
 import com.pickupluck.ecogging.domain.plogging.dto.AccompanyDTO;
 import com.pickupluck.ecogging.domain.plogging.service.AccompanyService;
