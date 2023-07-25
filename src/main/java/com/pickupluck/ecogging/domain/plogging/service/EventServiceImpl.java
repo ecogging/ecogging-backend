@@ -55,7 +55,7 @@ public class EventServiceImpl implements EventService{
             String originName = file.getOriginalFilename();
             Long size = file.getSize();
             String fullPath = path+originName;
-ㅡ
+
             com.pickupluck.ecogging.domain.file.entity.File fil = new com.pickupluck.ecogging.domain.file.entity.File();
             fil.setOriginName(originName);
             fil.setSize(size);
