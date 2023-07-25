@@ -513,11 +513,15 @@ public class ForumServiceImpl implements ForumService{
     // MyForum(SHARE) ----------------------------------------------------------------------------
     @Override
     @Transactional(readOnly = true)
-    public Page<MyForumShareResponseDto> getMyShares(Long userId, Pageable pageable) {
+    public Map<String, Object> getMyShares(Long userId, Pageable pageable) {
 
         // 데이터 확보
         String thisType = "나눔";
         Page<Forum> mySharesEntity = forumRepository.findAllByUserIdAndType(userId, pageable, thisType);
+
+        // 쿼리에 맞는 모든 데이터 확보 -> 전체 개수 확보 ( 전체 페이지 개수 위함 )
+        List<Forum> allMyRoutes = forumRepository.findAllByUserIdAndType(userId, thisType);
+        int count = allMyRoutes.size();
 
         // Entity -> DTO
         Page<MyForumShareResponseDto> mySharesDto = mySharesEntity.map(share -> {
@@ -551,7 +555,12 @@ public class ForumServiceImpl implements ForumService{
             }
         });
 
-        return mySharesDto;
+        // 결과 담아서 넘기는 맵
+        Map<String, Object> result = new HashMap<>();
+        result.put("res", mySharesDto); // 해당 페이지에 띄울 글 목록
+        result.put("all", count); // 페이징을 위한 전체 데이터 개수
+
+        return result;
     }
 
     // MyForum(ROUTE) ----------------------------------------------------------------------------

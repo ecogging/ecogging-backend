@@ -53,7 +53,7 @@ public interface ForumService{
     Page<MainForumsResponseDto> getMainForums(Pageable pageable);
 
     // MyForum(SHARE, ROUTE)  --------------------------------------------------------
-    Page<MyForumShareResponseDto> getMyShares(Long userId, Pageable pageable);
+    Map<String, Object> getMyShares(Long userId, Pageable pageable);
 //    Page<MyForumRouteResponseDto> getMyRoutes(Long userId, Pageable pageable);
     Map<String, Object> getMyRoutes(Long userId, Pageable pageable);
 
