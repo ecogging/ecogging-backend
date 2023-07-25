@@ -1,45 +1,40 @@
 package com.pickupluck.ecogging.domain.plogging.dto;
 
-import com.pickupluck.ecogging.domain.BaseEntity;
 import com.pickupluck.ecogging.domain.forum.entity.Forum;
-import com.pickupluck.ecogging.domain.forum.entity.Share;
-import com.pickupluck.ecogging.domain.plogging.entity.Review;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-@Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ReviewDTO extends BaseEntity {
+public class ReviewDTO {
 
-    private long id;
+    private Long id;
     private String type;
     private String title;
     private String content;
     private LocalDateTime createdAt;
-    private long views;
-    private Integer fileId;
-    private boolean isTemporary;
-    private long userId;
+    private Long views;
+    private Long fileId;
+    private Boolean isTemporary;
+    private Long userId;
     private String routeLoc;
     private String routeLocDetail;
-    private Integer accompanyId;
+    private Long accompanyId;
 
-    public ReviewDTO(Review review){
+    public ReviewDTO(Forum review){
         this.id=review.getId();
         this.type=review.getType();
         this.title=review.getTitle();
         this.content=review.getContent();
         this.createdAt=review.getCreatedAt();
-        this.views=review.getViews();
+        this.views=Long.parseLong(review.getViews()+"");
         this.fileId=review.getFileId();
         this.isTemporary=review.getIsTemporary();
-        this.userId=review.getUserId();
+        this.userId=review.getWriter().getId();
         this.routeLoc=review.getRouteLocation();
         this.routeLocDetail=review.getRouteLocationDetail();
-        this.accompanyId=review.getAccompanyId();
+        this.accompanyId=review.getThisAccompany().getId();
     }
 
 

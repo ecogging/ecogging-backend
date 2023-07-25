@@ -4,8 +4,6 @@ import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 
 @Getter
 public class MainEventResponseDto {
@@ -16,10 +14,12 @@ public class MainEventResponseDto {
     private final Boolean active; // 진행 상태
     private final String evtLocation; // 행사 지역
     private final String nickname; // 작성자 닉네임
+
     private final Long fileId; // 첨부파일 id
+    private final String filePath; // 첨부파일 경로
 
     @Builder
-    public MainEventResponseDto(Long evtid, String evtTitle, LocalDate evtStartDate, LocalDate evtEndDate, Boolean active, String evtLocation, String nickname, Long fileId) {
+    public MainEventResponseDto(Long evtid, String evtTitle, LocalDate evtStartDate, LocalDate evtEndDate, Boolean active, String evtLocation, String nickname, Long fileId, String filePath) {
         this.evtid = evtid;
         this.evtTitle = evtTitle;
         this.evtStartDate = evtStartDate;
@@ -28,5 +28,6 @@ public class MainEventResponseDto {
         this.evtLocation = evtLocation;
         this.nickname = nickname;
         this.fileId = fileId;
+        this.filePath = filePath;
     }
 }

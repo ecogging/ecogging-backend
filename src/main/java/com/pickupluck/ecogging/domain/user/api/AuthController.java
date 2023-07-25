@@ -101,6 +101,7 @@ public class AuthController {
             @Valid @RequestBody UserSignUpRequestDto userDto
     ) {
         try {
+            userService.signUp(userDto);
             return new ResponseEntity<>(HttpStatus.OK);
         } catch (Exception e) {
             e.printStackTrace();

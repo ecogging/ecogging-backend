@@ -1,5 +1,8 @@
 package com.pickupluck.ecogging.domain;
 
+import com.pickupluck.ecogging.domain.forum.dto.ForumDTO;
+import com.pickupluck.ecogging.domain.forum.dto.MainForumsResponseDto;
+import com.pickupluck.ecogging.domain.forum.service.ForumService;
 import com.pickupluck.ecogging.domain.plogging.dto.EventDTO;
 import com.pickupluck.ecogging.domain.plogging.dto.MainEventResponseDto;
 import com.pickupluck.ecogging.domain.plogging.service.AccompanyService;
@@ -27,8 +30,10 @@ public class MainController {
     private AccompanyService accompanyService;
     @Autowired
     private EventService eventService;
+    @Autowired
+    private ForumService forumService;
 
-    // MainAccompanies
+    // Main Accompanies
     @GetMapping("/main/accompanies")
     public Map<String,Object> getAccompList() {
         try {
@@ -45,7 +50,7 @@ public class MainController {
     public ResponseEntity<Map<String,Object>> getEventList(
             @PageableDefault(size = 4, sort = "createdAt", direction = Sort.Direction.DESC) final Pageable pageable) {
 
-            // DB에서 최신순 4개 글 확보
+            // DB에서 최신순 4개 글 확보 - 임시저장 필터
             Page<MainEventResponseDto> mainEvents = eventService.getMainEvents(pageable);
             if (mainEvents.isEmpty()) {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -56,6 +61,25 @@ public class MainController {
             responseBody.put("data", mainEvents.getContent());
 
             return ResponseEntity.ok(responseBody);
+    }
+
+    // Main Forums
+    @GetMapping("/main/forums")
+    public ResponseEntity<Map<String, Object>> getForumList(
+            @PageableDefault(size = 3, sort = "createdAt", direction = Sort.Direction.DESC) final Pageable pageable) {
+
+        // DB에서 최신순 3개 글 확보 - 임시저장 필터
+        Page<MainForumsResponseDto> mainForums = forumService.getMainForums(pageable);
+        if (mainForums.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        Map<String, Object> responseBody = new HashMap<>();
+        responseBody.put("msg", "포럼글 조회 완료~");
+        responseBody.put("data", mainForums.getContent());
+
+
+        return ResponseEntity.ok(responseBody);
     }
 
 }
