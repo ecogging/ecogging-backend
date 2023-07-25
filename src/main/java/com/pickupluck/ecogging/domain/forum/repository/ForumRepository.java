@@ -10,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -38,7 +39,12 @@ public interface ForumRepository extends JpaRepository<Forum,Long> {
 //    Page<Review> findAllByTypeOrderByIdDesc(String 후기, PageRequest pageRequest);
 
 
-    // Main Forums
+    // Main Forums -----------------------------------------------------------------------------------
     @Query("SELECT f FROM Forum f WHERE f.isTemporary = false AND (f.type = '경로' OR f.type = '나눔')")
     Page<Forum> findAllWithoutTemp(Pageable pageable);
+
+    // My Forums -------------------------------------------------------------------------------------
+    @Query("SELECT s FROM Forum s WHERE s.isTemporary = false AND s.type = '나눔' AND s.writer.id = :userId")
+    Page<Forum> findAllByUserIdAndType(@Param("userId")Long userId, Pageable pageable);
 }
+

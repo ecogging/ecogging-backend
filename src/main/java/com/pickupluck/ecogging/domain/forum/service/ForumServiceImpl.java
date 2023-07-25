@@ -2,6 +2,7 @@ package com.pickupluck.ecogging.domain.forum.service;
 
 import com.pickupluck.ecogging.domain.forum.dto.ForumDTO;
 import com.pickupluck.ecogging.domain.forum.dto.MainForumsResponseDto;
+import com.pickupluck.ecogging.domain.forum.dto.MyForumShareResponseDto;
 import com.pickupluck.ecogging.domain.forum.entity.Forum;
 import com.pickupluck.ecogging.domain.forum.entity.ForumFile;
 import com.pickupluck.ecogging.domain.forum.repository.ForumFileRepository;
@@ -480,5 +481,46 @@ public class ForumServiceImpl implements ForumService{
         return latestForumsToDto;
     }
 
+    // MyForum(SHARE) ----------------------------------------------------------------------------
+    @Override
+    @Transactional(readOnly = true)
+    public Page<MyForumShareResponseDto> getMyShares(Long userId, Pageable pageable) {
 
+        // 데이터 확보
+        Page<Forum> mySharesEntity = forumRepository.findAllByUserIdAndType(userId, pageable);
+
+        // Entity -> DTO
+        Page<MyForumShareResponseDto> mySharesDto = mySharesEntity.map(share -> {
+            Optional<ForumFile> shareFile = Optional.empty(); // 초기화
+
+            if(share.getFileId() != null) {
+                // 첨부파일
+                shareFile = forumFileRepository.findById(share.getFileId());
+            }
+
+            if(shareFile.isEmpty()){
+                return MyForumShareResponseDto.builder()
+                        .forumId(share.getId())
+                        .title(share.getTitle())
+                        .content(share.getContent())
+                        .createdAt(share.getCreatedAt())
+                        .views(share.getViews())
+                        .fileName(null)
+                        .filePath(null)
+                        .build();
+            } else {
+                return MyForumShareResponseDto.builder()
+                        .forumId(share.getId())
+                        .title(share.getTitle())
+                        .content(share.getContent())
+                        .createdAt(share.getCreatedAt())
+                        .views(share.getViews())
+                        .fileName(shareFile.get().getFileName())
+                        .filePath(shareFile.get().getPath())
+                        .build();
+            }
+        });
+
+        return mySharesDto;
+    }
 }
