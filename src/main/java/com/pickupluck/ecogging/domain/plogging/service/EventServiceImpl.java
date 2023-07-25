@@ -18,7 +18,6 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -44,11 +43,13 @@ public class EventServiceImpl implements EventService{
     private  final EventscrapRepository eventscrapRepository;
 
     private final String uploadDir = "D:/MJS/front-work/upload/";
+//    private final String uploadDir="C:/JSR/front-work/upload/"; dongur2 임시 경로
 
 
     public void writeEvent(EventDTO eventDTO, MultipartFile file) throws Exception {
         if(file!=null && !file.isEmpty()) {
             String path="D:/MJS/front-work/upload/";
+//            String path="C:/JSR/front-work/upload/"; dongur2 임시 경로
             String originName = file.getOriginalFilename();
             Long size = file.getSize();
             String fullPath = path+originName;
@@ -197,6 +198,7 @@ public class EventServiceImpl implements EventService{
 
     public void readFile(Long fileId, OutputStream out) throws Exception {
         String path="D:/MJS/front-work/upload/";
+//        String path="C:/JSR/front-work/upload/"; dongur2 임시 경로
         Optional<File> ofile = fileRepository.findById(fileId);
         if(ofile.isPresent()) {
             String fileName = ofile.get().getOriginName();
@@ -215,6 +217,7 @@ public class EventServiceImpl implements EventService{
     public void modifyEvent(EventDTO eventDTO, MultipartFile file) throws Exception {
         if(file!=null && !file.isEmpty()) {
             String path="D:/MJS/front-work/upload/";
+//            String path="C:/JSR/front-work/upload/"; dongur2 임시 경로
             String originName = file.getOriginalFilename();
             Long size = file.getSize();
             String fullPath = path+originName;
@@ -278,6 +281,35 @@ public class EventServiceImpl implements EventService{
             return false;
         }
     }
+
+
+    // Main Events
+    @Override
+    @Transactional(readOnly = true)
+    public Page<MainEventResponseDto> getMainEvents(Pageable pageable){
+
+        // 데이터 확보
+        Page<Event> latestEventsFour = eventRepository.findAllWithoutTemp(pageable);
+        // Entity -> DTO
+        Page<MainEventResponseDto> latesEventsToDto = latestEventsFour.map(evnt -> {
+            return MainEventResponseDto.builder()
+                    .evtid(evnt.getEventId().longValue())
+                    .evtTitle(evnt.getTitle())
+                    .evtStartDate(evnt.getMeetingDate())
+                    .evtEndDate(evnt.getEndDate())
+                    .active(evnt.getActive())
+                    .evtLocation(evnt.getLocation())
+                    .nickname(evnt.getCorpName())
+                    .fileId(evnt.getFileId())
+                    .filePath(fileRepository.findById(evnt.getFileId()).get().getFullPath())
+                    .build();
+        });
+
+        return latesEventsToDto;
+    }
+
+
+
 
 
 }

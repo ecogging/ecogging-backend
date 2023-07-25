@@ -22,5 +22,11 @@ public interface EventRepository extends JpaRepository<Event, Integer> {
     List<Event> findByUserId(Long userId);
     Page<Event> findByUserIdAndSaveTrue(Long userId, PageRequest paging);
     Page<Event> findByUserIdAndSaveFalse(Long userId, PageRequest paging);
+
+
+
+    // Main Events
+    @Query("SELECT e FROM Event e WHERE e.save = false")
+    Page<Event> findAllWithoutTemp(Pageable pageable);
 }
 
