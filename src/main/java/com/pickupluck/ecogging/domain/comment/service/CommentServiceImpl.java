@@ -10,7 +10,10 @@ import com.pickupluck.ecogging.domain.user.repository.UserRepository;
 import com.pickupluck.ecogging.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -42,10 +45,12 @@ public class CommentServiceImpl implements CommentService {
                 .stream()
                 .filter(comment -> !comment.isParentExist())
                 .map(CommentResponse::from)
+                .sorted(Comparator.comparing(CommentResponse::getCreatedAt).reversed())
                 .toList();
     }
 
     @Override
+    @Transactional
     public void save(CommentSaveRequest request) throws Exception {
         final String email = SecurityUtil.getCurrentUsername().orElse("");
         User user = userRepository.findByEmail(email)
@@ -73,7 +78,25 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public void delete(Long commentId) {
-        commentRepository.deleteById(commentId);
+    @Transactional
+    public void delete(Long commentId) throws Exception {
+        Comment findComment = commentRepository.findById(commentId)
+                .orElseThrow(()->new Exception("no comment for id"));
+
+        final String email = SecurityUtil.getCurrentUsername().orElse("");
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new Exception("No user for email: " + email));
+
+        // 다른 유저 댓글 삭제 불가
+        if (!user.equals(findComment.getWriter()))
+            throw new Exception(("남의 댓글은 지울 수 없습니다."));
+
+        // 자식 댓글 있을 경우 safe delete
+        if (findComment.isChildrenExist())
+            findComment.delete();
+        else
+            commentRepository.delete(findComment);
+
     }
 }
