@@ -12,5 +12,5 @@ public interface MessageService {
     void sendMessage(Long curId, Long messageRoomId, Long contactId, MessageRequestSendDto msgSendDto);
 
     // 모든 쪽지 조회
-//    Page<MessageResponseDto> getAllMessages(Long curId, Long messageRoomId, Pageable pageable);
+    Page<MessageResponseDto> getAllMessages(Long curId, Long messageRoomId, Pageable pageable);
 }
