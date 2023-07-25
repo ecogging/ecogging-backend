@@ -3,17 +3,15 @@ package com.pickupluck.ecogging.domain.forum.service;
 import com.pickupluck.ecogging.domain.forum.dto.ForumDTO;
 import com.pickupluck.ecogging.domain.forum.entity.Forum;
 import com.pickupluck.ecogging.domain.forum.dto.MainForumsResponseDto;
-import com.pickupluck.ecogging.domain.forum.entity.Forum;
 import com.pickupluck.ecogging.domain.forum.entity.ForumFile;
 import com.pickupluck.ecogging.domain.forum.repository.ForumFileRepository;
-import com.pickupluck.ecogging.domain.plogging.dto.ReviewDTO;
 import com.pickupluck.ecogging.domain.forum.repository.ForumRepository;
+import com.pickupluck.ecogging.domain.plogging.dto.ReviewDTO;
 import com.pickupluck.ecogging.domain.plogging.repository.AccompanyRepository;
 import com.pickupluck.ecogging.domain.user.entity.User;
 import com.pickupluck.ecogging.domain.user.repository.UserRepository;
 import com.pickupluck.ecogging.util.PageInfo;
 import jakarta.persistence.EntityNotFoundException;
-import org.springframework.transaction.annotation.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -21,6 +19,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
@@ -28,7 +27,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.io.File;
-import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
