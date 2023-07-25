@@ -12,11 +12,15 @@ import com.pickupluck.ecogging.domain.message.entity.MessageRoom;
 import com.pickupluck.ecogging.domain.message.entity.VisibilityState;
 import com.pickupluck.ecogging.domain.message.repository.MessageRepository;
 import com.pickupluck.ecogging.domain.message.repository.MessageRoomRepository;
+import com.pickupluck.ecogging.domain.notification.dto.NotificationSaveDto;
+import com.pickupluck.ecogging.domain.notification.entity.NotificationType;
+import com.pickupluck.ecogging.domain.notification.service.NotificationService;
 import com.pickupluck.ecogging.domain.user.entity.User;
 import com.pickupluck.ecogging.domain.user.repository.UserRepository;
 import com.sun.jdi.event.ExceptionEvent;
 import com.sun.jdi.request.InvalidRequestStateException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.PermissionDeniedDataAccessException;
 import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.data.domain.Page;
@@ -29,6 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Map;
 import java.util.Optional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class MessageRoomServiceI implements MessageRoomService {
@@ -36,6 +41,8 @@ public class MessageRoomServiceI implements MessageRoomService {
     private final MessageRoomRepository messageRoomRepository;
     private final MessageRepository messageRepository;
     private final UserRepository userRepository;
+
+    private final NotificationService notificationService;
 
     // 쪽지함 id 조회
     @Override
@@ -110,8 +117,26 @@ public class MessageRoomServiceI implements MessageRoomService {
 
         // 생성한 Message Entity -> Repository에 저장
         messageRepository.save(message);
-
         System.out.println("Msg Entity 생성 저장 완료");
+
+        // notification
+        // 발송: 쪽지 발송자
+        final Long notiSenderId = message.getSender().getId();
+        // 수신: 쪽지 수신자
+        final Long notiReceiverId = message.getReceiver().getId();
+        // 타겟은 메시지룸 아이디
+        final Long notiTargetId = message.getMessageRoom().getId();
+        // 디테일 없음
+        final NotificationType notiType = NotificationType.MESSAGE;
+
+        notificationService.createNotification(
+                NotificationSaveDto.builder()
+                        .receiverId(notiReceiverId)
+                        .targetId(notiTargetId)
+                        .senderId(notiSenderId)
+                        .type(notiType)
+                        .build()
+        );
 
         // 생성한 MessageRoomCreateDto return
         return new MessageRoomIdResponseDto(savedMessageRoom);

@@ -1,5 +1,8 @@
 package com.pickupluck.ecogging.domain.plogging.service;
 
+import com.pickupluck.ecogging.domain.notification.dto.NotificationSaveDto;
+import com.pickupluck.ecogging.domain.notification.entity.NotificationType;
+import com.pickupluck.ecogging.domain.notification.service.NotificationService;
 import com.pickupluck.ecogging.domain.plogging.dto.AccompanyDTO;
 import com.pickupluck.ecogging.domain.plogging.entity.Accompany;
 import com.pickupluck.ecogging.domain.plogging.entity.Participation;
@@ -29,6 +32,8 @@ public class AccompanyServiceImpl implements AccompanyService {
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
     private final Integer onePage = 10;
+
+    private final NotificationService notificationService;
 
     @Override
     public Map<String, Object> getAccompanyList(Integer page, String orderby) throws Exception {
@@ -102,6 +107,29 @@ public class AccompanyServiceImpl implements AccompanyService {
             participationRepository.save(new Participation(userId,accompany,false));
             accompany.setJoincnt(accompany.getJoincnt()+1);
             accompanyRepository.save(accompany);
+
+            // notification
+            // 발송: 동행 참여자
+            final Long notiSenderId = userId;
+            // 수신: 게시글 작성자
+            final Long notiReceiverId = accompany.getUser().getId();
+            // 타겟 : 게시글 아이디
+            final Long notiTargetId = accompanyId;
+
+            final String notiDetail = accompany.getTitle();
+
+            final NotificationType notiType = NotificationType.ACCOMPANY;
+
+            notificationService.createNotification(
+                    NotificationSaveDto.builder()
+                            .receiverId(notiReceiverId)
+                            .senderId(notiSenderId)
+                            .targetId(notiTargetId)
+                            .detail(notiDetail)
+                            .type(notiType)
+                            .build()
+                    );
+
             return true;
         } else { //참여중, 참여취소
             participationRepository.deleteById(oparticipation.get().getParticipationId());

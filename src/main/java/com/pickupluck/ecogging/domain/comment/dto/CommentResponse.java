@@ -47,7 +47,7 @@ public class CommentResponse {
                     comment.getChildren()
                             .stream()
                             .map(c -> CommentResponse.from(c))
-                            .sorted(Comparator.comparing(CommentResponse::getCreatedAt).reversed())
+                            .sorted(Comparator.comparing(CommentResponse::getCreatedAt))
                             .toList()
                 :
                     new ArrayList<>();
