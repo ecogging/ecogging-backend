@@ -42,7 +42,7 @@ public class Comment extends BaseEntity {
 
     private int depth;
 
-    private Boolean isDeleted = false;
+    private Boolean deleted = false;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
@@ -81,4 +81,7 @@ public class Comment extends BaseEntity {
         return (this.children != null) && (this.children.size() != 0);
     }
 
+    public void delete() {
+        this.deleted = true;
+    }
 }

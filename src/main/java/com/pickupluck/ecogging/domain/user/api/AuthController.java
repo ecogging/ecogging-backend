@@ -5,7 +5,6 @@ import com.pickupluck.ecogging.domain.user.entity.User;
 import com.pickupluck.ecogging.domain.user.entity.UserType;
 import com.pickupluck.ecogging.util.SecurityUtil;
 import com.pickupluck.ecogging.util.mail.MailService;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
 import org.springframework.http.HttpHeaders;
@@ -22,7 +21,6 @@ import lombok.extern.slf4j.Slf4j;
 
 import com.pickupluck.ecogging.domain.user.service.UserService;
 import com.pickupluck.ecogging.util.jwt.JwtFilter;
-import com.pickupluck.ecogging.util.jwt.TokenDto;
 import com.pickupluck.ecogging.util.jwt.TokenProvider;
 
 

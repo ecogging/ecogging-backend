@@ -2,13 +2,10 @@ package com.pickupluck.ecogging.domain.plogging.api;
 
 import com.pickupluck.ecogging.domain.comment.dto.CommentResponse;
 import com.pickupluck.ecogging.domain.comment.service.CommentService;
-import com.pickupluck.ecogging.domain.notification.dto.NotificationSaveDto;
-import com.pickupluck.ecogging.domain.notification.entity.NotificationType;
 import com.pickupluck.ecogging.domain.notification.service.NotificationService;
 import com.pickupluck.ecogging.domain.plogging.dto.AccompanyDTO;
 import com.pickupluck.ecogging.domain.plogging.service.AccompanyService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -83,6 +80,7 @@ public class AccompanyController {
                 map.put("isAccompanyscrap", isAccompanyscrap);
                 // comment
                 List<CommentResponse> comments = commentService.findByAccompanyId(param.get("accompanyId"));
+
                 map.put("comments", comments);
             }
             return new ResponseEntity<>(map, HttpStatus.OK);

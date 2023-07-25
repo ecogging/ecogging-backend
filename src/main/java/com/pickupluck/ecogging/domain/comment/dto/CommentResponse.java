@@ -20,9 +20,11 @@ public class CommentResponse {
 
     private Long id;
 
-    private Long writerId;
+    private Long userId;
 
-    private String writerName;
+    private String userNickname;
+
+    private Long articleId;
 
     private String content;
 
@@ -31,6 +33,10 @@ public class CommentResponse {
     private Long parentId;
 
     private int depth;
+
+    private String profileImageUrl;
+
+    private boolean deleted;
 
     private List<CommentResponse> children;
 
@@ -41,20 +47,23 @@ public class CommentResponse {
                     comment.getChildren()
                             .stream()
                             .map(c -> CommentResponse.from(c))
-                            .sorted(Comparator.comparing(CommentResponse::getCreatedAt))
+                            .sorted(Comparator.comparing(CommentResponse::getCreatedAt).reversed())
                             .toList()
                 :
                     new ArrayList<>();
 
         return CommentResponse.builder()
                 .id(comment.getId())
-                .writerId(comment.getWriter().getId())
-                .writerName(comment.getWriter().getName())
+                .userId(comment.getWriter().getId())
+                .userNickname(comment.getWriter().getNickname())
+                .profileImageUrl(comment.getWriter().getProfileImageUrl())
                 .content(comment.getContent())
                 .createdAt(comment.getCreatedAt())
                 .depth(comment.getDepth())
+                .articleId(comment.getArticleId())
                 .parentId(comment.isParentExist() ? comment.getParent().getId() : null)
                 .children(children)
+                .deleted(comment.getDeleted())
                 .build();
     }
 }
