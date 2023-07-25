@@ -1,5 +1,6 @@
 package com.pickupluck.ecogging.domain.notification.dto;
 
+import com.pickupluck.ecogging.domain.BoardType;
 import com.pickupluck.ecogging.domain.notification.entity.NotificationType;
 import lombok.*;
 
@@ -16,6 +17,8 @@ public class NotificationSaveDto {
     private Long targetId;
 
     private NotificationType type;
+
+    private BoardType boardType;
 
     private String detail;
 }

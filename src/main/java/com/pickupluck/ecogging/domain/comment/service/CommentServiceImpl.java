@@ -5,10 +5,17 @@ import com.pickupluck.ecogging.domain.comment.dto.CommentResponse;
 import com.pickupluck.ecogging.domain.comment.dto.CommentSaveRequest;
 import com.pickupluck.ecogging.domain.comment.entity.Comment;
 import com.pickupluck.ecogging.domain.comment.repository.CommentRepository;
+import com.pickupluck.ecogging.domain.notification.dto.NotificationSaveDto;
+import com.pickupluck.ecogging.domain.notification.entity.NotificationType;
+import com.pickupluck.ecogging.domain.notification.service.NotificationService;
+import com.pickupluck.ecogging.domain.plogging.dto.AccompanyDTO;
+import com.pickupluck.ecogging.domain.plogging.entity.Accompany;
+import com.pickupluck.ecogging.domain.plogging.service.AccompanyService;
 import com.pickupluck.ecogging.domain.user.entity.User;
 import com.pickupluck.ecogging.domain.user.repository.UserRepository;
 import com.pickupluck.ecogging.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Comparator;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class CommentServiceImpl implements CommentService {
@@ -23,6 +31,10 @@ public class CommentServiceImpl implements CommentService {
     private final UserRepository userRepository;
 
     private final CommentRepository commentRepository;
+
+    private final NotificationService notificationService;
+
+    private final AccompanyService accompanyService;
 
     @Override
     public List<CommentResponse> getMyComments() throws Exception {
@@ -53,10 +65,10 @@ public class CommentServiceImpl implements CommentService {
     @Transactional
     public void save(CommentSaveRequest request) throws Exception {
         final String email = SecurityUtil.getCurrentUsername().orElse("");
-        User user = userRepository.findByEmail(email)
+        final User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new Exception("No user for email: " + email));
 
-        Comment comment = Comment.builder()
+        final Comment comment = Comment.builder()
                 .content(request.getContent())
                 .boardType(BoardType.ACCOMPANY) // 현재는 동행에만 댓글 달림
                 .articleId(request.getArticleId())
@@ -64,7 +76,7 @@ public class CommentServiceImpl implements CommentService {
                 .build();
 
         if (request.getParentId() != null) {
-            Comment parent = commentRepository
+            final Comment parent = commentRepository
                     .findById(request.getParentId())
                     .orElseThrow(()-> new IllegalArgumentException("no comment for id: " + request.getParentId()));
 
@@ -75,6 +87,34 @@ public class CommentServiceImpl implements CommentService {
             comment.registerParent(parent);
         }
         commentRepository.save(comment);
+
+        // notification
+        final boolean isReply = comment.isParentExist();
+        final AccompanyDTO target = accompanyService.getAccompany(comment.getArticleId());
+
+        // 대댓글일 경우, 부모댓글 작성자. 댓글일 경우 글 작성자
+        final Long notiReceiverId = isReply ? comment.getParent().getWriter().getId() : target.getUserId();
+
+        // 댓글 작성자
+        final Long notiSenderId = user.getId();
+        // 게시글 아이디
+        final Long notiTargetId = target.getId();
+
+        // 댓글일 경우, 글 제목. 대댓글일경우 없음
+        final String notiDetail = isReply ? "" : target.getTitle();
+        final NotificationType notiType = isReply ? NotificationType.REPLYCOMMENT : NotificationType.COMMENT;
+        final BoardType notiBoardType = comment.getBoardType();
+
+        notificationService.createNotification(
+                NotificationSaveDto.builder()
+                        .receiverId(notiReceiverId)
+                        .senderId(notiSenderId)
+                        .targetId(notiTargetId)
+                        .detail(notiDetail)
+                        .type(notiType)
+                        .boardType(notiBoardType)
+                        .build()
+        );
     }
 
     @Override

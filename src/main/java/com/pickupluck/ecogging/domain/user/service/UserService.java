@@ -6,11 +6,11 @@ import org.springframework.web.multipart.MultipartFile;
 
 public interface UserService {
 
-    User findUserById(Long id);
+    User findUserById(Long id) throws Exception;
 
-    User findUserByEmail(String email);
+    User findUserByEmail(String email) throws Exception;
 
-    Boolean isValidEmailForSignup(String email);
+    Boolean isValidEmailForSignup(String email) throws Exception;
 
     void logout();
 
