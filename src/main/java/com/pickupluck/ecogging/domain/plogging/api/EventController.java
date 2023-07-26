@@ -10,6 +10,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +24,18 @@ public class EventController {
 
     private final EventService eventService;
 
+    @GetMapping("/test123")
+    public String test123() throws IOException  {
+        String homePath = System.getProperty("user.home");
+
+
+
+        Path myPath = Paths.get(homePath, "ecogging");
+        Files.createDirectory(myPath);
+
+
+        return myPath.toString();
+    }
 
     @GetMapping("/eventList/{page}/{sorttype}")
     public ResponseEntity<Map<String,Object>> eventList(@PathVariable Integer page, @PathVariable String sorttype) {
