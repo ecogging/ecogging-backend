@@ -193,5 +193,15 @@ public class AccompanyController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
+    @GetMapping("/reviewsdelete/{forumId}")
+    public ResponseEntity<Boolean> myForumDelete(@PathVariable Long forumId) {
+        try {
+            forumService.myForumDelete(forumId);
+            return new ResponseEntity<>(true, HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
 
 }
