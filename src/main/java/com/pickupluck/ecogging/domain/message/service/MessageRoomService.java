@@ -31,6 +31,7 @@ public interface MessageRoomService {
 
     // 쪽지함 읽음 처리
     void updateMessagesRead(Long userId, Long messageRoomId);
+    void updateMessagesReadAll(Long userId, Long messageRoomId);
 
 }
 

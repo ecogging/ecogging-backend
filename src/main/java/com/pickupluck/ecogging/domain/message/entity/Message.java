@@ -100,6 +100,10 @@ public class Message extends BaseEntity {
         // 이미 한 명이 읽었는데 다른 쪽도 읽으면 모두 읽음으로 변경
     }
 
+    public void changeForce(ReadState readBy) {
+        this.readBy=readBy;
+    }
+
 
 
     private void validateContent(String content) {

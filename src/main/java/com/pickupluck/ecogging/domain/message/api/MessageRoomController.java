@@ -153,7 +153,7 @@ public class MessageRoomController {
     }
 
     // 6. 쪽지함 읽음 처리
-    @PutMapping("/mypage/{userId}/messagerooms/read")
+    @PutMapping("/mypage/{userId}/messageroom/read")
     public ResponseEntity<Map<String, Object>> updateMessagesRead(@PathVariable("userId")Long userId,
                                                                   @RequestBody Long messageRoomId) {
 
@@ -164,4 +164,24 @@ public class MessageRoomController {
 
         return ResponseEntity.ok(response);
     }
+
+    // 7. 복수 쪽지함 읽음 처리
+    @PutMapping("/mypage/{userId}/messagerooms/read")
+    public ResponseEntity<Map<String, Object>> updateMessagesReadAll(@PathVariable("userId")Long userId,
+                                                                     @RequestBody List<String> requestBody) {
+        List<String> updateMsgRoomsIdInt = requestBody;
+
+        // Long 으로 변환해서 쪽지함 하나씩 차례차례 읽음 처리
+        for(int i=0;i<updateMsgRoomsIdInt.size();i++){
+            Long tempToLong = Long.parseLong(updateMsgRoomsIdInt.get(i)); // Long으로 변환
+            messageRoomService.updateMessagesReadAll(userId, tempToLong);
+        }
+
+        // Map에 문자열 설정해서 리턴
+        Map<String, Object> response = new HashMap<>();
+        response.put("msg", "쪽지함 복수 읽기 완료");
+
+        return ResponseEntity.ok(response);
+    }
+
 }

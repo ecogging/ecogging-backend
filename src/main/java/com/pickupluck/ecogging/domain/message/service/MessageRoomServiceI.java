@@ -293,7 +293,28 @@ public class MessageRoomServiceI implements MessageRoomService {
 
         // 쪽지함도 같은 값으로 변경
         msgRoom.changeReadBy(readState);
+    }
 
+    // 읽음 여부 처리 (모두)
+    @Override
+    @Transactional
+    public void updateMessagesReadAll(Long userId, Long messageRoomId) {
 
+        // 현재 유저
+        User now = userRepository.findById(userId).get();
+        // 선택된 쪽지함
+        MessageRoom msgRoom = messageRoomRepository.findById(messageRoomId).get();
+        // 쪽지함에 포함된 쪽지목록 조회
+        List<Message> messagesInTheRoom = messageRepository.findAllByMessageRoomId(messageRoomId);
+
+        // 읽음 상태 업데이트
+        for (Message m : messagesInTheRoom) {
+            m.changeReadBy(ReadState.BOTH);
+            System.out.println(m.getReadBy());
+        }
+
+        // 쪽지함도 같은 값으로 변경
+        msgRoom.changeForce(ReadState.BOTH);
+        System.out.println(msgRoom.getReadBy());
     }
 }
