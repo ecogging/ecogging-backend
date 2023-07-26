@@ -51,6 +51,17 @@ public class EventServiceImpl implements EventService{
 
 
     public void writeEvent(EventDTO eventDTO, MultipartFile file) throws Exception {
+        // 사용자 인증 및 권한 검사 로직 추가
+        Long userId = eventDTO.getUserId();
+        User user = userRepository.findById(userId).orElse(null);
+        if (user == null) {
+            throw new Exception("사용자 인증이 필요합니다.");
+        }
+
+        // corporate 값이 존재하지 않으면 접근 거부
+        if (user.getCorporate() == null) {
+            throw new Exception("corporate 값이 없어 행사글 작성이 불가능합니다.");
+        }
         if(file!=null && !file.isEmpty()) {
 //            String path="D:/MJS/front-work/upload/";
 //            dongur2 임시 경로
@@ -314,9 +325,5 @@ public class EventServiceImpl implements EventService{
 
         return latesEventsToDto;
     }
-
-
-
-
 
 }
