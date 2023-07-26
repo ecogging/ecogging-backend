@@ -24,7 +24,7 @@ public interface MessageRoomService {
     Map<String, Object> getMessageRooms(Long userId, Pageable pageable);
 
     // 쪽지함 상세 조회
-    MessageRoomResponseDto getMessageRoom(Long userId, MessageRoomRequestGetDto requestGetDto);
+    Map<String, Object> getMessageRoom(Long userId, MessageRoomRequestGetDto requestGetDto, int pageNo);
 
     // 쪽지함 삭제
     void deleteMessageRoom(Long userId, Long messageRoomId);

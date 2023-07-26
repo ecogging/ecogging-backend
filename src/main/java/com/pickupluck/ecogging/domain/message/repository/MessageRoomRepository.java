@@ -91,8 +91,12 @@ public interface MessageRoomRepository extends JpaRepository<MessageRoom, Long> 
     // 내가 SENDER / RECEVIER 일 경우에 따른 쪽지함 복원
     @Query("select m from Message m join fetch m.messageRoom join fetch m.sender where m.messageRoom.id=:id AND (m.visibilityTo='BOTH' OR m.visibilityTo='ONLY_INITIAL_SENDER')")
     Page<Message> findMessagesByMessageRoomIdAndSender(@Param("id") Long messageRoomId, Pageable pageable);
+    @Query("select m from Message m join fetch m.messageRoom join fetch m.sender where m.messageRoom.id=:id AND (m.visibilityTo='BOTH' OR m.visibilityTo='ONLY_INITIAL_SENDER')")
+    List<Message> findMessagesByMessageRoomIdAndSender(@Param("id") Long messageRoomId);
     @Query("select m from Message m join fetch m.messageRoom join fetch m.sender where m.messageRoom.id=:id AND (m.visibilityTo='BOTH' OR m.visibilityTo='ONLY_INITIAL_RECEIVER')")
     Page<Message> findMessagesByMessageRoomIdAndReceiver(@Param("id") Long messageRoomId, Pageable pageable);
+    @Query("select m from Message m join fetch m.messageRoom join fetch m.sender where m.messageRoom.id=:id AND (m.visibilityTo='BOTH' OR m.visibilityTo='ONLY_INITIAL_RECEIVER')")
+    List<Message> findMessagesByMessageRoomIdAndReceiver(@Param("id") Long messageRoomId);
 
 
 }

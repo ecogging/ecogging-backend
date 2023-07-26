@@ -88,16 +88,24 @@ public class MessageRoomController {
     // getMessageRoom()
     @GetMapping("/{userId}/messageroom/{messageRoomId}")
     public ResponseEntity<Map<String, Object>> getMessageRoom(@PathVariable("userId")Long userId,
-                                                              @PathVariable("messageRoomId")Long messageRoomId) {
+                                                              @PathVariable("messageRoomId")Long messageRoomId,
+                                                              @RequestParam("pageNo") int pageNo
+    ) {
+        pageNo = pageNo==0 ? 0 : (pageNo-1);
+
         // 2-1. MessageRoom -> getRequest 생성
         MessageRoomRequestGetDto request = new MessageRoomRequestGetDto(messageRoomId);
         // 2-2. 생성한 MessageRoomRequestGetDto, userId로 MessageRoomResponseDto 획득
-        MessageRoomResponseDto response = messageRoomService.getMessageRoom(userId, request);
+        Map<String, Object> responseMap = messageRoomService.getMessageRoom(userId, request, pageNo);
+
+        MessageRoomResponseDto response = (MessageRoomResponseDto)responseMap.get("res");
+        int all = (int)responseMap.get("all");
 
         // 2-3. responseBody에 message, data(쪽지함 상세 리스트 담은 - contactNickname & messages ) 저장
         Map<String, Object> responseBody = new HashMap<>();
         responseBody.put("message", "쪽지함 상세 리스트 조회 완료");
         responseBody.put("data", response);
+        responseBody.put("allCount", all);
 
         return ResponseEntity.ok(responseBody);
     }
@@ -108,7 +116,6 @@ public class MessageRoomController {
     public ResponseEntity<Map<String,Object>> getMessageRooms(
             @PathVariable("userId")Long userId,
             @RequestParam("pageNo") int pageNo) {
-//            @PageableDefault(size = 10, sort = "max_created_at", direction = Sort.Direction.DESC) final Pageable pageable) {
 
         pageNo = pageNo==0 ? 0 : (pageNo-1);
         Pageable pageable = PageRequest.of(pageNo, 10, Sort.by("max_created_at").descending()); // Pageable 객체 조건 맞춰 생성

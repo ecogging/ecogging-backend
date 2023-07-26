@@ -190,7 +190,7 @@ public class MessageRoomServiceI implements MessageRoomService {
     // 쪽지함 조회해서 상세 쪽지목록 있는 쪽지함 반환
     @Override
     @Transactional(readOnly = true)
-    public MessageRoomResponseDto getMessageRoom(Long userId, MessageRoomRequestGetDto requestGetDto) {
+    public Map<String, Object> getMessageRoom(Long userId, MessageRoomRequestGetDto requestGetDto, int pageNo) {
         // 1. 현재 유저 조회
         User currentUser = userRepository.findById(userId).get();
         // 2. 쪽지함레포지에서 쪽지함id로 검색해 조회
@@ -200,29 +200,42 @@ public class MessageRoomServiceI implements MessageRoomService {
         checkMessageRoomIsDeleted(messageRoom, userId);
 
         // 페이징
-        Pageable pageable = PageRequest.of(0, 10, Sort.by("createdAt").descending());
-//        Page<Message> messages = messageRoomRepository.findMessagesByMessageRoomId(
-//                messageRoom.getId(), pageable);
+        Pageable pageable = PageRequest.of(pageNo, 10, Sort.by("createdAt").descending());
 
         Page<Message> messages = null;
+        List<Message> alls = null;
+        Integer count = null;
+
         // 현재 유저가 initialSENDER
         if(messageRoom.getInitialSender().getId() == userId) {
             messages = messageRoomRepository.findMessagesByMessageRoomIdAndSender(
                     messageRoom.getId(), pageable);
+            alls = messageRoomRepository.findMessagesByMessageRoomIdAndSender(currentUser.getId());
+            count=alls.size();
         } else {
             messages = messageRoomRepository.findMessagesByMessageRoomIdAndReceiver(
                     messageRoom.getId(), pageable);
+            // 쿼리에 맞는 모든 데이터 -> 전체 개수
+            alls = messageRoomRepository.findMessagesByMessageRoomIdAndReceiver(currentUser.getId());
+            count=alls.size();
         }
 
         User contact =
                 (currentUser.getId() == messageRoom.getInitialSender().getId()) ?
                 messageRoom.getInitialReceiver() : messageRoom.getInitialSender();
 
-        return MessageRoomResponseDto.builder()
-                .messages(messages)
-                .messageRoom(messageRoom)
-                .contact(contact)
-                .build();
+        MessageRoomResponseDto responseDto = MessageRoomResponseDto.builder()
+                                            .messages(messages)
+                                            .messageRoom(messageRoom)
+                                            .contact(contact)
+                                            .build();
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("res", responseDto); // 해당 페이지에 띄울 글 목록
+        result.put("all", count); // 페이징을 위한 전체 데이터 개수
+
+        return result;
+
     }
 
     // 쪽지함 삭제 - Enum 상태만 변경
