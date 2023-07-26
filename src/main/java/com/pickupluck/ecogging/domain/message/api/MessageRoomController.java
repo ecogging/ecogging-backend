@@ -9,6 +9,7 @@ import com.pickupluck.ecogging.domain.message.service.MessageRoomService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -86,17 +87,25 @@ public class MessageRoomController {
     // 2. 쪽지함 조회 - 기존 존재하고 있는 쪽지함 조회 GET /{messageRoomId} - 쪽지 목록까지!
     // getMessageRoom()
     @GetMapping("/{userId}/messageroom/{messageRoomId}")
-    public ResponseEntity<Map<String, Object>> getMessageRoom( @PathVariable("userId")Long userId,
-                                                               @PathVariable("messageRoomId")Long messageRoomId) {
+    public ResponseEntity<Map<String, Object>> getMessageRoom(@PathVariable("userId")Long userId,
+                                                              @PathVariable("messageRoomId")Long messageRoomId,
+                                                              @RequestParam("pageNo") int pageNo
+    ) {
+        pageNo = pageNo==0 ? 0 : (pageNo-1);
+
         // 2-1. MessageRoom -> getRequest 생성
         MessageRoomRequestGetDto request = new MessageRoomRequestGetDto(messageRoomId);
         // 2-2. 생성한 MessageRoomRequestGetDto, userId로 MessageRoomResponseDto 획득
-        MessageRoomResponseDto response = messageRoomService.getMessageRoom(userId, request);
+        Map<String, Object> responseMap = messageRoomService.getMessageRoom(userId, request, pageNo);
+
+        MessageRoomResponseDto response = (MessageRoomResponseDto)responseMap.get("res");
+        int all = (int)responseMap.get("all");
 
         // 2-3. responseBody에 message, data(쪽지함 상세 리스트 담은 - contactNickname & messages ) 저장
         Map<String, Object> responseBody = new HashMap<>();
         responseBody.put("message", "쪽지함 상세 리스트 조회 완료");
         responseBody.put("data", response);
+        responseBody.put("allCount", all);
 
         return ResponseEntity.ok(responseBody);
     }
@@ -106,13 +115,30 @@ public class MessageRoomController {
     @GetMapping("/mypage/{userId}/messagerooms")
     public ResponseEntity<Map<String,Object>> getMessageRooms(
             @PathVariable("userId")Long userId,
-            @PageableDefault(size = 10, sort = "max_created_at", direction = Sort.Direction.DESC) final Pageable pageable) {
+            @RequestParam("pageNo") int pageNo) {
 
-        Page<MessageRoomListResponseDto> response = messageRoomService.getMessageRooms(userId, pageable);
+        pageNo = pageNo==0 ? 0 : (pageNo-1);
+        Pageable pageable = PageRequest.of(pageNo, 10, Sort.by("max_created_at").descending()); // Pageable 객체 조건 맞춰 생성
+
+        Map<String, Object> myMessageRoomsMap = messageRoomService.getMessageRooms(userId, pageable);
+
+        // 쪽지함 목록
+        Page<MessageRoomListResponseDto> response = (Page<MessageRoomListResponseDto>)myMessageRoomsMap.get("res");
+        if (response.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        // 전체 쪽지함 개수
+        int all = (int)myMessageRoomsMap.get("all");
+
+        // 전체 안읽은 쪽지 개수
+        Integer unRead = (Integer) myMessageRoomsMap.get("unReads");
 
         Map<String, Object> responseBody = new HashMap<>();
         responseBody.put("message", "쪽지방 리스트 조회 완료~");
         responseBody.put("data", response.getContent());
+        responseBody.put("allCount", all);
+        responseBody.put("unReads", unRead);
 
         return ResponseEntity.ok(responseBody);
     }
@@ -151,4 +177,37 @@ public class MessageRoomController {
 
         return ResponseEntity.ok(response);
     }
+
+    // 6. 쪽지함 읽음 처리
+    @PutMapping("/mypage/{userId}/messageroom/read")
+    public ResponseEntity<Map<String, Object>> updateMessagesRead(@PathVariable("userId")Long userId,
+                                                                  @RequestBody Long messageRoomId) {
+
+        messageRoomService.updateMessagesRead(userId, messageRoomId);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("msg", "쪽지함 읽기 완료");
+
+        return ResponseEntity.ok(response);
+    }
+
+    // 7. 복수 쪽지함 읽음 처리
+    @PutMapping("/mypage/{userId}/messagerooms/read")
+    public ResponseEntity<Map<String, Object>> updateMessagesReadAll(@PathVariable("userId")Long userId,
+                                                                     @RequestBody List<String> requestBody) {
+        List<String> updateMsgRoomsIdInt = requestBody;
+
+        // Long 으로 변환해서 쪽지함 하나씩 차례차례 읽음 처리
+        for(int i=0;i<updateMsgRoomsIdInt.size();i++){
+            Long tempToLong = Long.parseLong(updateMsgRoomsIdInt.get(i)); // Long으로 변환
+            messageRoomService.updateMessagesReadAll(userId, tempToLong);
+        }
+
+        // Map에 문자열 설정해서 리턴
+        Map<String, Object> response = new HashMap<>();
+        response.put("msg", "쪽지함 복수 읽기 완료");
+
+        return ResponseEntity.ok(response);
+    }
+
 }

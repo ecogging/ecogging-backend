@@ -9,6 +9,7 @@ import com.pickupluck.ecogging.domain.message.dto.response.MessageRoomListRespon
 import com.pickupluck.ecogging.domain.message.dto.response.MessageRoomResponseDto;
 import com.pickupluck.ecogging.domain.message.entity.Message;
 import com.pickupluck.ecogging.domain.message.entity.MessageRoom;
+import com.pickupluck.ecogging.domain.message.entity.ReadState;
 import com.pickupluck.ecogging.domain.message.entity.VisibilityState;
 import com.pickupluck.ecogging.domain.message.repository.MessageRepository;
 import com.pickupluck.ecogging.domain.message.repository.MessageRoomRepository;
@@ -30,6 +31,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -109,7 +111,6 @@ public class MessageRoomServiceI implements MessageRoomService {
                 .sender(sender)
                 .receiver(receiver)
                 .content(firstMessage)
-                .read(0)
                 .build();
 
         // 생성한 Message Entity -> Repository에 저장
@@ -142,12 +143,20 @@ public class MessageRoomServiceI implements MessageRoomService {
     // 쪽지함 조회해서 리스트로 반환
     @Override
     @Transactional(readOnly = true)
-    public Page<MessageRoomListResponseDto> getMessageRooms(Long userId, Pageable pageable) {
+    public Map<String, Object>  getMessageRooms(Long userId, Pageable pageable) {
         User currentUser = userRepository.findById(userId).get();
 
         // 페이지대로 정렬해서 리스트 조회
         Page<MessageRoomsWithLastMessages> messageRooms = messageRoomRepository.findMessageRoomsAndLastMessagesByUserId(
                 currentUser.getId(), pageable);
+
+        // 쿼리에 맞는 모든 데이터 -> 전체 개수
+        List<MessageRoomsWithLastMessages> alls = messageRoomRepository.findMessageRoomsAndLastMessagesByUserId(currentUser.getId());
+        int count = alls.size();
+
+        // 안읽은 쪽지 개수
+        List<MessageRoomsWithLastMessages> unReads = messageRoomRepository.findMessageRoomsAndLastMessagesByUserIdAndReadBy(currentUser.getId());
+        int unReadsCount = unReads.size();
 
         // map을 이용해 Page 내용 변환
         // userId와 msgRoom의 initialSenderId를 비교
@@ -167,16 +176,25 @@ public class MessageRoomServiceI implements MessageRoomService {
                     .contactNickname(contact.getNickname())
                     .lastMessageSentTime(messageRoom.getCreatedAt().toLocalDateTime())
                     .lastMessageContent(messageRoom.getContent())
+                    .readBy(messageRoom.getReadBy())
+                    .initialSend(messageRoom.getInitialSenderId())
+                    .initialRcv(messageRoom.getInitialReceiverId())
                     .build();
         });
 
-        return responses;
+        // 결과 담아서 넘기는 맵
+        Map<String, Object> result = new HashMap<>();
+        result.put("res", responses); // 해당 페이지에 띄울 글 목록
+        result.put("all", count); // 페이징을 위한 전체 데이터 개수
+        result.put("unReads", unReadsCount); // 안읽은 쪽지
+
+        return result;
     }
 
     // 쪽지함 조회해서 상세 쪽지목록 있는 쪽지함 반환
     @Override
     @Transactional(readOnly = true)
-    public MessageRoomResponseDto getMessageRoom(Long userId, MessageRoomRequestGetDto requestGetDto) {
+    public Map<String, Object> getMessageRoom(Long userId, MessageRoomRequestGetDto requestGetDto, int pageNo) {
         // 1. 현재 유저 조회
         User currentUser = userRepository.findById(userId).get();
         // 2. 쪽지함레포지에서 쪽지함id로 검색해 조회
@@ -186,29 +204,42 @@ public class MessageRoomServiceI implements MessageRoomService {
         checkMessageRoomIsDeleted(messageRoom, userId);
 
         // 페이징
-        Pageable pageable = PageRequest.of(0, 10, Sort.by("createdAt").descending());
-//        Page<Message> messages = messageRoomRepository.findMessagesByMessageRoomId(
-//                messageRoom.getId(), pageable);
+        Pageable pageable = PageRequest.of(pageNo, 10, Sort.by("createdAt").descending());
 
         Page<Message> messages = null;
+        List<Message> alls = null;
+        Integer count = null;
+
         // 현재 유저가 initialSENDER
         if(messageRoom.getInitialSender().getId() == userId) {
             messages = messageRoomRepository.findMessagesByMessageRoomIdAndSender(
                     messageRoom.getId(), pageable);
+            alls = messageRoomRepository.findMessagesByMessageRoomIdAndSender(currentUser.getId());
+            count=alls.size();
         } else {
             messages = messageRoomRepository.findMessagesByMessageRoomIdAndReceiver(
                     messageRoom.getId(), pageable);
+            // 쿼리에 맞는 모든 데이터 -> 전체 개수
+            alls = messageRoomRepository.findMessagesByMessageRoomIdAndReceiver(currentUser.getId());
+            count=alls.size();
         }
 
         User contact =
                 (currentUser.getId() == messageRoom.getInitialSender().getId()) ?
                 messageRoom.getInitialReceiver() : messageRoom.getInitialSender();
 
-        return MessageRoomResponseDto.builder()
-                .messages(messages)
-                .messageRoom(messageRoom)
-                .contact(contact)
-                .build();
+        MessageRoomResponseDto responseDto = MessageRoomResponseDto.builder()
+                                            .messages(messages)
+                                            .messageRoom(messageRoom)
+                                            .contact(contact)
+                                            .build();
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("res", responseDto); // 해당 페이지에 띄울 글 목록
+        result.put("all", count); // 페이징을 위한 전체 데이터 개수
+
+        return result;
+
     }
 
     // 쪽지함 삭제 - Enum 상태만 변경
@@ -263,5 +294,53 @@ public class MessageRoomServiceI implements MessageRoomService {
             return true;
         }
         return false;
+    }
+
+
+    // 읽음 여부 처리
+    @Override
+    @Transactional
+    public void updateMessagesRead(Long userId, Long messageRoomId) {
+
+        // 현재 유저
+        User now = userRepository.findById(userId).get();
+        // 선택된 쪽지함
+        MessageRoom msgRoom = messageRoomRepository.findById(messageRoomId).get();
+        // 쪽지함에 포함된 쪽지목록 조회
+        List<Message> messagesInTheRoom = messageRepository.findAllByMessageRoomId(messageRoomId);
+
+        // 읽음 상태 업데이트
+        ReadState readState = isInitialSender(now, msgRoom) ?
+                ReadState.ONLY_INITIAL_SENDER : ReadState.ONLY_INITIAL_RECEIVER;
+
+        for (Message m : messagesInTheRoom) {
+            m.changeReadBy(readState);
+        }
+
+        // 쪽지함도 같은 값으로 변경
+        msgRoom.changeReadBy(readState);
+    }
+
+    // 읽음 여부 처리 (모두)
+    @Override
+    @Transactional
+    public void updateMessagesReadAll(Long userId, Long messageRoomId) {
+
+        // 현재 유저
+        User now = userRepository.findById(userId).get();
+        // 선택된 쪽지함
+        MessageRoom msgRoom = messageRoomRepository.findById(messageRoomId).get();
+        // 쪽지함에 포함된 쪽지목록 조회
+        List<Message> messagesInTheRoom = messageRepository.findAllByMessageRoomId(messageRoomId);
+
+        // 읽음 상태 업데이트
+        for (Message m : messagesInTheRoom) {
+            m.changeReadBy(ReadState.BOTH);
+            System.out.println(m.getReadBy());
+        }
+
+        // 쪽지함도 같은 값으로 변경
+        msgRoom.changeForce(ReadState.BOTH);
+        System.out.println(msgRoom.getReadBy());
     }
 }

@@ -53,7 +53,6 @@ public class MessageServiceI implements MessageService{
                 .sender(currentUser)
                 .receiver(contactUser)
                 .content(msgSendDto.getMessage())
-                .read(0)
                 .build();
         // Message Entity -> Repo 저장
         messageRepository.save(message);
