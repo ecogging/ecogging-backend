@@ -1,10 +1,13 @@
 package com.pickupluck.ecogging.domain.forum.dto;
 
+import com.pickupluck.ecogging.domain.forum.entity.Forum;
 import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Getter
+@NoArgsConstructor
+@ToString
 public class ForumDTO {
 
     // 기본
@@ -51,5 +54,29 @@ public class ForumDTO {
         this.filePath = filePath;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+    }
+
+    public ForumDTO(Forum forum) {
+        this.forumId = forum.getId();
+        this.forumType = forum.getType();
+        this.writerId = forum.getWriter().getId();
+        this.title = forum.getTitle();
+        this.content = forum.getContent();
+        this.views = forum.getViews();
+        this.isTemp = forum.getIsTemporary();
+        this.routeLocation = forum.getRouteLocation();
+        this.routeLocationDetail = forum.getRouteLocationDetail();
+        this.thisAccompanyId = forum.getThisAccompany().getId();
+        if(forum.getWriter()!=null) {
+            this.writerNickname = forum.getWriter().getNickname();
+            this.writerPic = forum.getWriter().getProfileImageUrl();
+        }
+        if(forum.getFile()!=null) {
+            this.fileId = forum.getFile().getId();
+            this.fileName = forum.getFile().getFileName();
+            this.filePath = forum.getFile().getPath();
+        }
+        this.createdAt = forum.getCreatedAt();
+        this.updatedAt = forum.getUpdatedAt();
     }
 }

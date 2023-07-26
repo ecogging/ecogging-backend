@@ -186,8 +186,8 @@ public class AccompanyController {
 
     @PostMapping("/myforum")
     public ResponseEntity<Map<String,Object>> getMyForum(@RequestBody Map<String,Object> param) {
-        Long userId = (Long)param.get("userId");
-        Integer page = (Integer)param.get("page");
+        Long userId = Long.valueOf((String)param.get("userId"));
+        Integer page = Integer.valueOf((String)param.get("page"));
         String order = (String)param.get("order");
         try {
             Map<String, Object> res = forumService.getMyForumList(userId, page, order);

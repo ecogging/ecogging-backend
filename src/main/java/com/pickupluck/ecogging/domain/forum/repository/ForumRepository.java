@@ -16,8 +16,8 @@ import java.util.List;
 
 public interface ForumRepository extends JpaRepository<Forum,Long> {
 
-    @Query ("SELECT r FROM Forum r WHERE r.isTemporary = false AND r.type = '후기' AND r.writer.id = :userId")
-    Page<Forum> findAllByWriterId(Long userId, PageRequest pageRequest);
+    //@Query ("SELECT r FROM Forum r WHERE r.isTemporary = false AND r.type = '후기' AND r.writer.id = :userId")
+    Page<Forum> findByIsTemporaryFalseAndTypeAndWriterId(String type, Long userId, PageRequest pageRequest);
 
     // RouteRepository 에서 옮겨온거 -- 메서드 이름 중복이라 ForRoute, ForShare 붙였어요
     Page<Forum> findAllByType(String type, PageRequest pageRequest, Sort sortByCreateAtDesc);

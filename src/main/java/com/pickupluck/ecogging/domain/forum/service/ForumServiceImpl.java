@@ -75,17 +75,19 @@ public class ForumServiceImpl implements ForumService{
         if(order.equals("old")) {
             sort = Sort.Direction.ASC;
         }
-        PageRequest pageRequest=PageRequest.of(page-1, 10, Sort.by(sort,"forumId"));
-        Page<Forum> pages=forumRepository.findAllByWriterId(userId, pageRequest);
+        PageRequest pageRequest=PageRequest.of(page-1, 5, Sort.by(sort,"id"));
+        Page<Forum> pages=forumRepository.findByIsTemporaryFalseAndTypeAndWriterId("후기", userId, pageRequest);
 
         Map<String,Object> map = new HashMap<>();
         List<ForumDTO> list=new ArrayList<>();
         for(Forum forum:pages.getContent()){
-            list.add(modelMapper.map(forum, ForumDTO.class));
+            System.out.println(forum);
+            list.add(new ForumDTO(forum));
         }
 
         map.put("list", list);
 
+        Long allCount = pages.getTotalElements();
         PageInfo pageInfo = new PageInfo();
         pageInfo.setAllPage(pages.getTotalPages());
         pageInfo.setCurPage(page);
@@ -98,6 +100,7 @@ public class ForumServiceImpl implements ForumService{
         pageInfo.setEndPage(endPage);
 
         map.put("pageInfo", pageInfo);
+        map.put("allCount", allCount);
         return map;
 
     }
