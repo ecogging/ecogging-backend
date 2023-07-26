@@ -21,7 +21,7 @@ public interface MessageRoomService {
     MessageRoomIdResponseDto saveMessageRoom(Long curId, Long contactId, String firstMessage);
 
     // 쪽지함 리스트 조회한 페이지 반환
-    Page<MessageRoomListResponseDto> getMessageRooms(Long userId, Pageable pageable);
+    Map<String, Object> getMessageRooms(Long userId, Pageable pageable);
 
     // 쪽지함 상세 조회
     MessageRoomResponseDto getMessageRoom(Long userId, MessageRoomRequestGetDto requestGetDto);
@@ -32,6 +32,8 @@ public interface MessageRoomService {
     // 쪽지함 읽음 처리
     void updateMessagesRead(Long userId, Long messageRoomId);
     void updateMessagesReadAll(Long userId, Long messageRoomId);
+
+
 
 }
 

@@ -31,6 +31,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -142,13 +143,16 @@ public class MessageRoomServiceI implements MessageRoomService {
     // 쪽지함 조회해서 리스트로 반환
     @Override
     @Transactional(readOnly = true)
-    public Page<MessageRoomListResponseDto> getMessageRooms(Long userId, Pageable pageable) {
+    public Map<String, Object>  getMessageRooms(Long userId, Pageable pageable) {
         User currentUser = userRepository.findById(userId).get();
 
         // 페이지대로 정렬해서 리스트 조회
         Page<MessageRoomsWithLastMessages> messageRooms = messageRoomRepository.findMessageRoomsAndLastMessagesByUserId(
                 currentUser.getId(), pageable);
 
+        // 쿼리에 맞는 모든 데이터 -> 전체 개수
+        List<MessageRoomsWithLastMessages> alls = messageRoomRepository.findMessageRoomsAndLastMessagesByUserId(currentUser.getId());
+        int count = alls.size();
 
 
         // map을 이용해 Page 내용 변환
@@ -175,7 +179,12 @@ public class MessageRoomServiceI implements MessageRoomService {
                     .build();
         });
 
-        return responses;
+        // 결과 담아서 넘기는 맵
+        Map<String, Object> result = new HashMap<>();
+        result.put("res", responses); // 해당 페이지에 띄울 글 목록
+        result.put("all", count); // 페이징을 위한 전체 데이터 개수
+
+        return result;
     }
 
     // 쪽지함 조회해서 상세 쪽지목록 있는 쪽지함 반환

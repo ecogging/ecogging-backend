@@ -9,6 +9,7 @@ import com.pickupluck.ecogging.domain.message.service.MessageRoomService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -106,13 +107,27 @@ public class MessageRoomController {
     @GetMapping("/mypage/{userId}/messagerooms")
     public ResponseEntity<Map<String,Object>> getMessageRooms(
             @PathVariable("userId")Long userId,
-            @PageableDefault(size = 10, sort = "max_created_at", direction = Sort.Direction.DESC) final Pageable pageable) {
+            @RequestParam("pageNo") int pageNo) {
+//            @PageableDefault(size = 10, sort = "max_created_at", direction = Sort.Direction.DESC) final Pageable pageable) {
 
-        Page<MessageRoomListResponseDto> response = messageRoomService.getMessageRooms(userId, pageable);
+        pageNo = pageNo==0 ? 0 : (pageNo-1);
+        Pageable pageable = PageRequest.of(pageNo, 10, Sort.by("max_created_at").descending()); // Pageable 객체 조건 맞춰 생성
+
+        Map<String, Object> myMessageRoomsMap = messageRoomService.getMessageRooms(userId, pageable);
+
+        // 쪽지함 목록
+        Page<MessageRoomListResponseDto> response = (Page<MessageRoomListResponseDto>)myMessageRoomsMap.get("res");
+        if (response.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        // 전체 쪽지함 개수
+        int all = (int)myMessageRoomsMap.get("all");
 
         Map<String, Object> responseBody = new HashMap<>();
         responseBody.put("message", "쪽지방 리스트 조회 완료~");
         responseBody.put("data", response.getContent());
+        responseBody.put("allCount", all);
 
         return ResponseEntity.ok(responseBody);
     }
