@@ -1,6 +1,5 @@
 package com.pickupluck.ecogging.domain.message.api;
 
-import com.pickupluck.ecogging.domain.message.dto.request.MessageRoomRequestCreateDto;
 import com.pickupluck.ecogging.domain.message.dto.request.MessageRoomRequestGetDto;
 import com.pickupluck.ecogging.domain.message.dto.response.MessageRoomIdResponseDto;
 import com.pickupluck.ecogging.domain.message.dto.response.MessageRoomListResponseDto;
@@ -12,13 +11,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.UnsupportedEncodingException;
@@ -26,7 +21,10 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @Slf4j
 @RestController
