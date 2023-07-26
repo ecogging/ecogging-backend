@@ -62,6 +62,10 @@ public class MessageRoom extends BaseEntity {
         }
     }
 
+    public void setVisibilityTo(VisibilityState visibilityTo) {
+        this.visibilityTo = visibilityTo;
+    }
+
     @Override
     public String toString() {
         return "MessageRoom{" +

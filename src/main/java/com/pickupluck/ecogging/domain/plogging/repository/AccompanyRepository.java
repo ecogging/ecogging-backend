@@ -5,9 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 public interface AccompanyRepository extends JpaRepository<Accompany, Long> {
 
@@ -20,4 +18,5 @@ public interface AccompanyRepository extends JpaRepository<Accompany, Long> {
     Page<Accompany> findByUserId(Long userId, PageRequest paging);
     List<Accompany> findByUserId(Long userId);
     Page<Accompany> findByUserIdAndSaveTrue(Long userId, PageRequest paging);
+    Page<Accompany> findByUserIdAndSaveFalse(Long userId, PageRequest paging);
 }

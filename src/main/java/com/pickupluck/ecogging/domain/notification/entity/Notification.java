@@ -1,6 +1,7 @@
 package com.pickupluck.ecogging.domain.notification.entity;
 
 import com.pickupluck.ecogging.domain.BaseEntity;
+import com.pickupluck.ecogging.domain.BoardType;
 import com.pickupluck.ecogging.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.Builder;
@@ -37,16 +38,24 @@ public class Notification extends BaseEntity {
     @Enumerated(value = EnumType.STRING)
     private NotificationType type;
 
+    @Enumerated(value = EnumType.STRING)
+    private BoardType boardType;
+
     private String detail;
 
     @Builder
-    public Notification(User sender, User receiver, Boolean isRead, Boolean isDeleted, Long targetId, String detail, NotificationType type) {
+    public Notification(User sender, User receiver, Long targetId, String detail, NotificationType type, BoardType boardType) {
         this.sender = sender;
         this.receiver = receiver;
-        this.isRead = isRead;
-        this.isDeleted = isDeleted;
+        this.isRead = false;
+        this.isDeleted = false;
         this.targetId = targetId;
         this.detail = detail;
         this.type = type;
+        this.boardType = boardType;
+    }
+
+    public void read() {
+        this.isRead = true;
     }
 }

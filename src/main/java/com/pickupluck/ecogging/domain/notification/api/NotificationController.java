@@ -29,9 +29,6 @@ public class NotificationController {
             @RequestHeader(value = "Last-Received-Noti-Id", required = false, defaultValue = "0") Long after) {
         log.info(after.toString());
         try {
-            String userEmail = SecurityUtil.getCurrentUsername().orElseThrow();
-            Long userId = userService.findUserByEmail(userEmail).getId();
-
             List<NotificationResponseDto> myNotifications = notificationService.getMyNotifications(after);
             return new ResponseEntity<>(myNotifications, HttpStatus.OK);
 
@@ -46,6 +43,17 @@ public class NotificationController {
     public ResponseEntity deleteNotification(@PathVariable Long id) {
         notificationService.deleteNotification(id);
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PostMapping("/notifications/{id}")
+    public ResponseEntity readNotification(@PathVariable("id") Long notificationId) {
+        try {
+            notificationService.readNotification(notificationId);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
     }
 
 }

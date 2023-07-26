@@ -42,17 +42,15 @@ public class Message extends BaseEntity {
     @OnDelete(action = OnDeleteAction.NO_ACTION)
     private User sender; // FK
 
-//    @Column(nullable = false, name = "deleted_by_receiver_YN")
-//    private Integer deletedByRcv;
-//
-//    @Column(nullable = false, name = "deleted_by_sender_YN")
-//    private Integer deletedBySnd;
+    @Column(name = "visible_to_msg", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private VisibilityState visibilityTo; // 삭제 상태 추가
 
     @Builder
     public Message(Long id, MessageRoom messageRoom, String content, Integer read, User receiver, User sender) {
-        Assert.notNull(messageRoom, "messageRoom은 null이 아니여야 합니다.");
-        Assert.notNull(receiver, "receiver는 null이 아니여야 합니다.");
-        Assert.notNull(sender, "sender null이 아니여야 합니다.");
+        Assert.notNull(messageRoom, "messageRoom null 불가능");
+        Assert.notNull(receiver, "receiver null 불가능");
+        Assert.notNull(sender, "sender null 불가능");
         validateContent(content);
         this.id = id;
         this.messageRoom = messageRoom;
@@ -60,14 +58,27 @@ public class Message extends BaseEntity {
         this.sender = sender;
         this.content = content;
         this.read = read;
-//        this.deletedByRcv = deletedByRcv;
-//        this.deletedBySnd = deletedBySnd;
+        this.visibilityTo = VisibilityState.BOTH; // 삭제 상태 추가
+    }
+
+    public void changeVisibilityTo(VisibilityState visibilityTo) {
+        if (this.visibilityTo.equals(VisibilityState.BOTH)) {
+            this.visibilityTo = visibilityTo;
+        } else if (this.visibilityTo.equals(VisibilityState.ONLY_INITIAL_RECEIVER)) {
+            if (visibilityTo.equals(VisibilityState.ONLY_INITIAL_SENDER)) {
+                this.visibilityTo = VisibilityState.NO_ONE;
+            }
+        } else if (this.visibilityTo.equals(VisibilityState.ONLY_INITIAL_SENDER)) {
+            if (visibilityTo.equals(VisibilityState.ONLY_INITIAL_RECEIVER)) {
+                this.visibilityTo = VisibilityState.NO_ONE;
+            }
+        }
     }
 
     private void validateContent(String content) {
         Assert.notNull(content, "메세지 내용은 비어있을 수 없습니다.");
         Assert.isTrue(content.length() <= 300,
-                "메세지 길이는 300자 이하여야 합니다.");
+                "메세지 길이는 300자 이하");
     }
 
     @Override
