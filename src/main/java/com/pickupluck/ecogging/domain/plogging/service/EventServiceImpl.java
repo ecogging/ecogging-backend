@@ -51,7 +51,7 @@ public class EventServiceImpl implements EventService{
 
 
     public void writeEvent(EventDTO eventDTO, MultipartFile file) throws Exception {
-        // 사용자 인증 및 권한 검사 로직 추가.
+        // 사용자 인증 및 권한 검사 로직 추가
         Long userId = eventDTO.getUserId();
         User user = userRepository.findById(userId).orElse(null);
         if (user == null) {
