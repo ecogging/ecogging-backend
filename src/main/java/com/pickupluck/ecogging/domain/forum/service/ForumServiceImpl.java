@@ -8,6 +8,9 @@ import com.pickupluck.ecogging.domain.forum.repository.ForumFileRepository;
 import com.pickupluck.ecogging.domain.forum.repository.ForumRepository;
 import com.pickupluck.ecogging.domain.plogging.dto.ReviewDTO;
 import com.pickupluck.ecogging.domain.plogging.repository.AccompanyRepository;
+import com.pickupluck.ecogging.domain.scrap.dto.ScrapDTO;
+import com.pickupluck.ecogging.domain.scrap.entity.Scrap;
+import com.pickupluck.ecogging.domain.scrap.repository.ForumscrapRepository;
 import com.pickupluck.ecogging.domain.user.entity.User;
 import com.pickupluck.ecogging.domain.user.repository.UserRepository;
 import com.pickupluck.ecogging.util.PageInfo;
@@ -43,25 +46,54 @@ public class ForumServiceImpl implements ForumService{
     private UserRepository userRepository; // 유저 레포지
     @Autowired
     private ModelMapper modelMapper;
+    @Autowired
+    private ForumscrapRepository forumscrapRepository;
 
     @Override
-    public List<ReviewDTO> getReviews(Integer page, PageInfo pageInfo) throws Exception{
-//        List<Forum> list=forumRepository.findAll();
-        PageRequest pageRequest=PageRequest.of(page-1, 10, Sort.by(Sort.Direction.DESC,"forumId"));
-        //Page<Forum> pages=forumRepository.findRequest(pageRequest);
-        //pageInfo.setAllPage(pages.getTotalPages());
-        pageInfo.setCurPage(page);
-        int startPage=(page-1)/5*5+1;
-        int endPage=startPage+5-1;
-        if(endPage>pageInfo.getAllPage()){
-            endPage=pageInfo.getAllPage();
-        }
-        pageInfo.setStartPage(startPage);
-        pageInfo.setEndPage(endPage);
+    public Page<ReviewDTO> getReviews(Long userId, Pageable pageable) throws Exception{
+        Page<Forum> pages = forumRepository.findAllByType("후기",pageable);
 
-        List<ReviewDTO> list=new ArrayList<>();
-//        for(Forum forum:pages.getContent()){
-//            list.add(modelMapper.map(forum, ForumDto.class));
+        for(Forum a:pages){
+            System.out.println("test : "+a);
+        }
+//        pageInfo.setAllPage(pages.getTotalPages());
+
+        // 현재 페이지가 마지막 페이지인 경우 다음 페이지로 이동하지 않음
+//        if (page > pageInfo.getAllPage()) {
+//            return Collections.emptyList();
+//        }
+
+//        pageInfo.setCurPage(page);
+//        int startPage = (page - 1) / 5 * 5 + 1;
+//        int endPage = startPage + 5 - 1;
+//        if (endPage > pageInfo.getAllPage()) endPage = pageInfo.getAllPage();
+//        pageInfo.setStartPage(startPage);
+//        pageInfo.setEndPage(endPage);
+        // boolean isLastPage = page >= pageInfo.getAllPage(); // 현재 페이지가 마지막 페이지인지 여부 판단
+        //pageInfo.setIsLastPage(isLastPage); // isLastPage 값을 설정
+
+
+        Page<ReviewDTO> list =pages.map(pagess->{
+//            Long contactId=
+//                    (userId==pagess.getWriter())
+            User contact=userRepository.findById(userId).get();
+
+            return ReviewDTO.builder()
+                    .forumId(pagess.getId())
+                    .views(pagess.getViews())
+                    .forumType(pagess.getType())
+                    .isTemp(pagess.getIsTemporary())
+                    .content(pagess.getContent())
+                    .createdAt(pagess.getCreatedAt())
+                    .title(pagess.getTitle())
+                    .writerNickname(contact.getNickname())
+                    .writerPic(contact.getProfileImageUrl())
+                    .build();
+
+        });
+
+//        for (Forum share : pages.getContent()) {
+//            list.add(modelMapper.map(share, ForumDTO.class));
 //        }
         return list;
     }
@@ -112,31 +144,42 @@ public class ForumServiceImpl implements ForumService{
         Page<Forum> pages=forumRepository.findAllByType("경로",pageRequest,sortByCreateAtDesc);
 //        Page<Review> pages = reviewRepository.findAll(pageRequest);
 
-        pageInfo.setAllPage(pages.getTotalPages());
 
-        // 현재 페이지가 마지막 페이지인 경우 다음 페이지로 이동하지 않음
-        if (page > pageInfo.getAllPage()) {
-            return Collections.emptyList();
-        }
+    // RouteServiceImpl ---------------------------------------------------------------------------------
 
-        pageInfo.setCurPage(page);
-        int startPage = (page-1)/5*5+1;
-        int endPage = startPage+5-1;
-        if(endPage>pageInfo.getAllPage()) endPage=pageInfo.getAllPage();
-        pageInfo.setStartPage(startPage);
-        pageInfo.setEndPage(endPage);
-        // boolean isLastPage = page >= pageInfo.getAllPage(); // 현재 페이지가 마지막 페이지인지 여부 판단
-        //pageInfo.setIsLastPage(isLastPage); // isLastPage 값을 설정
-
-        List<ForumDTO> list = new ArrayList<>();
-        for(Forum route : pages.getContent()) {
-            list.add(modelMapper.map(route, ForumDTO.class));
-        }
-        return list;
-    }
+//    @Override
+//    public List<ForumDTO> getRoutes(Integer page, PageInfo pageInfo) throws Exception {
+//        PageRequest pageRequest = PageRequest.of(page-1, 5);
+//
+//        Sort sortByCreateAtDesc=Sort.by(Sort.Direction.DESC,"createdAt");
+////        Page<Forum> pages=forumRepository.findAllByType("경로",pageRequest,sortByCreateAtDesc);
+////        Page<Review> pages = reviewRepository.findAll(pageRequest);
+//
+////        pageInfo.setAllPage(pages.getTotalPages());
+//
+//        // 현재 페이지가 마지막 페이지인 경우 다음 페이지로 이동하지 않음
+//        if (page > pageInfo.getAllPage()) {
+//            return Collections.emptyList();
+//        }
+//
+//        pageInfo.setCurPage(page);
+//        int startPage = (page-1)/5*5+1;
+//        int endPage = startPage+5-1;
+//        if(endPage>pageInfo.getAllPage()) endPage=pageInfo.getAllPage();
+//        pageInfo.setStartPage(startPage);
+//        pageInfo.setEndPage(endPage);
+//        // boolean isLastPage = page >= pageInfo.getAllPage(); // 현재 페이지가 마지막 페이지인지 여부 판단
+//        //pageInfo.setIsLastPage(isLastPage); // isLastPage 값을 설정
+//
+//        List<ForumDTO> list = new ArrayList<>();
+////        for(Forum route : pages.getContent()) {
+////            list.add(modelMapper.map(route, ForumDTO.class));
+////        }
+//        return list;
+//    }
 
     @Override
-    public void routeWrite(Map<String, String> res) throws Exception {
+    public void routeWrite(Map<String, String> res, Long userId) throws Exception {
         System.out.println("루틴작성서비스");
 
         String title=res.get("title");
@@ -148,8 +191,10 @@ public class ForumServiceImpl implements ForumService{
                 .title(title)
                 .content(content)
                 .type("경로")
-                .writer((userRepository.findById(1L).get()))
+                .writer((userRepository.findById(userId).get()))
                 .routeLocation(routeLocation)
+                .isTemporary(false)
+                .views(0)
                 .build();
         forumRepository.save(routeEntity);
     }
@@ -180,43 +225,96 @@ public class ForumServiceImpl implements ForumService{
                 .build();
 
 //        route.setViews(route.getViews()+1);
-        forumRepository.save(route);
+//        forumRepository.save(route);
 //        return getRoute;
-        return null;
+        return getRoute;
     }
+
+    @Override
+    public void routeModify(ForumDTO forumDTO, Long userId, Long id) throws Exception {
+        System.out.println("루틴수정서비스");
+        System.out.println(forumDTO);
+//        String title=res.get("title");
+//        String content=res.get("content");
+//        String routeLocation=res.get("routeLocation");
+
+//        forumRepository.save(routeEntity);
+        System.out.println("userId : "+userId);
+        System.out.println("id : "+id);
+        User user = userRepository.findById(userId).get();
+        Forum routeEntity= Forum.builder()
+                .id(forumDTO.getForumId())
+                .title(forumDTO.getTitle())
+                .content(forumDTO.getContent())
+                .type(forumDTO.getForumType())
+                .writer(user)
+                .routeLocation(forumDTO.getRouteLocation())
+                .routeLocationDetail(forumDTO.getRouteLocationDetail())
+                .isTemporary(forumDTO.getIsTemp())
+                .views(forumDTO.getViews())
+//                .createdAt
+                .build();
+        forumRepository.save(routeEntity);
+    }
+
 
 
     // ShareServiceImpl ------------------------------------------------------------------------------------
 
     @Override
-    public List<ForumDTO> getShares(Integer page, PageInfo pageInfo) throws Exception {
-        PageRequest pageRequest = PageRequest.of(page - 1, 5);
+    public Page<ForumDTO> getShares(Long userId, Pageable pageable) throws Exception {
+//        PageRequest pageRequest = PageRequest.of(page - 1, 5);
 
         //Page<Event> pages = eventRepository.findBySaveFalse(pageRequest);
 
-        Sort sortByCreateAtDesc=Sort.by(Sort.Direction.DESC,"createdAt");
-        Page<Forum> pages = forumRepository.findAllByType("나눔",pageRequest,sortByCreateAtDesc);
+//        String type="나눔";
+//        Sort sortByCreateAtDesc=Sort.by(Sort.Direction.DESC,"createdAt");
+//        Page<Forum> pages = forumRepository.findAllByType(type,pageable);
 
-        pageInfo.setAllPage(pages.getTotalPages());
+//        Page<Forum> pages = forumRepository.findAllByType(pageable);
+        Page<Forum> pages = forumRepository.findAllByType("나눔",pageable);
+
+        for(Forum a:pages){
+            System.out.println("test : "+a);
+        }
+//        pageInfo.setAllPage(pages.getTotalPages());
 
         // 현재 페이지가 마지막 페이지인 경우 다음 페이지로 이동하지 않음
-        if (page > pageInfo.getAllPage()) {
-            return Collections.emptyList();
-        }
+//        if (page > pageInfo.getAllPage()) {
+//            return Collections.emptyList();
+//        }
 
-        pageInfo.setCurPage(page);
-        int startPage = (page - 1) / 5 * 5 + 1;
-        int endPage = startPage + 5 - 1;
-        if (endPage > pageInfo.getAllPage()) endPage = pageInfo.getAllPage();
-        pageInfo.setStartPage(startPage);
-        pageInfo.setEndPage(endPage);
+//        pageInfo.setCurPage(page);
+//        int startPage = (page - 1) / 5 * 5 + 1;
+//        int endPage = startPage + 5 - 1;
+//        if (endPage > pageInfo.getAllPage()) endPage = pageInfo.getAllPage();
+//        pageInfo.setStartPage(startPage);
+//        pageInfo.setEndPage(endPage);
         // boolean isLastPage = page >= pageInfo.getAllPage(); // 현재 페이지가 마지막 페이지인지 여부 판단
         //pageInfo.setIsLastPage(isLastPage); // isLastPage 값을 설정
 
-        List<ForumDTO> list = new ArrayList<>();
-        for (Forum share : pages.getContent()) {
-            list.add(modelMapper.map(share, ForumDTO.class));
-        }
+        Page<ForumDTO> list =pages.map(pagess->{
+//            Long contactId=
+//                    (userId==pagess.getWriter())
+            User contact=userRepository.findById(userId).get();
+
+            return ForumDTO.builder()
+                    .forumId(pagess.getId())
+                    .views(pagess.getViews())
+                    .forumType(pagess.getType())
+                    .isTemp(pagess.getIsTemporary())
+                    .content(pagess.getContent())
+                    .createdAt(pagess.getCreatedAt())
+                    .title(pagess.getTitle())
+                    .writerNickname(contact.getNickname())
+                    .writerPic(contact.getProfileImageUrl())
+                    .build();
+
+        });
+
+//        for (Forum share : pages.getContent()) {
+//            list.add(modelMapper.map(share, ForumDTO.class));
+//        }
         return list;
     }
 
@@ -245,7 +343,7 @@ public class ForumServiceImpl implements ForumService{
 //        shareFileEntity.setFileName(filename);
 //        shareFileEntity.setCreatedAt(LocalDateTime.now());
         forumFileRepository.save(shareFileEntity);
-        return "C:/JSR/front-work/upload/"+filename;
+        return "Http://localhost:8080/upload/"+filename;
     }
 
     @Override
@@ -259,8 +357,8 @@ public class ForumServiceImpl implements ForumService{
         User writer = writerOpt.get();
 
         // 첨부파일
-        Optional<ForumFile> fileOpt = forumFileRepository.findById(Long.parseLong(share.getFileId()+""));
-        ForumFile file = fileOpt.get();
+//        Optional<ForumFile> fileOpt = forumFileRepository.findById(Long.parseLong(share.getFileId()+""));
+//        ForumFile file = fileOpt.get();
 
         // DTO 생성
         ForumDTO getShare= ForumDTO.builder()
@@ -270,9 +368,10 @@ public class ForumServiceImpl implements ForumService{
                 .content(share.getContent())
                 .views(Integer.parseInt(share.getViews()+""))
                 .isTemp(share.getIsTemporary())
-                .fileId(file.getId())
-                .fileName(file.getFileName())
-                .filePath(file.getPath())
+                .createdAt(share.getCreatedAt())
+//                .fileId(file.getId())
+//                .fileName(file.getFileName())
+//                .filePath(file.getPath())
                 .build();
 
 //        ForumDTO getShare=ForumDTO.builder()
@@ -282,7 +381,7 @@ public class ForumServiceImpl implements ForumService{
 
 
 //        share.setViews(share.getViews()+1);
-        forumRepository.save(share);
+//        forumRepository.save(share);
         return getShare;
     }
 
@@ -293,8 +392,8 @@ public class ForumServiceImpl implements ForumService{
     }
 
     @Override
-    public void shareModify(Map<String, String> res, long id) throws Exception {
-        System.out.println("리뷰 수정 서비스");
+    public void shareModify(Map<String, String> res, Long id) throws Exception {
+        System.out.println("나눔 수정 서비스");
 
         Forum share=forumRepository.findById(id).orElse(null);
         if(share==null){
@@ -306,10 +405,13 @@ public class ForumServiceImpl implements ForumService{
 
 //        Review reviewEntity=new Review();
         share = Forum.builder()
+                .id(id)
                 .title(title)
                 .content(content)
                 .type("나눔")
                 .writer(userRepository.findById(1L).get())
+                .isTemporary(false)
+                .views(0)
                 .build();
 //        share.setTitle(title);
 //        share.setContent(content);
@@ -321,7 +423,7 @@ public class ForumServiceImpl implements ForumService{
     }
 
     @Override
-    public void shareWrite(Map<String, String> res) throws Exception {
+    public void shareWrite(Map<String, String> res, Long userId) throws Exception {
         System.out.println("나눔작성서비스");
 
         String title=res.get("title");
@@ -331,7 +433,9 @@ public class ForumServiceImpl implements ForumService{
                 .title(title)
                 .content(content)
                 .type("나눔")
-                .writer(userRepository.findById(1L).get())
+                .writer(userRepository.findById(userId).get())
+                .isTemporary(false)
+                .views(0)
                 .build();
 //        shareEntity.setTitle(title);
 //        shareEntity.setContent(content);
@@ -342,7 +446,55 @@ public class ForumServiceImpl implements ForumService{
         forumRepository.save(shareEntity);
     }
 
+    // routes
+    @Override
+    public Page<ForumDTO> getRoutes(Long userId, Pageable pageable) throws Exception {
 
+        Page<Forum> pages = forumRepository.findAllByType("경로",pageable);
+
+        for(Forum a:pages){
+            System.out.println("test : "+a);
+        }
+//        pageInfo.setAllPage(pages.getTotalPages());
+
+        // 현재 페이지가 마지막 페이지인 경우 다음 페이지로 이동하지 않음
+//        if (page > pageInfo.getAllPage()) {
+//            return Collections.emptyList();
+//        }
+
+//        pageInfo.setCurPage(page);
+//        int startPage = (page - 1) / 5 * 5 + 1;
+//        int endPage = startPage + 5 - 1;
+//        if (endPage > pageInfo.getAllPage()) endPage = pageInfo.getAllPage();
+//        pageInfo.setStartPage(startPage);
+//        pageInfo.setEndPage(endPage);
+        // boolean isLastPage = page >= pageInfo.getAllPage(); // 현재 페이지가 마지막 페이지인지 여부 판단
+        //pageInfo.setIsLastPage(isLastPage); // isLastPage 값을 설정
+
+        Page<ForumDTO> list =pages.map(pagess->{
+//            Long contactId=
+//                    (userId==pagess.getWriter())
+            User contact=userRepository.findById(userId).get();
+
+            return ForumDTO.builder()
+                    .forumId(pagess.getId())
+                    .views(pagess.getViews())
+                    .forumType(pagess.getType())
+                    .isTemp(pagess.getIsTemporary())
+                    .content(pagess.getContent())
+                    .createdAt(pagess.getCreatedAt())
+                    .title(pagess.getTitle())
+                    .writerNickname(contact.getNickname())
+                    .writerPic(contact.getProfileImageUrl())
+                    .build();
+
+        });
+
+//        for (Forum share : pages.getContent()) {
+//            list.add(modelMapper.map(share, ForumDTO.class));
+//        }
+        return list;
+    }
 
 
     // ReviewServiceImpl ------------------------------------------------------------------------------------
@@ -351,10 +503,10 @@ public class ForumServiceImpl implements ForumService{
         PageRequest pageRequest = PageRequest.of(page-1, 5);
 
         Sort sortByCreateAtDesc=Sort.by(Sort.Direction.DESC,"createdAt");
-        Page<Forum> pages=forumRepository.findAllByType("후기",pageRequest,sortByCreateAtDesc);
+//        Page<Forum> pages=forumRepository.findAllByType("후기",pageRequest,sortByCreateAtDesc);
 //        Page<Review> pages = reviewRepository.findAll(pageRequest);
 
-        pageInfo.setAllPage(pages.getTotalPages());
+//        pageInfo.setAllPage(pages.getTotalPages());
 
         // 현재 페이지가 마지막 페이지인 경우 다음 페이지로 이동하지 않음
         if (page > pageInfo.getAllPage()) {
@@ -371,22 +523,53 @@ public class ForumServiceImpl implements ForumService{
         //pageInfo.setIsLastPage(isLastPage); // isLastPage 값을 설정
 
         List<ReviewDTO> list = new ArrayList<>();
-        for(Forum review : pages.getContent()) {
-            list.add(modelMapper.map(review, ReviewDTO.class));
-        }
+//        for(Forum review : pages.getContent()) {
+//            list.add(modelMapper.map(review, ReviewDTO.class));
+//        }
         return list;
     }
 
     @Override
-    public ReviewDTO getReviewInfo(Long id) throws Exception {
+    public ReviewDTO getReviewInfo(Long id, Long userId) throws Exception {
         Optional<Forum> reviewInfo=forumRepository.findById(id);
         if(reviewInfo.isEmpty()) return null;
-
         Forum review=reviewInfo.get();
-        ReviewDTO getReview=new ReviewDTO(review);
 
-        review.setViews(review.getViews()+1);
-        forumRepository.save(review);
+        // 작성자
+//        Optional<User> writerOpt = userRepository.findById(review.getWriter().getId());
+//        User writer = writerOpt.get();
+//        User pic=writerOpt.get();
+
+        // 첨부파일
+//        Optional<ForumFile> fileOpt = forumFileRepository.findById(Long.parseLong(share.getFileId()+""));
+//        ForumFile file = fileOpt.get();
+
+        // DTO 생성
+        ReviewDTO getReview= ReviewDTO.builder()
+                .forumId(review.getId())
+                .forumType(review.getType())
+                .title(review.getTitle())
+                .content(review.getContent())
+                .views(Integer.parseInt(review.getViews()+""))
+                .isTemp(review.getIsTemporary())
+                .createdAt(review.getCreatedAt())
+                .writerNickname(String.valueOf(userRepository.findById(userId).get()))
+                .writerPic(String.valueOf(userRepository.findById(userId).get()))
+//                .writerNickname(writerOpt.get())
+//                .writerPic(writerOpt.get())
+//                .fileId(file.getId())
+//                .fileName(file.getFileName())
+//                .filePath(file.getPath())
+                .build();
+
+//        ForumDTO getShare=ForumDTO.builder()
+//                .forumId(share.getId())
+//                        .views(share.getViews()+1);
+
+
+
+//        share.setViews(share.getViews()+1);
+//        forumRepository.save(share);
         return getReview;
     }
 
@@ -414,31 +597,41 @@ public class ForumServiceImpl implements ForumService{
         file.transferTo(file2);
 
         ForumFile reviewFileEntity= ForumFile.builder()
-                .path("C:/JSR/front-work/reviewUpload/"+filename)
+                .path("http://localhost:8080/imageview/"+filename)
                 .fileName(filename)
                 .build();
 //        reviewFileEntity.setPath("C:/JSR/front-work/reviewUpload/"+filename);
 //        reviewFileEntity.setFileName(filename);
 //        reviewFileEntity.setCreatedAt(LocalDateTime.now());
         forumFileRepository.save(reviewFileEntity);
-        return "C:/JSR/front-work/reviewUpload/"+filename;
+        return "http://localhost:8080/imageview/"+filename;
 
     }
 
+
+
     @Override
-    public void reviewWrite(Map<String, String> res) throws Exception {
+    public void reviewWrite(Map<String, String> res, Long accompId, Boolean temp, Long userId) throws Exception {
         System.out.println("리뷰작성서비스");
-
-
         String title=res.get("title");
         String content=res.get("content");
+
+//        Optional<User> user=userRepository.findById(userId);
+
+//        if(user.isPresent()){
+//            ForumDTO forumDTO=new ForumDTO();
+//            forumDTO.
+//        }
+
 
         Forum reviewEntity=Forum.builder()
                 .title(title)
                 .content(content)
                 .type("후기")
-                .writer(userRepository.findById(1L).get())
-                .thisAccompany(accompanyRepository.findById(1L).get())
+                .isTemporary(temp)
+                .writer(userRepository.findById(userId).get())
+                .thisAccompany(accompanyRepository.findById(accompId).get())
+                .views(0)
                 .build();
 
 //        reviewEntity.setTitle(title);
@@ -447,11 +640,11 @@ public class ForumServiceImpl implements ForumService{
 //        reviewEntity.setCreatedAt(LocalDateTime.now());
 //        reviewEntity.setUserId(123);
 //        reviewEntity.setAccompanyId();
-//        reviewRepository.save(reviewEntity);
+        forumRepository.save(reviewEntity);
     }
 
     @Override
-    public void reviewModify(Map<String, String> res, long id) throws Exception{
+    public void reviewModify(Map<String, String> res, Long id, Long userId) throws Exception{
         System.out.println("리뷰 수정 서비스");
 
         Forum review=forumRepository.findById(id).orElse(null);
@@ -462,21 +655,23 @@ public class ForumServiceImpl implements ForumService{
         String title=res.get("title");
         String content=res.get("content");
 
-        Forum reviewEntity=Forum.builder()
+//        Review reviewEntity=new Review();
+        review = Forum.builder()
+                .id(id)
                 .title(title)
                 .content(content)
                 .type("후기")
-                .writer(userRepository.findById(1L).get())
-                .thisAccompany(accompanyRepository.findById(1L).get())
+                .writer(userRepository.findById(userId).get())
+                .isTemporary(false)
+                .views(0)
                 .build();
-//        Review reviewEntity=new Review();
-//        review.setTitle(title);
-//        review.setContent(content);
-//        review.setType("후기");
-//        review.setCreatedAt(LocalDateTime.now());
-//        review.setUserId(123);
-//        review.setAccompanyId(1);
-//        reviewRepository.save(review);
+//        share.setTitle(title);
+//        share.setContent(content);
+//        share.setType("나눔");
+//        share.setCreatedAt(LocalDateTime.now());
+//        share.setUserId(123);
+//        share.setAccompanyId(1);
+        forumRepository.save(review);
     }
 
     @Override
@@ -566,6 +761,7 @@ public class ForumServiceImpl implements ForumService{
         return result;
     }
 
+
     // MyForum(ROUTE) ----------------------------------------------------------------------------
     @Override
     @Transactional(readOnly = true)
@@ -599,4 +795,32 @@ public class ForumServiceImpl implements ForumService{
         return result;
     }
 
+
+
+    //  scrap
+    @Override
+    public Boolean setForumScrap(Long forumId, Long userId) throws Exception {
+        System.out.println("나눔 스크랩 서비스");
+
+        Optional<Scrap> oscrap = forumscrapRepository.findByForumIdAndUserId(forumId, userId);
+
+        if(oscrap.isEmpty()) {
+            Forum forum = forumRepository.findById(forumId).get();
+            Scrap scrap = Scrap.builder()
+                    .forum(forum).userId(userId)
+                    .build();
+            forumscrapRepository.save(scrap);
+            return true;
+        } else {
+            forumscrapRepository.delete(oscrap.get());
+            return false;
+        }
+    }
+
+    @Override
+    public Boolean isForumScrap(Long forumId, Long userId) throws Exception {
+        Optional<Scrap> oscrap = forumscrapRepository.findByForumIdAndUserId(forumId, userId);
+        if(oscrap.isEmpty()) return false;
+        return true;
+    }
 }

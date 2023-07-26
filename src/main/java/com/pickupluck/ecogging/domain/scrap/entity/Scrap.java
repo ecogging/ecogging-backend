@@ -1,27 +1,41 @@
 package com.pickupluck.ecogging.domain.scrap.entity;
 
 import com.pickupluck.ecogging.domain.BaseEntity;
-import com.pickupluck.ecogging.domain.plogging.entity.Event;
-import com.pickupluck.ecogging.domain.user.entity.User;
+import com.pickupluck.ecogging.domain.forum.entity.Forum;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
-public class Scrap extends BaseEntity {
+@ToString
+public class Scrap  {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer scrapId;
+    private Long scrapId;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name="user_id")
-    private User userScrap;
+    private Long userId;
 
-    @OneToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name="eventId")
-    private Event eventScrap;
+//    @ManyToOne(fetch = FetchType.EAGER)
+//    @JoinColumn(name="user_id")
+//    private User userScrap;
+//
+//    @OneToOne(fetch = FetchType.EAGER)
+//    @JoinColumn(name="eventId")
+//    private Event eventScrap;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="forum_id")
+    private Forum forum;
+
+    @Builder
+    public Scrap(Long scrapId, Long userId, Forum forum) {
+        this.scrapId=scrapId;
+        this.userId=userId;
+//        this.userScrap=userScrap;
+//        this.eventScrap=eventScrap;
+        this.forum=forum;
+    }
+
 }

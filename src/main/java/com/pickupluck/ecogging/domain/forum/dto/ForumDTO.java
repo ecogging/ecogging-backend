@@ -60,6 +60,7 @@ public class ForumDTO {
         this.forumId = forum.getId();
         this.forumType = forum.getType();
         this.writerId = forum.getWriter().getId();
+
         this.title = forum.getTitle();
         this.content = forum.getContent();
         this.views = forum.getViews();
@@ -68,6 +69,8 @@ public class ForumDTO {
         this.routeLocationDetail = forum.getRouteLocationDetail();
         this.thisAccompanyId = forum.getThisAccompany().getId();
         if(forum.getWriter()!=null) {
+            this.writerId = forum.getWriter().getId();
+
             this.writerNickname = forum.getWriter().getNickname();
             this.writerPic = forum.getWriter().getProfileImageUrl();
         }
