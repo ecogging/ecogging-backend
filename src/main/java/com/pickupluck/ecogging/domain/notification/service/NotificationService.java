@@ -12,4 +12,6 @@ public interface NotificationService {
     public void createNotification(NotificationSaveDto notificationSaveDto);
 
     public void deleteNotification(Long id);
+
+    public void readNotification(Long id) throws Exception ;
 }

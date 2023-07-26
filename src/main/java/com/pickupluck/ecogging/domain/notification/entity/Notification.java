@@ -44,14 +44,18 @@ public class Notification extends BaseEntity {
     private String detail;
 
     @Builder
-    public Notification(User sender, User receiver, Boolean isRead, Boolean isDeleted, Long targetId, String detail, NotificationType type, BoardType boardType) {
+    public Notification(User sender, User receiver, Long targetId, String detail, NotificationType type, BoardType boardType) {
         this.sender = sender;
         this.receiver = receiver;
-        this.isRead = isRead;
-        this.isDeleted = isDeleted;
+        this.isRead = false;
+        this.isDeleted = false;
         this.targetId = targetId;
         this.detail = detail;
         this.type = type;
         this.boardType = boardType;
+    }
+
+    public void read() {
+        this.isRead = true;
     }
 }
