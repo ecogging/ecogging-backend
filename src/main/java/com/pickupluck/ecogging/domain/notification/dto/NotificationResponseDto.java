@@ -30,6 +30,8 @@ public class NotificationResponseDto {
 
     private String detail;
 
+    private boolean isRead;
+
     private LocalDateTime createdAt;
 
     public static NotificationResponseDto from(Notification notification) {
@@ -40,9 +42,11 @@ public class NotificationResponseDto {
                 .senderId(notification.getSender().getId())
                 .senderNickname(notification.getSender().getNickname())
                 .type(notification.getType())
+                .isRead(notification.getIsRead())
                 .boardType(notification.getBoardType())
                 .detail(notification.getDetail())
                 .createdAt(notification.getCreatedAt())
+
                 .build();
     }
 }

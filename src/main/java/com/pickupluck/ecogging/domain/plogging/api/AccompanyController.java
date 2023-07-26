@@ -179,4 +179,29 @@ public class AccompanyController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
+
+    @PostMapping("/myforum")
+    public ResponseEntity<Map<String,Object>> getMyForum(@RequestBody Map<String,Object> param) {
+        Long userId = Long.valueOf((String)param.get("userId"));
+        Integer page = Integer.valueOf((String)param.get("page"));
+        String order = (String)param.get("order");
+        try {
+            Map<String, Object> res = forumService.getMyForumList(userId, page, order);
+            return new ResponseEntity<>(res, HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+    @GetMapping("/reviewsdelete/{forumId}")
+    public ResponseEntity<Boolean> myForumDelete(@PathVariable Long forumId) {
+        try {
+            forumService.myForumDelete(forumId);
+            return new ResponseEntity<>(true, HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
 }
