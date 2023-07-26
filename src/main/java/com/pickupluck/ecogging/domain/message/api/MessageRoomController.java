@@ -44,7 +44,6 @@ public class MessageRoomController {
         Long contactId = Long.parseLong((String) requestBody.get("contactId"));
 
         // @RequestParam으로 프론트단에서 넘어온 데이터 각 변수에 확보 완료
-        System.out.println("###createMessageRoom 함수 진입 == "+curId+","+content+","+contactId);
 
         // 1-1. 쪽지함 기존 존재여부 확인
         Optional<Long> isAlreadyExistId = messageRoomService.getMessageRoomId(curId, contactId);
@@ -79,7 +78,6 @@ public class MessageRoomController {
         } else {
         // 1-3. 둘이 대화하던 쪽지함이 존재하지 않을 경우 새로운 쪽지함을 생성하고 해당하는 쪽지함ID 반환
         MessageRoomIdResponseDto newMessageRoom = messageRoomService.saveMessageRoom(curId, contactId, content);
-        System.out.println("쪽지함 생성 완료");
 
         return ResponseEntity.ok("쪽지함 생성 완료");
         }
@@ -100,9 +98,6 @@ public class MessageRoomController {
         responseBody.put("message", "쪽지함 상세 리스트 조회 완료");
         responseBody.put("data", response);
 
-        System.out.println("데이터확인~~~~~~~~~~~~~~~~"+response.getMessages().toString());
-        System.out.println("##"+response.getContactNickname());
-
         return ResponseEntity.ok(responseBody);
     }
 
@@ -112,9 +107,6 @@ public class MessageRoomController {
     public ResponseEntity<Map<String,Object>> getMessageRooms(
             @PathVariable("userId")Long userId,
             @PageableDefault(size = 10, sort = "max_created_at", direction = Sort.Direction.DESC) final Pageable pageable) {
-        System.out.println("##############GETMESSAGEROOM 진입 완료");
-        System.out.println(userId);
-        System.out.println(userId.getClass().getName()); // Long타입으로 userId 확보 성공
 
         Page<MessageRoomListResponseDto> response = messageRoomService.getMessageRooms(userId, pageable);
 

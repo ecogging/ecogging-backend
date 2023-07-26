@@ -1,6 +1,6 @@
 package com.pickupluck.ecogging.domain.forum.service;
 
-import com.pickupluck.ecogging.domain.forum.dto.ForumDTO;
+import com.pickupluck.ecogging.domain.forum.dto.*;
 import com.pickupluck.ecogging.domain.forum.entity.Forum;
 import com.pickupluck.ecogging.domain.forum.dto.MainForumsResponseDto;
 import com.pickupluck.ecogging.domain.forum.entity.ForumFile;
@@ -32,7 +32,6 @@ import java.util.*;
 @Service
 @Transactional
 public class ForumServiceImpl implements ForumService{
-
 
     @Autowired
     AccompanyRepository accompanyRepository;
@@ -509,6 +508,92 @@ public class ForumServiceImpl implements ForumService{
         });
 
         return latestForumsToDto;
+    }
+
+    // MyForum(SHARE) ----------------------------------------------------------------------------
+    @Override
+    @Transactional(readOnly = true)
+    public Map<String, Object> getMyShares(Long userId, Pageable pageable) {
+
+        // 데이터 확보
+        String thisType = "나눔";
+        Page<Forum> mySharesEntity = forumRepository.findAllByUserIdAndType(userId, pageable, thisType);
+
+        // 쿼리에 맞는 모든 데이터 확보 -> 전체 개수 확보 ( 전체 페이지 개수 위함 )
+        List<Forum> allMyRoutes = forumRepository.findAllByUserIdAndType(userId, thisType);
+        int count = allMyRoutes.size();
+
+        // Entity -> DTO
+        Page<MyForumShareResponseDto> mySharesDto = mySharesEntity.map(share -> {
+            Optional<ForumFile> shareFile = Optional.empty(); // 초기화
+
+            if(share.getFileId() != null) {
+                // 첨부파일
+                shareFile = forumFileRepository.findById(share.getFileId());
+            }
+
+            if(shareFile.isEmpty()){
+                return MyForumShareResponseDto.builder()
+                        .forumId(share.getId())
+                        .title(share.getTitle())
+                        .content(share.getContent())
+                        .createdAt(share.getCreatedAt())
+                        .views(share.getViews())
+                        .fileName(null)
+                        .filePath(null)
+                        .build();
+            } else {
+                return MyForumShareResponseDto.builder()
+                        .forumId(share.getId())
+                        .title(share.getTitle())
+                        .content(share.getContent())
+                        .createdAt(share.getCreatedAt())
+                        .views(share.getViews())
+                        .fileName(shareFile.get().getFileName())
+                        .filePath(shareFile.get().getPath())
+                        .build();
+            }
+        });
+
+        // 결과 담아서 넘기는 맵
+        Map<String, Object> result = new HashMap<>();
+        result.put("res", mySharesDto); // 해당 페이지에 띄울 글 목록
+        result.put("all", count); // 페이징을 위한 전체 데이터 개수
+
+        return result;
+    }
+
+    // MyForum(ROUTE) ----------------------------------------------------------------------------
+    @Override
+    @Transactional(readOnly = true)
+    public Map<String, Object> getMyRoutes(Long userId, Pageable pageable) {
+
+        // 조건에 맞는 데이터 확보 ( 조건: 5개, 최신순 )
+        String thisType = "경로";
+        Page<Forum> myRoutesEntity = forumRepository.findAllByUserIdAndType(userId, pageable, thisType);
+
+        // 쿼리에 맞는 모든 데이터 확보 -> 전체 개수 확보 ( 전체 페이지 개수 위함 )
+        List<Forum> allMyRoutes = forumRepository.findAllByUserIdAndType(userId, thisType);
+        int count = allMyRoutes.size();
+
+        // Entity -> DTO
+        Page<MyForumRouteResponseDto> myRouteDto = myRoutesEntity.map(route -> {
+            return MyForumRouteResponseDto.builder()
+                    .forumId(route.getId())
+                    .title(route.getTitle())
+                    .content(route.getContent())
+                    .createdAt(route.getCreatedAt())
+                    .views(route.getViews())
+                    .location(route.getRouteLocation())
+                    .build();
+        });
+
+        // 결과 담아서 넘기는 맵
+        Map<String, Object> result = new HashMap<>();
+        result.put("res", myRouteDto); // 해당 페이지에 띄울 글 목록
+        result.put("all", count); // 페이징을 위한 전체 데이터 개수
+
+        return result;
     }
 
 }

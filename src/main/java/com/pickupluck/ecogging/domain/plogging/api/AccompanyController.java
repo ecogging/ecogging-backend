@@ -1,5 +1,6 @@
 package com.pickupluck.ecogging.domain.plogging.api;
 
+import com.pickupluck.ecogging.domain.comment.dto.CommentResponse;
 import com.pickupluck.ecogging.domain.comment.service.CommentService;
 import com.pickupluck.ecogging.domain.forum.service.ForumService;
 import com.pickupluck.ecogging.domain.notification.service.NotificationService;
@@ -20,8 +21,6 @@ import java.util.Map;
 public class AccompanyController {
 
     private final AccompanyService accompanyService;
-
-    private final NotificationService notificationService;
 
     private final CommentService commentService;
 
@@ -82,6 +81,9 @@ public class AccompanyController {
                 map.put("isParticipation", isParticipation);
                 Boolean isAccompanyscrap = accompanyService.isAccompanyScrap(param.get("userId"), param.get("accompanyId"));
                 map.put("isAccompanyscrap", isAccompanyscrap);
+                // comment
+                List<CommentResponse> comments = commentService.findByAccompanyId(param.get("accompanyId"));
+                map.put("comments", comments);
             }
             return new ResponseEntity<>(map, HttpStatus.OK);
         } catch (Exception e) {
