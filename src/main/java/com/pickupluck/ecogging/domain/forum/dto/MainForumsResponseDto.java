@@ -1,7 +1,5 @@
 package com.pickupluck.ecogging.domain.forum.dto;
 
-import com.pickupluck.ecogging.domain.forum.entity.Forum;
-import com.pickupluck.ecogging.domain.user.entity.User;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -15,19 +13,19 @@ public class MainForumsResponseDto {
     private final String content; // 글 내용
     private final LocalDateTime createdAt; // 생성일시
     private final Integer views; // 조회수
-    private final String userNickname; // 작성자 닉네임
-    private final Long userId; // 작성자 Id
+    private final String writerNickname; // 작성자 닉네임
+    private final Long writerId; // 작성자 Id
 
     @Builder
-    public MainForumsResponseDto(Long forumId, String type, String title, String content, LocalDateTime createdAt, Integer views, String userNickname, Long userId) {
+    public MainForumsResponseDto(Long forumId, String type, String title, String content, LocalDateTime createdAt, Integer views, String writerNickname, Long writerId) {
         this.forumId = forumId;
         this.type = type;
         this.title = title;
         this.content = content;
         this.createdAt = createdAt;
         this.views = views;
-        this.userNickname = userNickname;
-        this.userId = userId;
+        this.writerNickname = writerNickname;
+        this.writerId = writerId;
     }
 }
 

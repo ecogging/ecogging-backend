@@ -20,6 +20,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.FileCopyUtils;
@@ -46,10 +47,25 @@ public class EventServiceImpl implements EventService{
     private  final EventscrapRepository eventscrapRepository;
 
     private final String uploadDir = "D:/MJS/front-work/upload/";
+//    private final String uploadDir="C:/JSR/front-work/upload/"; dongur2 임시 경로
+
 
     public void writeEvent(EventDTO eventDTO, MultipartFile file) throws Exception {
+        // 사용자 인증 및 권한 검사 로직 추가.
+        Long userId = eventDTO.getUserId();
+        User user = userRepository.findById(userId).orElse(null);
+        if (user == null) {
+            throw new Exception("사용자 인증이 필요합니다.");
+        }
+
+        // corporate 값이 존재하지 않으면 접근 거부
+        if (user.getCorporate() == null) {
+            throw new Exception("corporate 값이 없어 행사글 작성이 불가능합니다.");
+        }
         if(file!=null && !file.isEmpty()) {
-            String path="D:/MJS/front-work/upload/";
+//            String path="D:/MJS/front-work/upload/";
+//            dongur2 임시 경로
+            String path="C:/JSR/front-work/upload/";
             String originName = file.getOriginalFilename();
             Long size = file.getSize();
             String fullPath = path+originName;
@@ -78,7 +94,7 @@ public class EventServiceImpl implements EventService{
     }
     @Override
     public List<EventDTO> getEventList(Integer page, PageInfo pageInfo,  String sorttype) throws Exception {
-        PageRequest pageRequest = PageRequest.of(page-1, 5);
+        PageRequest pageRequest = PageRequest.of(page-1, 8);
         Boolean save = null;
         Date endDate = null;
 
@@ -122,8 +138,6 @@ public class EventServiceImpl implements EventService{
         return list;
     }
 
-
-
     @Override
     public EventDTO getEvent(Integer eventId) throws Exception {
         Optional<Event> oevent = eventRepository.findById(eventId);
@@ -136,8 +150,72 @@ public class EventServiceImpl implements EventService{
         return eventDTO;
     }
 
+    private PageInfo calcPage(Integer allPage, Integer page) {
+        PageInfo pageInfo = new PageInfo();
+        pageInfo.setCurPage(page);
+        pageInfo.setAllPage(allPage);
+        int startPage = (page-1)/10*10+1;
+        int endPage = startPage+10-1;
+        if(endPage>pageInfo.getAllPage()) endPage=pageInfo.getAllPage();
+        pageInfo.setStartPage(startPage);
+        pageInfo.setEndPage(endPage);
+        return pageInfo;
+    }
+
+    @Override
+    public Map<String, Object> getMyEventList(Long userId, Integer page) throws Exception {
+        PageRequest pageRequest = PageRequest.of(page-1,5, Sort.by(Sort.Direction.DESC, "eventId"));
+        Page<Event> eventPage = eventRepository.findByUserIdAndSaveFalse(userId, pageRequest);
+
+        Map<String, Object> map = new HashMap<>();
+        List<EventDTO> list = new ArrayList<>();
+        for(Event event : eventPage.getContent()){
+            EventDTO eventDTO = new EventDTO(event);
+            list.add(eventDTO);
+        }
+        map.put("list", list);
+        PageInfo pageInfo = calcPage(eventPage.getTotalPages(), page);
+        map.put("pageInfo", pageInfo);
+        return map;
+    }
+
+    @Override
+    public Map<String, Object> getMyEventTempList(Long userId, Integer page) throws Exception {
+        PageRequest pageRequest = PageRequest.of(page-1,5, Sort.by(Sort.Direction.DESC, "eventId"));
+        Page<Event> eventPage = eventRepository.findByUserIdAndSaveTrue(userId, pageRequest);
+        Map<String, Object> map = new HashMap<>();
+        List<EventDTO> list = new ArrayList<>();
+        for(Event event : eventPage.getContent()){
+            EventDTO eventDTO = new EventDTO(event);
+            list.add(eventDTO);
+        }
+        map.put("list", list);
+        PageInfo pageInfo = calcPage(eventPage.getTotalPages(), page);
+        map.put("pageInfo", pageInfo);
+        return map;
+    }
+
+    @Override
+    public Map<String, Object> getMyEventscrapList(Long userId, Integer page) throws Exception {
+        PageRequest pageRequest = PageRequest.of(page-1,5, Sort.by(Sort.Direction.DESC, "scrapId"));
+        Page<Eventscrap> eventscrapPage = eventscrapRepository.findByUserId(userId, pageRequest);
+
+        Map<String, Object> map = new HashMap<>();
+        List<EventDTO> list = new ArrayList<>();
+        for(Eventscrap eventscrap : eventscrapPage.getContent()){
+            EventDTO eventDTO = new EventDTO(eventscrap.getEvent());
+            list.add(eventDTO);
+        }
+        map.put("list", list);
+        PageInfo pageInfo = calcPage(eventscrapPage.getTotalPages(), page);
+        map.put("pageInfo", pageInfo);
+        return map;
+    }
+
     public void readFile(Long fileId, OutputStream out) throws Exception {
-        String path="D:/MJS/front-work/upload/";
+//        String path="D:/MJS/front-work/upload/";
+//        dongur2 임시 경로
+        String path="C:/JSR/front-work/upload/";
         Optional<File> ofile = fileRepository.findById(fileId);
         if(ofile.isPresent()) {
             String fileName = ofile.get().getOriginName();
@@ -155,7 +233,9 @@ public class EventServiceImpl implements EventService{
     @Override
     public void modifyEvent(EventDTO eventDTO, MultipartFile file) throws Exception {
         if(file!=null && !file.isEmpty()) {
-            String path="D:/MJS/front-work/upload/";
+//            String path="D:/MJS/front-work/upload/";
+//            dongur2 임시 경로
+            String path="C:/JSR/front-work/upload/";
             String originName = file.getOriginalFilename();
             Long size = file.getSize();
             String fullPath = path+originName;
@@ -196,28 +276,20 @@ public class EventServiceImpl implements EventService{
         return this.eventRepository.updateView(id);
     }
 
-//    @Override
-//    public Boolean isEventScrap(Long userId, Integer eventId) throws Exception {
-//        User user = userRepository.findById(userId).get();
-//        Event event = eventRepository.findById(eventId).get();
-//        Optional<Eventscrap> eventscrap = eventscrapRepository.findByUserScrapAndEventScrap(user, event);
-//        if(eventscrap.isPresent()) return true;
-//        else return false;
-//    }
     @Override
     public Boolean isEventScrap(Long userId, Integer eventId) throws Exception {
         User user = userRepository.findById(userId).get();
         Event event = eventRepository.findById(eventId).get();
-        Optional<Eventscrap> eventscrap = eventscrapRepository.findByUserScrapAndEventScrap(user,event);
+        Optional<Eventscrap> eventscrap = eventscrapRepository.findByUserAndEvent(user,event);
         if (eventscrap.isPresent()) return true;
           else return false;
     }
 
     @Override
     public Boolean toggleEventScrap(Long userId, Long eventId) throws Exception {
-        User user = userRepository.findById(userId).orElseThrow(() -> new Exception("User not found"));
-        Event event = eventRepository.findById(Math.toIntExact(eventId)).orElseThrow(() -> new Exception("Event not found"));
-        Optional<Eventscrap> eventscrap = eventscrapRepository.findByUserScrapAndEventScrap(user, event);
+        User user = userRepository.findById(userId).get();
+        Event event = eventRepository.findById(Math.toIntExact(eventId)).get();
+        Optional<Eventscrap> eventscrap = eventscrapRepository.findByUserAndEvent(user, event);
 
         if(eventscrap.isEmpty()) {
             eventscrapRepository.save(new Eventscrap(null, user, event));
@@ -247,14 +319,11 @@ public class EventServiceImpl implements EventService{
                     .evtLocation(evnt.getLocation())
                     .nickname(evnt.getCorpName())
                     .fileId(evnt.getFileId())
+                    .filePath(fileRepository.findById(evnt.getFileId()).get().getFullPath())
                     .build();
         });
 
         return latesEventsToDto;
     }
-
-
-
-
 
 }

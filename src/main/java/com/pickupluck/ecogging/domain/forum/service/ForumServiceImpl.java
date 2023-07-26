@@ -1,12 +1,12 @@
 package com.pickupluck.ecogging.domain.forum.service;
 
-import com.pickupluck.ecogging.domain.forum.dto.ForumDTO;
-import com.pickupluck.ecogging.domain.forum.dto.MainForumsResponseDto;
+import com.pickupluck.ecogging.domain.forum.dto.*;
 import com.pickupluck.ecogging.domain.forum.entity.Forum;
+import com.pickupluck.ecogging.domain.forum.dto.MainForumsResponseDto;
 import com.pickupluck.ecogging.domain.forum.entity.ForumFile;
 import com.pickupluck.ecogging.domain.forum.repository.ForumFileRepository;
-import com.pickupluck.ecogging.domain.plogging.dto.ReviewDTO;
 import com.pickupluck.ecogging.domain.forum.repository.ForumRepository;
+import com.pickupluck.ecogging.domain.plogging.dto.ReviewDTO;
 import com.pickupluck.ecogging.domain.plogging.repository.AccompanyRepository;
 import com.pickupluck.ecogging.domain.scrap.dto.ScrapDTO;
 import com.pickupluck.ecogging.domain.scrap.entity.Scrap;
@@ -15,7 +15,6 @@ import com.pickupluck.ecogging.domain.user.entity.User;
 import com.pickupluck.ecogging.domain.user.repository.UserRepository;
 import com.pickupluck.ecogging.util.PageInfo;
 import jakarta.persistence.EntityNotFoundException;
-import org.springframework.transaction.annotation.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -23,15 +22,19 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.io.File;
 import java.util.*;
 
 @Service
 @Transactional
 public class ForumServiceImpl implements ForumService{
-
 
     @Autowired
     AccompanyRepository accompanyRepository;
@@ -69,6 +72,7 @@ public class ForumServiceImpl implements ForumService{
         // boolean isLastPage = page >= pageInfo.getAllPage(); // 현재 페이지가 마지막 페이지인지 여부 판단
         //pageInfo.setIsLastPage(isLastPage); // isLastPage 값을 설정
 
+
         Page<ReviewDTO> list =pages.map(pagess->{
 //            Long contactId=
 //                    (userId==pagess.getWriter())
@@ -94,6 +98,51 @@ public class ForumServiceImpl implements ForumService{
         return list;
     }
 
+    @Override
+    public Map<String, Object> getMyForumList(Long userId, Integer page, String order) throws Exception {
+        Sort.Direction sort = Sort.Direction.DESC;
+        if(order.equals("old")) {
+            sort = Sort.Direction.ASC;
+        }
+        PageRequest pageRequest=PageRequest.of(page-1, 5, Sort.by(sort,"id"));
+        Page<Forum> pages=forumRepository.findByIsTemporaryFalseAndTypeAndWriterId("후기", userId, pageRequest);
+
+        Map<String,Object> map = new HashMap<>();
+        List<ForumDTO> list=new ArrayList<>();
+        for(Forum forum:pages.getContent()){
+            System.out.println(forum);
+            list.add(new ForumDTO(forum));
+        }
+
+        map.put("list", list);
+
+        Long allCount = pages.getTotalElements();
+        PageInfo pageInfo = new PageInfo();
+        pageInfo.setAllPage(pages.getTotalPages());
+        pageInfo.setCurPage(page);
+        int startPage=(page-1)/10*10+1;
+        int endPage=startPage+10-1;
+        if(endPage>pageInfo.getAllPage()){
+            endPage=pageInfo.getAllPage();
+        }
+        pageInfo.setStartPage(startPage);
+        pageInfo.setEndPage(endPage);
+
+        map.put("pageInfo", pageInfo);
+        map.put("allCount", allCount);
+        return map;
+
+    }
+
+    // RouteServiceImpl ---------------------------------------------------------------------------------
+
+    @Override
+    public List<ForumDTO> getRoutes(Integer page, PageInfo pageInfo) throws Exception {
+        PageRequest pageRequest = PageRequest.of(page-1, 5);
+
+        Sort sortByCreateAtDesc=Sort.by(Sort.Direction.DESC,"createdAt");
+        Page<Forum> pages=forumRepository.findAllByType("경로",pageRequest,sortByCreateAtDesc);
+//        Page<Review> pages = reviewRepository.findAll(pageRequest);
 
 
     // RouteServiceImpl ---------------------------------------------------------------------------------
@@ -640,28 +689,112 @@ public class ForumServiceImpl implements ForumService{
     public Page<MainForumsResponseDto> getMainForums(Pageable pageable) {
 
         // 데이터 확보
-//        Page<Forum> latestForumsThree = forumRepository.findAllWithoutTemp(pageable);
+        Page<Forum> latestForumsThree = forumRepository.findAllWithoutTemp(pageable);
 
         // Entity -> DTO
-//        Page<MainForumsResponseDto> latestForumsToDto = latestForumsThree.map(fr -> {
-//            return MainForumsResponseDto.builder()
-//                    .forumId(fr.getId())
-//                    .type(fr.getType())
-//                    .title(fr.getTitle())
-//                    .content(fr.getContent())
-//                    .createdAt(fr.getCreatedAt())
-//                    .views(fr.getViews())
-//                    .userId(fr.getUserId())
-//                    .userNickname()
-//        });
+        Page<MainForumsResponseDto> latestForumsToDto = latestForumsThree.map(fr -> {
+            return MainForumsResponseDto.builder()
+                    .forumId(fr.getId())
+                    .type(fr.getType())
+                    .title(fr.getTitle())
+                    .content(fr.getContent())
+                    .createdAt(fr.getCreatedAt())
+                    .views(fr.getViews())
+                    .writerId(fr.getWriter().getId())
+                    .writerNickname(fr.getWriter().getNickname())
+                    .build();
+        });
 
-        return null;
+        return latestForumsToDto;
     }
 
-//    @Override
-//    public void shareWrite(Map<String, String> res, Long userId) throws Exception {
-//
-//    }
+    // MyForum(SHARE) ----------------------------------------------------------------------------
+    @Override
+    @Transactional(readOnly = true)
+    public Map<String, Object> getMyShares(Long userId, Pageable pageable) {
+
+        // 데이터 확보
+        String thisType = "나눔";
+        Page<Forum> mySharesEntity = forumRepository.findAllByUserIdAndType(userId, pageable, thisType);
+
+        // 쿼리에 맞는 모든 데이터 확보 -> 전체 개수 확보 ( 전체 페이지 개수 위함 )
+        List<Forum> allMyRoutes = forumRepository.findAllByUserIdAndType(userId, thisType);
+        int count = allMyRoutes.size();
+
+        // Entity -> DTO
+        Page<MyForumShareResponseDto> mySharesDto = mySharesEntity.map(share -> {
+            Optional<ForumFile> shareFile = Optional.empty(); // 초기화
+
+            if(share.getFileId() != null) {
+                // 첨부파일
+                shareFile = forumFileRepository.findById(share.getFileId());
+            }
+
+            if(shareFile.isEmpty()){
+                return MyForumShareResponseDto.builder()
+                        .forumId(share.getId())
+                        .title(share.getTitle())
+                        .content(share.getContent())
+                        .createdAt(share.getCreatedAt())
+                        .views(share.getViews())
+                        .fileName(null)
+                        .filePath(null)
+                        .build();
+            } else {
+                return MyForumShareResponseDto.builder()
+                        .forumId(share.getId())
+                        .title(share.getTitle())
+                        .content(share.getContent())
+                        .createdAt(share.getCreatedAt())
+                        .views(share.getViews())
+                        .fileName(shareFile.get().getFileName())
+                        .filePath(shareFile.get().getPath())
+                        .build();
+            }
+        });
+
+        // 결과 담아서 넘기는 맵
+        Map<String, Object> result = new HashMap<>();
+        result.put("res", mySharesDto); // 해당 페이지에 띄울 글 목록
+        result.put("all", count); // 페이징을 위한 전체 데이터 개수
+
+        return result;
+    }
+
+
+    // MyForum(ROUTE) ----------------------------------------------------------------------------
+    @Override
+    @Transactional(readOnly = true)
+    public Map<String, Object> getMyRoutes(Long userId, Pageable pageable) {
+
+        // 조건에 맞는 데이터 확보 ( 조건: 5개, 최신순 )
+        String thisType = "경로";
+        Page<Forum> myRoutesEntity = forumRepository.findAllByUserIdAndType(userId, pageable, thisType);
+
+        // 쿼리에 맞는 모든 데이터 확보 -> 전체 개수 확보 ( 전체 페이지 개수 위함 )
+        List<Forum> allMyRoutes = forumRepository.findAllByUserIdAndType(userId, thisType);
+        int count = allMyRoutes.size();
+
+        // Entity -> DTO
+        Page<MyForumRouteResponseDto> myRouteDto = myRoutesEntity.map(route -> {
+            return MyForumRouteResponseDto.builder()
+                    .forumId(route.getId())
+                    .title(route.getTitle())
+                    .content(route.getContent())
+                    .createdAt(route.getCreatedAt())
+                    .views(route.getViews())
+                    .location(route.getRouteLocation())
+                    .build();
+        });
+
+        // 결과 담아서 넘기는 맵
+        Map<String, Object> result = new HashMap<>();
+        result.put("res", myRouteDto); // 해당 페이지에 띄울 글 목록
+        result.put("all", count); // 페이징을 위한 전체 데이터 개수
+
+        return result;
+    }
+
 
 
     //  scrap

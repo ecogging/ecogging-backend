@@ -64,15 +64,22 @@ public class MainController {
     }
 
     // Main Forums
-//    @GetMapping("/main/forums")
-//    public ResponseEntity<Map<String, Object>> getForumList(
-//            @PageableDefault(size = 3, sort = "createdAt", direction = Sort.Direction.DESC) final Pageable pageable) {
-//
-//        // DB에서 최신순 3개 글 확보 - 임시저장 필터
-////        Page<MainForumsResponseDto> mainForums = forumService.getMainForums(pageable);
-//
-//
-//        }
-//    )
+    @GetMapping("/main/forums")
+    public ResponseEntity<Map<String, Object>> getForumList(
+            @PageableDefault(size = 3, sort = "createdAt", direction = Sort.Direction.DESC) final Pageable pageable) {
+
+        // DB에서 최신순 3개 글 확보 - 임시저장 필터
+        Page<MainForumsResponseDto> mainForums = forumService.getMainForums(pageable);
+        if (mainForums.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        Map<String, Object> responseBody = new HashMap<>();
+        responseBody.put("msg", "포럼글 조회 완료~");
+        responseBody.put("data", mainForums.getContent());
+
+
+        return ResponseEntity.ok(responseBody);
+    }
 
 }

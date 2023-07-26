@@ -50,12 +50,6 @@ public class MessageController {
             @RequestParam("contactId") Long contactId,
             @RequestParam("content") String content) {
 
-        System.out.println("sendRedirectedMessage 함수 진입");
-        System.out.println("msgRoomID: "+messageRoomId);
-        System.out.println("curId: "+curId);
-        System.out.println("contactId: "+contactId);
-        System.out.println("content: "+content); // 진입 성공
-
         // requestSendDto 생성
         MessageRequestSendDto request = new MessageRequestSendDto(content);
         System.out.println(request.getMessage());
@@ -65,19 +59,19 @@ public class MessageController {
         return ResponseEntity.ok(new String("리다이렉트된 쪽지 전송 진짜 완료!"));
     }
 
-//    // 3. 모든 쪽지 조회 GET /{messageRoomId}/messages
-//    // getAllMessages()
-//    @GetMapping("{userId}/messagerooms/{messageRoomId}/messages")
-//    public ResponseEntity<Map<String,Object>> getAllMassages(@PathVariable("userId") Long curId,
-//                                                             @PathVariable("messageRoomId") Long msgRoomId,
-//                                                             @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) final Pageable pageable) {
-//        Page<MessageResponseDto> allMessages = messageService.getAllMessages(curId, msgRoomId, pageable);
-//
-//        Map<String,Object> responseBody = new HashMap<>();
-//        responseBody.put("message", "모든 쪽지 조회 완료~");
-//        responseBody.put("allMsgs", allMessages);
-//
-//        return ResponseEntity.ok(responseBody);
-//    }
+    // 3. 모든 쪽지 조회 GET /{messageRoomId}/messages
+    // getAllMessages()
+    @GetMapping("{userId}/messagerooms/{messageRoomId}/messages")
+    public ResponseEntity<Map<String,Object>> getAllMassages(@PathVariable("userId") Long curId,
+                                                             @PathVariable("messageRoomId") Long msgRoomId,
+                                                             @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) final Pageable pageable) {
+        Page<MessageResponseDto> allMessages = messageService.getAllMessages(curId, msgRoomId, pageable);
+
+        Map<String,Object> responseBody = new HashMap<>();
+        responseBody.put("message", "모든 쪽지 조회 완료~");
+        responseBody.put("allMsgs", allMessages);
+
+        return ResponseEntity.ok(responseBody);
+    }
 
 }

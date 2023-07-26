@@ -23,9 +23,6 @@ public class EventController {
 
     @GetMapping("/eventList/{page}/{sorttype}")
     public ResponseEntity<Map<String,Object>> eventList(@PathVariable Integer page, @PathVariable String sorttype) {
-
-        System.out.println("page:"+page);
-        System.out.println("sort:"+sorttype);
         try {
             PageInfo pageInfo = new PageInfo();
             List<EventDTO> list = eventService.getEventList(page, pageInfo, sorttype);
@@ -33,7 +30,6 @@ public class EventController {
             if (list.isEmpty()) {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
-
             boolean isLastPage = page >= pageInfo.getAllPage(); // 현재 페이지가 마지막 페이지인지 여부 판단
             Map<String, Object> res = new HashMap<>();
             res.put("pageInfo", pageInfo);
@@ -45,6 +41,45 @@ public class EventController {
             return new ResponseEntity<Map<String, Object>>(HttpStatus.BAD_REQUEST);
         }
     }
+    @PostMapping("/myevent")
+    public ResponseEntity<Map<String,Object>> myEventList(@RequestBody Map<String,Object> param) {
+        Long userId = Long.parseLong((String) param.get("userId"));
+        Integer page = Integer.valueOf((String)param.get("page"));
+        System.out.println(page);
+        try {
+            Map<String,Object> map= eventService.getMyEventList(userId, page);
+            return new ResponseEntity<>(map, HttpStatus.OK);
+        } catch(Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PostMapping("/myeventtemp")
+    public ResponseEntity<Map<String,Object>> myEventTempList(@RequestBody Map<String,Object> param) {
+        Long userId = Long.parseLong((String) param.get("userId"));
+        Integer page = Integer.valueOf((String)param.get("page"));
+        try {
+            Map<String,Object> map= eventService.getMyEventTempList(userId, page);
+            return new ResponseEntity<>(map, HttpStatus.OK);
+        } catch(Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PostMapping("/myaeventscrap")
+    public ResponseEntity<Map<String,Object>> myEventscrapList(@RequestBody Map<String,Object> param) {
+        Long userId = Long.parseLong((String) param.get("userId"));
+        Integer page = Integer.valueOf((String)param.get("page"));
+        try {
+            Map<String,Object> map= eventService.getMyEventscrapList(userId, page);
+            return new ResponseEntity<>(map, HttpStatus.OK);
+        } catch(Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
 
     @PostMapping("/eventDetail")
     public ResponseEntity<Map<String,Object>> eventDetail(@RequestBody Map<String, Integer> param) {
@@ -53,8 +88,10 @@ public class EventController {
             Map<String,Object> map = new HashMap<>();
             EventDTO eventDTO = eventService.getEvent(param.get("eventId"));
             map.put("event", eventDTO);
-            Boolean isEventscrap = eventService.isEventScrap(Long.valueOf(param.get("userId")), param.get("eventId"));
-            map.put("isEventscrap", isEventscrap);
+            if(param.get("userId") != null) {
+                Boolean isEventscrap = eventService.isEventScrap(Long.valueOf(param.get("userId")), param.get("eventId"));
+                map.put("isEventscrap", isEventscrap);
+            }
             return new ResponseEntity<>(map, HttpStatus.OK);
         } catch (Exception e) {
             e.printStackTrace();
@@ -87,12 +124,13 @@ public class EventController {
 
         @DeleteMapping("/eventDelete/{eventId}")
         public  ResponseEntity<Boolean> eventDelete(@PathVariable Integer eventId) {
+            ResponseEntity<Boolean> res = null;
             try {
                 eventService.removeEvent(eventId);
-                return new ResponseEntity<Boolean>(true, HttpStatus.OK);
+                return new ResponseEntity<>(true, HttpStatus.OK);
             } catch (Exception e) {
                 e.printStackTrace();
-                return new ResponseEntity<Boolean>(HttpStatus.BAD_REQUEST);
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
         }
 
@@ -110,7 +148,7 @@ public class EventController {
             ResponseEntity<Boolean> res = null;
             try {
                 Boolean isScrap = eventService.toggleEventScrap(param.get("userId"), param.get("eventId"));
-                return new ResponseEntity<>(isScrap,HttpStatus.OK);
+                return new ResponseEntity<>(isScrap, HttpStatus.OK);
             } catch (Exception e) {
                 e.printStackTrace();
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

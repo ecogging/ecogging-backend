@@ -38,20 +38,23 @@ public class Comment extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private BoardType boardType;
 
-    private Integer articleId;
+    private Long articleId;
 
-    private Boolean isDeleted = false;
+    private int depth;
+
+    private Boolean deleted = false;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User writer;
 
     @Builder
-    public Comment(String content, BoardType boardType, Integer articleId, User writer) {
+    public Comment(String content, BoardType boardType, Long articleId, User writer) {
         this.content = content;
         this.boardType = boardType;
         this.articleId = articleId;
         this.writer = writer;
+        this.depth = 1;
     }
 
     public void addChildren(Comment comment) {
@@ -61,6 +64,7 @@ public class Comment extends BaseEntity {
     public void registerParent(Comment comment) {
         this.parent = comment;
         comment.addChildren(this);
+        this.depth += 1;
     }
 
     public void updateContent(String content) {
@@ -69,4 +73,15 @@ public class Comment extends BaseEntity {
         this.content = content;
     }
 
+    public boolean isParentExist() {
+        return this.parent != null;
+    }
+
+    public boolean isChildrenExist() {
+        return (this.children != null) && (this.children.size() != 0);
+    }
+
+    public void delete() {
+        this.deleted = true;
+    }
 }

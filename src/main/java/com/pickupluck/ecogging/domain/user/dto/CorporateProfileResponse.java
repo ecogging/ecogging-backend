@@ -1,5 +1,6 @@
 package com.pickupluck.ecogging.domain.user.dto;
 
+import com.pickupluck.ecogging.domain.user.entity.Corporate;
 import com.pickupluck.ecogging.domain.user.entity.User;
 import lombok.*;
 
@@ -29,6 +30,8 @@ public class CorporateProfileResponse {
     private String corpRegisterNumber;
 
     public static CorporateProfileResponse from(User user) {
+        final Corporate corporate = user.getCorporate();
+
         return CorporateProfileResponse.builder()
                 .email(user.getEmail())
                 .name(user.getName())
@@ -36,9 +39,9 @@ public class CorporateProfileResponse {
                 .telephone(user.getTelephone())
                 .profileImageUrl(user.getProfileImageUrl())
                 .notiYn(user.getNotiYn())
-                .corpName(user.getCorporate().getCorpName())
-                .corpRepresentative(user.getCorporate().getCorpRepresentative())
-                .corpRegisterNumber(user.getCorporate().getCorpRegisterNumber())
+                .corpName(corporate.getCorpName())
+                .corpRepresentative(corporate.getCorpRepresentative())
+                .corpRegisterNumber(corporate.getCorpRegisterNumber())
                 .build();
     }
 }

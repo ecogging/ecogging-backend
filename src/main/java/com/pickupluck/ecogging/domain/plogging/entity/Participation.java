@@ -30,9 +30,9 @@ public class Participation {
                 '}';
     }
 
-    public Participation(Long userId, Long accompanyId, Boolean confirm) {
+    public Participation(Long userId, Accompany accompany, Boolean confirm) {
         this.userId = userId;
-        this.accompany.setId(accompanyId);
+        this.accompany = accompany;
         this.confirm = confirm;
     }
 
