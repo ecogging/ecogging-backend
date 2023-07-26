@@ -11,6 +11,7 @@ import lombok.*;
 @Getter
 @Setter
 @NoArgsConstructor
+@ToString
 @EqualsAndHashCode(of = "id", callSuper = false)
 public class Forum extends BaseEntity {
     @Id // PK 매핑

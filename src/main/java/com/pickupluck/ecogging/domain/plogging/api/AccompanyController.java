@@ -179,4 +179,19 @@ public class AccompanyController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
+
+    @PostMapping("/myforum")
+    public ResponseEntity<Map<String,Object>> getMyForum(@RequestBody Map<String,Object> param) {
+        Long userId = Long.valueOf((String)param.get("userId"));
+        Integer page = Integer.valueOf((String)param.get("page"));
+        String order = (String)param.get("order");
+        try {
+            Map<String, Object> res = forumService.getMyForumList(userId, page, order);
+            return new ResponseEntity<>(res, HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
 }
