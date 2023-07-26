@@ -57,4 +57,6 @@ public interface ForumService{
 //    Page<MyForumRouteResponseDto> getMyRoutes(Long userId, Pageable pageable);
     Map<String, Object> getMyRoutes(Long userId, Pageable pageable);
 
+    Boolean myForumDelete(Long forumId) throws Exception;
+
 }
