@@ -89,6 +89,7 @@ public interface MessageRoomRepository extends JpaRepository<MessageRoom, Long> 
     Page<Message> findMessagesByMessageRoomId(@Param("id") Long messageRoomId, Pageable pageable);
 
 
+
     @Query(
             value =
                     "select mr.message_room_id as messageRoomId, mr.initial_receiver_id as initialReceiverId, mr.initial_sender_id as initialSenderId, mr.read_by as readBy, mr.initial_sender_id as initialSenderId, mr.initial_receiver_id as initialReceiverId, m1.created_at as createdAt, m1.content as content "
@@ -99,7 +100,7 @@ public interface MessageRoomRepository extends JpaRepository<MessageRoom, Long> 
                             + "group by message_room_id) as m2 on m1.created_at=m2.max_created_at "
 
                             + "where (initial_receiver_id=:id or initial_sender_id=:id) "
-                            + "and (visible_to='BOTH' and ((initial_receiver_id=:id and read_by='ONLY_INITIAL_SENDER') or (initial_sender_id =:id and read_by!='ONLY_INITIAL_RECEIVER'))"
+                            + "and (visible_to='BOTH' and ((initial_receiver_id=:id and read_by='ONLY_INITIAL_SENDER') or (initial_sender_id =:id and read_by='ONLY_INITIAL_RECEIVER'))"
                             + "or (visible_to='ONLY_INITIAL_RECEIVER' and initial_receiver_id=:id and read_by='ONLY_INITIAL_SENDER') "
                             + "or (visible_to='ONLY_INITIAL_SENDER' and initial_sender_id =:id and read_by!='ONLY_INITIAL_RECEIVER'))",
             nativeQuery = true,
@@ -110,7 +111,7 @@ public interface MessageRoomRepository extends JpaRepository<MessageRoom, Long> 
                     + "from message "
                     + "group by message_room_id) as m2 on m1.created_at=m2.max_created_at "
                     + "where (initial_receiver_id=:id or initial_sender_id=:id) "
-                    + "and (visible_to='BOTH' and ((initial_receiver_id=:id and read_by='ONLY_INITIAL_SENDER') or (initial_sender_id =:id and read_by!='ONLY_INITIAL_RECEIVER')) "
+                    + "and (visible_to='BOTH' and ((initial_receiver_id=:id and read_by='ONLY_INITIAL_SENDER') or (initial_sender_id =:id and read_by='ONLY_INITIAL_RECEIVER')) "
                     + "or (visible_to='ONLY_INITIAL_RECEIVER' and initial_receiver_id=:id and read_by='ONLY_INITIAL_SENDER') "
                     + "or (visible_to='ONLY_INITIAL_SENDER' and initial_sender_id =:id and read_by!='ONLY_INITIAL_RECEIVER')")
     List<MessageRoomsWithLastMessages> findMessageRoomsAndLastMessagesByUserIdAndReadBy(@Param("id") Long userId);
