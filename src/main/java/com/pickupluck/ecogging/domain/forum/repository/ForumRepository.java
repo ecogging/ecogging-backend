@@ -17,7 +17,18 @@ public interface ForumRepository extends JpaRepository<Forum,Long> {
     Page<Forum> findByIsTemporaryFalseAndTypeAndWriterId(String type, Long userId, PageRequest pageRequest);
 
     // RouteRepository 에서 옮겨온거 -- 메서드 이름 중복이라 ForRoute, ForShare 붙였어요
-    Page<Forum> findAllByType(String type, PageRequest pageRequest, Sort sortByCreateAtDesc);
+
+    @Query("select f from Forum f where f.type in ('나눔','경로','후기')")
+    Page<Forum> findAllByType(Pageable pageable);
+
+//    @Query("select f from Forum f where f.type in ('나눔','경로','후기')")
+//    Page<Forum> findAllByType(String type, Pageable pageable);
+
+//    @Query("SELECT f FROM Forum f WHERE f.type = :type")
+//    Page<Forum> findAllByType(String type, Pageable pageable);
+
+    @Query("SELECT f FROM Forum f WHERE f.type=:type")
+    Page<Forum> findAllByType(@Param("type")String type, Pageable pageable);
 
 
     // ShareRepository 에서 옮겨온거
