@@ -154,6 +154,9 @@ public class MessageRoomServiceI implements MessageRoomService {
         List<MessageRoomsWithLastMessages> alls = messageRoomRepository.findMessageRoomsAndLastMessagesByUserId(currentUser.getId());
         int count = alls.size();
 
+        // 안읽은 쪽지 개수
+        List<MessageRoomsWithLastMessages> unReads = messageRoomRepository.findMessageRoomsAndLastMessagesByUserIdAndReadBy(currentUser.getId());
+        int unReadsCount = unReads.size();
 
         // map을 이용해 Page 내용 변환
         // userId와 msgRoom의 initialSenderId를 비교
@@ -183,6 +186,7 @@ public class MessageRoomServiceI implements MessageRoomService {
         Map<String, Object> result = new HashMap<>();
         result.put("res", responses); // 해당 페이지에 띄울 글 목록
         result.put("all", count); // 페이징을 위한 전체 데이터 개수
+        result.put("unReads", unReadsCount); // 안읽은 쪽지
 
         return result;
     }

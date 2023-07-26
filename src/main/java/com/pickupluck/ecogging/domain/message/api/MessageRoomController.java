@@ -131,10 +131,14 @@ public class MessageRoomController {
         // 전체 쪽지함 개수
         int all = (int)myMessageRoomsMap.get("all");
 
+        // 전체 안읽은 쪽지 개수
+        Integer unRead = (Integer) myMessageRoomsMap.get("unReads");
+
         Map<String, Object> responseBody = new HashMap<>();
         responseBody.put("message", "쪽지방 리스트 조회 완료~");
         responseBody.put("data", response.getContent());
         responseBody.put("allCount", all);
+        responseBody.put("unReads", unRead);
 
         return ResponseEntity.ok(responseBody);
     }
