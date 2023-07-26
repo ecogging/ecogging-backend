@@ -582,6 +582,11 @@ public class ForumServiceImpl implements ForumService{
     }
 
 
+    @Override
+    public Boolean myForumDelete(Long forumId) throws Exception {
+        forumRepository.deleteById(forumId);
+
+
 
     //  scrap
     @Override
@@ -607,6 +612,7 @@ public class ForumServiceImpl implements ForumService{
     public Boolean isForumScrap(Long forumId, Long userId) throws Exception {
         Optional<Scrap> oscrap = forumscrapRepository.findByForumIdAndUserId(forumId, userId);
         if(oscrap.isEmpty()) return false;
+
         return true;
     }
 }
