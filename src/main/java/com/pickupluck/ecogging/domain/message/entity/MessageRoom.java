@@ -33,12 +33,16 @@ public class MessageRoom extends BaseEntity {
     // * mappedBy 두 객체 중 하나의 객체만 테이블을 관리 가능하도록 설정
     // mappedBy가 적용된 객체는 조회만 가능 --> mappedBy가 정의되지 않은 객체가 Owner
     // 일반적으로 FK를 가진 객체를 Owner로 정의하는 것이 바람직
-    @OneToMany(mappedBy = "messageRoom")
+    @OneToMany(mappedBy = "messageRoom", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Message> messages = new ArrayList<>();
 
     @Column(name = "visible_to", nullable = false)
     @Enumerated(EnumType.STRING)
     private VisibilityState visibilityTo;
+
+    @Column(name = "read_by", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private ReadState readBy; // 읽음 상태 추가
 
     @Builder
     public MessageRoom(Long id, User initialSender, User initialReceiver) {
@@ -46,6 +50,12 @@ public class MessageRoom extends BaseEntity {
         this.initialSender = initialSender;
         this.initialReceiver = initialReceiver;
         this.visibilityTo = VisibilityState.BOTH;
+        this.readBy = ReadState.ONLY_INITIAL_SENDER;
+        this.messages = new ArrayList<>(); // messages 필드 초기화
+    }
+
+    public void setReadByFromMessage(ReadState readBy) {
+        this.readBy = readBy;
     }
 
     public void changeVisibilityTo(VisibilityState visibilityTo) {
@@ -66,15 +76,19 @@ public class MessageRoom extends BaseEntity {
         this.visibilityTo = visibilityTo;
     }
 
-    @Override
-    public String toString() {
-        return "MessageRoom{" +
-                "id=" + id +
-                ", initialSender=" + initialSender +
-                ", initialReceiver=" + initialReceiver +
-                ", createdAt=" + createdAt +
-                ", updatedAt=" + updatedAt +
-                '}';
+    public void changeReadBy(ReadState readBy) {
+        if (this.readBy.equals(ReadState.NO_ONE)) { // 모두 안읽었으면
+            this.readBy = readBy; // 매개변수 들어오는 것대로 값 변경
+        } else if (this.readBy.equals(ReadState.ONLY_INITIAL_RECEIVER)) {
+            if(readBy.equals(ReadState.ONLY_INITIAL_SENDER)) {
+                this.readBy = ReadState.BOTH;
+            }
+        } else if (this.readBy.equals(ReadState.ONLY_INITIAL_SENDER)) {
+            if(readBy.equals(ReadState.ONLY_INITIAL_RECEIVER)) {
+                this.readBy = ReadState.BOTH;
+            }
+        }
+        // 이미 한 명이 읽었는데 다른 쪽도 읽으면 모두 읽음으로 변경
     }
 
 

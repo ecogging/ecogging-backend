@@ -29,5 +29,8 @@ public interface MessageRoomService {
     // 쪽지함 삭제
     void deleteMessageRoom(Long userId, Long messageRoomId);
 
+    // 쪽지함 읽음 처리
+    void updateMessagesRead(Long userId, Long messageRoomId);
+
 }
 

@@ -86,8 +86,8 @@ public class MessageRoomController {
     // 2. 쪽지함 조회 - 기존 존재하고 있는 쪽지함 조회 GET /{messageRoomId} - 쪽지 목록까지!
     // getMessageRoom()
     @GetMapping("/{userId}/messageroom/{messageRoomId}")
-    public ResponseEntity<Map<String, Object>> getMessageRoom( @PathVariable("userId")Long userId,
-                                                               @PathVariable("messageRoomId")Long messageRoomId) {
+    public ResponseEntity<Map<String, Object>> getMessageRoom(@PathVariable("userId")Long userId,
+                                                              @PathVariable("messageRoomId")Long messageRoomId) {
         // 2-1. MessageRoom -> getRequest 생성
         MessageRoomRequestGetDto request = new MessageRoomRequestGetDto(messageRoomId);
         // 2-2. 생성한 MessageRoomRequestGetDto, userId로 MessageRoomResponseDto 획득
@@ -148,6 +148,19 @@ public class MessageRoomController {
         // Map에 문자열 설정해서 리턴
         Map<String, Object> response = new HashMap<>();
         response.put("message", "쪽지함 복수 삭제 완료");
+
+        return ResponseEntity.ok(response);
+    }
+
+    // 6. 쪽지함 읽음 처리
+    @PutMapping("/mypage/{userId}/messagerooms/read")
+    public ResponseEntity<Map<String, Object>> updateMessagesRead(@PathVariable("userId")Long userId,
+                                                                  @RequestBody Long messageRoomId) {
+
+        messageRoomService.updateMessagesRead(userId, messageRoomId);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("msg", "쪽지함 읽기 완료");
 
         return ResponseEntity.ok(response);
     }

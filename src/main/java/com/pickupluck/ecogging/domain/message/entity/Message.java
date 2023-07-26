@@ -4,12 +4,9 @@ import com.pickupluck.ecogging.domain.BaseEntity;
 import com.pickupluck.ecogging.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
-import org.antlr.v4.runtime.misc.NotNull;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.springframework.util.Assert;
-
-import java.util.Date;
 
 @Entity
 @Getter
@@ -29,9 +26,6 @@ public class Message extends BaseEntity {
     @Column(columnDefinition = "TEXT", nullable = false, length = 300) // 내용 길이 300자 제한 -- 프론트에서 필터
     private String content;
 
-    @Column(nullable = false, name = "raed_YN")
-    private Integer read; // 읽음 여부 상태
-
     @ManyToOne(fetch = FetchType.LAZY) // 한 명 : 여러 개 쪽지(기준:Many)
     @JoinColumn(name = "receiver_id") // User 테이블과 JOIN 해서 아이디 가져오기
     @OnDelete(action = OnDeleteAction.NO_ACTION) // User 제거되면 이것도 제거
@@ -45,9 +39,13 @@ public class Message extends BaseEntity {
     @Column(name = "visible_to_msg", nullable = false)
     @Enumerated(EnumType.STRING)
     private VisibilityState visibilityTo; // 삭제 상태 추가
+    
+    @Column(name = "msg_read_by", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private ReadState readBy; // 읽음 상태 추가
 
     @Builder
-    public Message(Long id, MessageRoom messageRoom, String content, Integer read, User receiver, User sender) {
+    public Message(Long id, MessageRoom messageRoom, String content, User receiver, User sender) {
         Assert.notNull(messageRoom, "messageRoom null 불가능");
         Assert.notNull(receiver, "receiver null 불가능");
         Assert.notNull(sender, "sender null 불가능");
@@ -57,8 +55,12 @@ public class Message extends BaseEntity {
         this.receiver = receiver;
         this.sender = sender;
         this.content = content;
-        this.read = read;
         this.visibilityTo = VisibilityState.BOTH; // 삭제 상태 추가
+
+        // visibilityTo와 readBy 값 설정
+        ReadState readBy = messageRoom.getInitialSender().equals(sender)
+                ? ReadState.ONLY_INITIAL_SENDER : ReadState.ONLY_INITIAL_RECEIVER;
+        this.readBy = readBy;
     }
 
     public void changeVisibilityTo(VisibilityState visibilityTo) {
@@ -75,23 +77,35 @@ public class Message extends BaseEntity {
         }
     }
 
+    // @PrePersist 어노테이션을 사용한 메서드 추가
+    @PrePersist
+    public void synchronizeReadBy() {
+        if (this.messageRoom != null) {
+            this.messageRoom.setReadByFromMessage(this.readBy);
+        }
+    }
+
+    public void changeReadBy(ReadState readBy) {
+        if (this.readBy.equals(ReadState.NO_ONE)) { // 모두 안읽었으면
+            this.readBy = readBy; // 매개변수 들어오는 것대로 값 변경
+        } else if (this.readBy.equals(ReadState.ONLY_INITIAL_RECEIVER)) {
+            if(readBy.equals(ReadState.ONLY_INITIAL_SENDER)) {
+                this.readBy = ReadState.BOTH;
+            }
+        } else if (this.readBy.equals(ReadState.ONLY_INITIAL_SENDER)) {
+            if(readBy.equals(ReadState.ONLY_INITIAL_RECEIVER)) {
+                this.readBy = ReadState.BOTH;
+            }
+        }
+        // 이미 한 명이 읽었는데 다른 쪽도 읽으면 모두 읽음으로 변경
+    }
+
+
+
     private void validateContent(String content) {
         Assert.notNull(content, "메세지 내용은 비어있을 수 없습니다.");
         Assert.isTrue(content.length() <= 300,
                 "메세지 길이는 300자 이하");
     }
 
-    @Override
-    public String toString() {
-        return "Message{" +
-                "id=" + id +
-                ", messageRoom=" + messageRoom +
-                ", content='" + content + '\'' +
-                ", read=" + read +
-                ", receiver=" + receiver +
-                ", sender=" + sender +
-                ", createdAt=" + createdAt +
-                ", updatedAt=" + updatedAt +
-                '}';
-    }
 }

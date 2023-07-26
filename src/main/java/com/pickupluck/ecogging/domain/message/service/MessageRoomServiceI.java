@@ -9,6 +9,7 @@ import com.pickupluck.ecogging.domain.message.dto.response.MessageRoomListRespon
 import com.pickupluck.ecogging.domain.message.dto.response.MessageRoomResponseDto;
 import com.pickupluck.ecogging.domain.message.entity.Message;
 import com.pickupluck.ecogging.domain.message.entity.MessageRoom;
+import com.pickupluck.ecogging.domain.message.entity.ReadState;
 import com.pickupluck.ecogging.domain.message.entity.VisibilityState;
 import com.pickupluck.ecogging.domain.message.repository.MessageRepository;
 import com.pickupluck.ecogging.domain.message.repository.MessageRoomRepository;
@@ -109,7 +110,6 @@ public class MessageRoomServiceI implements MessageRoomService {
                 .sender(sender)
                 .receiver(receiver)
                 .content(firstMessage)
-                .read(0)
                 .build();
 
         // 생성한 Message Entity -> Repository에 저장
@@ -149,6 +149,8 @@ public class MessageRoomServiceI implements MessageRoomService {
         Page<MessageRoomsWithLastMessages> messageRooms = messageRoomRepository.findMessageRoomsAndLastMessagesByUserId(
                 currentUser.getId(), pageable);
 
+
+
         // map을 이용해 Page 내용 변환
         // userId와 msgRoom의 initialSenderId를 비교
         // -> 둘이 같으면 initialSenderId를 contactId로 설정
@@ -167,6 +169,9 @@ public class MessageRoomServiceI implements MessageRoomService {
                     .contactNickname(contact.getNickname())
                     .lastMessageSentTime(messageRoom.getCreatedAt().toLocalDateTime())
                     .lastMessageContent(messageRoom.getContent())
+                    .readBy(messageRoom.getReadBy())
+                    .initialSend(messageRoom.getInitialSenderId())
+                    .initialRcv(messageRoom.getInitialReceiverId())
                     .build();
         });
 
@@ -263,5 +268,32 @@ public class MessageRoomServiceI implements MessageRoomService {
             return true;
         }
         return false;
+    }
+
+
+    // 읽음 여부 처리
+    @Override
+    @Transactional
+    public void updateMessagesRead(Long userId, Long messageRoomId) {
+
+        // 현재 유저
+        User now = userRepository.findById(userId).get();
+        // 선택된 쪽지함
+        MessageRoom msgRoom = messageRoomRepository.findById(messageRoomId).get();
+        // 쪽지함에 포함된 쪽지목록 조회
+        List<Message> messagesInTheRoom = messageRepository.findAllByMessageRoomId(messageRoomId);
+
+        // 읽음 상태 업데이트
+        ReadState readState = isInitialSender(now, msgRoom) ?
+                ReadState.ONLY_INITIAL_SENDER : ReadState.ONLY_INITIAL_RECEIVER;
+
+        for (Message m : messagesInTheRoom) {
+            m.changeReadBy(readState);
+        }
+
+        // 쪽지함도 같은 값으로 변경
+        msgRoom.changeReadBy(readState);
+
+
     }
 }

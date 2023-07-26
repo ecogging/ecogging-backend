@@ -33,7 +33,7 @@ public interface MessageRoomRepository extends JpaRepository<MessageRoom, Long> 
 
     @Query(
             value =
-                    "select mr.message_room_id as messageRoomId, mr.initial_receiver_id as initialReceiverId, mr.initial_sender_id as initialSenderId, m1.created_at as createdAt, m1.content as content "
+                    "select mr.message_room_id as messageRoomId, mr.initial_receiver_id as initialReceiverId, mr.initial_sender_id as initialSenderId, mr.read_by as readBy, mr.initial_sender_id as initialSenderId, mr.initial_receiver_id as initialReceiverId, m1.created_at as createdAt, m1.content as content "
                             + "from message_room as mr "
                             + "inner join message as m1 on mr.message_room_id=m1.message_room_id "
                             + "inner join (select max(created_at) as max_created_at, message_room_id "
@@ -67,6 +67,7 @@ public interface MessageRoomRepository extends JpaRepository<MessageRoom, Long> 
     Page<Message> findMessagesByMessageRoomIdAndSender(@Param("id") Long messageRoomId, Pageable pageable);
     @Query("select m from Message m join fetch m.messageRoom join fetch m.sender where m.messageRoom.id=:id AND (m.visibilityTo='BOTH' OR m.visibilityTo='ONLY_INITIAL_RECEIVER')")
     Page<Message> findMessagesByMessageRoomIdAndReceiver(@Param("id") Long messageRoomId, Pageable pageable);
+
 
 }
 
