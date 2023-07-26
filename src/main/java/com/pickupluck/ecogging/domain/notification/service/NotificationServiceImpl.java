@@ -63,8 +63,6 @@ public class NotificationServiceImpl implements NotificationService {
                                         .targetId(notificationSaveDto.getTargetId())
                                         .boardType(notificationSaveDto.getBoardType())
                                         .detail(notificationSaveDto.getDetail())
-                                        .isRead(false)
-                                        .isDeleted(false)
                                         .build();
 
         notificationRepository.save(notification);
@@ -73,6 +71,15 @@ public class NotificationServiceImpl implements NotificationService {
 
     public void deleteNotification(Long id) {
         notificationRepository.deleteById(id);
+    }
+
+    @Override
+    @Transactional
+    public void readNotification(Long id) throws Exception {
+        Notification notification = notificationRepository.findById(id)
+                .orElseThrow(() -> new InvalidParameterException("no noti for id: " + id));
+
+        notification.read();
     }
 
 }
