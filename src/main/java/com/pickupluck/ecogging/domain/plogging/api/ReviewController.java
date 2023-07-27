@@ -126,10 +126,10 @@ public class ReviewController {
         }
     }
 
-    @PostMapping("/reviewWrite/{forumId}/{temp}/{userId}")
-    public ResponseEntity<String> reviewWrite(@PathVariable Long id, @PathVariable Boolean temp,@PathVariable Long userId, @RequestBody Map<String, String> requestData){
+    @PostMapping("/reviewWrite/{accompanyId}/{temp}/{userId}")
+    public ResponseEntity<String> reviewWrite(@PathVariable Long accompanyId,@PathVariable Boolean temp ,@PathVariable Long userId, @RequestBody Map<String, String> requestData){
 
-        System.out.println("id : "+id);
+        System.out.println("id : "+accompanyId);
         System.out.println("temp : "+temp);
         System.out.println("userId : "+userId);
         String content=requestData.get("content");
@@ -142,7 +142,7 @@ public class ReviewController {
             Map<String,String> res=new HashMap<>();
             res.put("title",title);
             res.put("content",content);
-            forumService.reviewWrite(res,id,temp,userId);
+            forumService.reviewWrite(res,accompanyId,temp,userId);
             return new ResponseEntity<>("controller message : 리뷰 등록 성공",HttpStatus.OK);
         }catch (Exception e){
             e.printStackTrace();

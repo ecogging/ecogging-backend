@@ -24,6 +24,7 @@ public class ForumDTO {
     private Long thisAccompanyId; // 후기 - 해당 플로깅 모임글
     private String writerNickname; // 작성자 닉네임
     private String writerPic; // 작성자 프로필 사진 url
+    private String progress; //진행상황 - 진행중, 완료
 
     // 나눔 첨부파일 관련
     private Long fileId; // 첨부파일 ID
@@ -36,7 +37,7 @@ public class ForumDTO {
 
     // 기본생성자
     @Builder
-    public ForumDTO(Long forumId, String forumType, Long writerId, String title, String content, Integer views, Boolean isTemp, String routeLocation, String routeLocationDetail, Long thisAccompanyId, String writerNickname, String writerPic, Long fileId, String fileName, String filePath, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public ForumDTO(Long forumId, String forumType, Long writerId, String title, String content, Integer views, Boolean isTemp, String routeLocation, String routeLocationDetail, Long thisAccompanyId, String writerNickname, String writerPic, Long fileId, String fileName, String filePath, LocalDateTime createdAt, LocalDateTime updatedAt, String progress) {
         this.forumId = forumId;
         this.forumType = forumType;
         this.writerId = writerId;
@@ -54,6 +55,7 @@ public class ForumDTO {
         this.filePath = filePath;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+        this.progress=progress;
     }
 
     public ForumDTO(Forum forum) {
@@ -65,6 +67,7 @@ public class ForumDTO {
         this.content = forum.getContent();
         this.views = forum.getViews();
         this.isTemp = forum.getIsTemporary();
+        this.progress=forum.getProgress();
         this.routeLocation = forum.getRouteLocation();
         this.routeLocationDetail = forum.getRouteLocationDetail();
         this.thisAccompanyId = forum.getThisAccompany().getId();

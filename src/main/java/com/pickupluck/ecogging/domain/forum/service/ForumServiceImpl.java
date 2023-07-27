@@ -6,9 +6,9 @@ import com.pickupluck.ecogging.domain.forum.dto.MainForumsResponseDto;
 import com.pickupluck.ecogging.domain.forum.entity.ForumFile;
 import com.pickupluck.ecogging.domain.forum.repository.ForumFileRepository;
 import com.pickupluck.ecogging.domain.forum.repository.ForumRepository;
+import com.pickupluck.ecogging.domain.plogging.dto.AccompanyDTO;
 import com.pickupluck.ecogging.domain.plogging.dto.ReviewDTO;
 import com.pickupluck.ecogging.domain.plogging.repository.AccompanyRepository;
-import com.pickupluck.ecogging.domain.scrap.dto.ScrapDTO;
 import com.pickupluck.ecogging.domain.scrap.entity.Scrap;
 import com.pickupluck.ecogging.domain.scrap.repository.ForumscrapRepository;
 import com.pickupluck.ecogging.domain.user.entity.User;
@@ -113,7 +113,7 @@ public class ForumServiceImpl implements ForumService{
     }
 
     @Override
-    public void routeWrite(Map<String, String> res, Long userId) throws Exception {
+    public void routeWrite(Map<String, String> res, Long userId, Boolean temp) throws Exception {
         System.out.println("루틴작성서비스");
 
         String title=res.get("title");
@@ -126,7 +126,7 @@ public class ForumServiceImpl implements ForumService{
                 .type("경로")
                 .writer((userRepository.findById(userId).get()))
                 .routeLocation(routeLocation)
-                .isTemporary(false)
+                .isTemporary(temp)
                 .views(0)
                 .build();
         forumRepository.save(routeEntity);
@@ -142,13 +142,17 @@ public class ForumServiceImpl implements ForumService{
         Optional<User> writerOpt = userRepository.findById(route.getWriter().getId());
         User writer = writerOpt.get();
 
+        int views=route.getViews();
+        route.setViews(views+1);
+        forumRepository.save(route);
+
         // DTO 생성
         ForumDTO getRoute= ForumDTO.builder()
                 .forumId(route.getId())
                 .forumType(route.getType())
                 .title(route.getTitle())
                 .content(route.getContent())
-                .views(route.getViews()+1)
+                .views(views+1)
                 .isTemp(route.getIsTemporary())
                 .routeLocation(route.getRouteLocation())
                 .routeLocationDetail(route.getRouteLocationDetail())
@@ -160,7 +164,7 @@ public class ForumServiceImpl implements ForumService{
     }
 
     @Override
-    public void routeModify(ForumDTO forumDTO, Long userId, Long id) throws Exception {
+    public void routeModify(ForumDTO forumDTO, Long userId, Long id, Boolean temp) throws Exception {
         System.out.println("루틴수정서비스");
         System.out.println(forumDTO);
         System.out.println("userId : "+userId);
@@ -174,7 +178,7 @@ public class ForumServiceImpl implements ForumService{
                 .writer(user)
                 .routeLocation(forumDTO.getRouteLocation())
                 .routeLocationDetail(forumDTO.getRouteLocationDetail())
-                .isTemporary(forumDTO.getIsTemp())
+                .isTemporary(temp)
                 .views(forumDTO.getViews())
 //                .createdAt
                 .build();
@@ -248,13 +252,17 @@ public class ForumServiceImpl implements ForumService{
         Optional<User> writerOpt = userRepository.findById(share.getWriter().getId());
         User writer = writerOpt.get();
 
+        int views=share.getViews();
+        share.setViews(views+1);
+        forumRepository.save(share);
+
         // DTO 생성
         ForumDTO getShare= ForumDTO.builder()
                 .forumId(share.getId())
                 .forumType(share.getType())
                 .title(share.getTitle())
                 .content(share.getContent())
-                .views(Integer.parseInt(share.getViews()+""))
+                .views(views+1)
                 .isTemp(share.getIsTemporary())
                 .createdAt(share.getCreatedAt())
                 .build();
@@ -293,7 +301,7 @@ public class ForumServiceImpl implements ForumService{
     }
 
     @Override
-    public void shareWrite(Map<String, String> res, Long userId) throws Exception {
+    public void shareWrite(Map<String, String> res, Long userId, Boolean temp) throws Exception {
         System.out.println("나눔작성서비스");
 
         String title=res.get("title");
@@ -304,7 +312,7 @@ public class ForumServiceImpl implements ForumService{
                 .content(content)
                 .type("나눔")
                 .writer(userRepository.findById(userId).get())
-                .isTemporary(false)
+                .isTemporary(temp)
                 .views(0)
                 .build();
         forumRepository.save(shareEntity);
@@ -367,13 +375,17 @@ public class ForumServiceImpl implements ForumService{
         if(reviewInfo.isEmpty()) return null;
         Forum review=reviewInfo.get();
 
+        int views=review.getViews();
+        review.setViews(views+1);
+        forumRepository.save(review);
+
         // DTO 생성
         ReviewDTO getReview= ReviewDTO.builder()
                 .forumId(review.getId())
                 .forumType(review.getType())
                 .title(review.getTitle())
                 .content(review.getContent())
-                .views(Integer.parseInt(review.getViews()+""))
+                .views(views+1)
                 .isTemp(review.getIsTemporary())
                 .createdAt(review.getCreatedAt())
                 .writerNickname(String.valueOf(userRepository.findById(userId).get()))
@@ -587,6 +599,8 @@ public class ForumServiceImpl implements ForumService{
         return true;
     }
 
+
+
     //  scrap
     @Override
     public Boolean setForumScrap(Long forumId, Long userId) throws Exception {
@@ -613,5 +627,37 @@ public class ForumServiceImpl implements ForumService{
         if(oscrap.isEmpty()) return false;
 
         return true;
+    }
+
+
+    //myScrap
+    @Override
+    public List<Forum> getMyforumScrap(Long userId) throws Exception {
+
+        List<Forum> forumList=forumscrapRepository.findAllByUserId(userId);
+
+        for(Forum a:forumList){
+            System.out.println("스크랩 포럼 아이디 : "+a);
+        }
+
+//        for()
+//        ForumDTO list =forumList.map(pagess->{
+//            User contact=userRepository.findById(userId).get();
+//
+//            return ForumDTO.builder()
+//                    .forumId(pagess.getId())
+//                    .views(pagess.getViews())
+//                    .forumType(pagess.getType())
+//                    .isTemp(pagess.getIsTemporary())
+//                    .content(pagess.getContent())
+//                    .createdAt(pagess.getCreatedAt())
+//                    .title(pagess.getTitle())
+//                    .writerNickname(contact.getNickname())
+//                    .writerPic(contact.getProfileImageUrl())
+//                    .build();
+//
+//        });
+//        return list;
+        return forumList;
     }
 }
