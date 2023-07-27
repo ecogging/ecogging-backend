@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -31,24 +32,21 @@ public class ReviewController {
     private ForumService forumService;
 
 
-    @GetMapping("/reviews/{page}/{userId}")
-    public ResponseEntity<Map<String,Object>> reviews(@PathVariable Long userId,
-                                                      @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) final Pageable pageable){
+    @GetMapping("/reviews/{pageNo}")
+    public ResponseEntity<Map<String,Object>> reviews(@PathVariable Integer pageNo) {
+        System.out.println("루트 목록");
+        pageNo = pageNo==0 ? 0 : (pageNo-1); // -> 프론트: 1부터 시작 BUT Page: 0부터 시작 -> Page에 맞춰주기
+        Pageable pageable = PageRequest.of(pageNo, 5, Sort.by("createdAt").descending()); // Pageable 객체 조건 맞춰 생성
 
-//        System.out.println("page : "+page);
-        System.out.println("reviews test");
+
         try {
-            PageInfo pageInfo=new PageInfo();
-            Page<ReviewDTO> reviews=forumService.getReviews(userId, pageable);
+            Map<String, Object> reviews=forumService.getReviews(pageable);
 
-            Map<String,Object> res=new HashMap<>();
-            res.put("pageInfo",pageInfo);
-            res.put("reviews",reviews);
-            for(ReviewDTO a: reviews){
-                System.out.println(a);
-            }
+//            for(ForumDTO a: routes){
+//                System.out.println("루트 테스트 : "+a.getContent());
+//            }
 
-            return new ResponseEntity<Map<String,Object>>(res, HttpStatus.OK);
+            return new ResponseEntity<Map<String,Object>>(reviews, HttpStatus.OK);
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("reviews error");

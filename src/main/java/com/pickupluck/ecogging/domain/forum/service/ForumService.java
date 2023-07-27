@@ -24,7 +24,7 @@ public interface ForumService {
 
 
     // ShareService ----------------------------------------------------------
-    Page<ForumDTO> getShares(Long userId, Pageable pageable) throws Exception;
+    Map<String, Object> getShares(Pageable pageable) throws Exception;
 //    void shareWrite(Map<String, String> res) throws Exception;
     String shareImgUpload(MultipartFile file) throws Exception;
     ForumDTO getShareInfo(Long id) throws Exception;
@@ -55,10 +55,10 @@ public interface ForumService {
     void shareWrite(Map<String, String> res, Long userId, Boolean temp) throws Exception;
 
     //routes
-    Page<ForumDTO> getRoutes(Long userId, Pageable pageable) throws Exception;
+    Map<String, Object> getRoutes(Pageable pageable) throws Exception;
 
     //revivews
-    Page<ReviewDTO> getReviews(Long userId, Pageable pageable) throws Exception;
+    Map<String, Object> getReviews(Pageable pageable) throws Exception;
 
     void routeModify(ForumDTO forumDTO, Long userId, Long id, Boolean temp) throws Exception;
 
