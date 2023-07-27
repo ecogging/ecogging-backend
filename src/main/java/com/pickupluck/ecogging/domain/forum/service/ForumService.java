@@ -2,8 +2,7 @@ package com.pickupluck.ecogging.domain.forum.service;
 
 import com.pickupluck.ecogging.domain.forum.dto.ForumDTO;
 import com.pickupluck.ecogging.domain.forum.dto.MainForumsResponseDto;
-import com.pickupluck.ecogging.domain.forum.dto.MyForumRouteResponseDto;
-import com.pickupluck.ecogging.domain.forum.dto.MyForumShareResponseDto;
+import com.pickupluck.ecogging.domain.forum.entity.Forum;
 import com.pickupluck.ecogging.domain.plogging.dto.ReviewDTO;
 import com.pickupluck.ecogging.util.PageInfo;
 import org.springframework.data.domain.Page;
@@ -20,7 +19,7 @@ public interface ForumService {
 
     // RouteService ----------------------------------------------------------
 //    List<ForumDTO> getRoutes(Integer page, PageInfo pageInfo) throws Exception;
-    void routeWrite(Map<String, String> res, Long userId) throws Exception;
+    void routeWrite(Map<String, String> res, Long userId, Boolean temp) throws Exception;
     ForumDTO getRouteInfo(Long id) throws Exception;
 
 
@@ -53,7 +52,7 @@ public interface ForumService {
     Page<MainForumsResponseDto> getMainForums(Pageable pageable);
 
     // share
-    void shareWrite(Map<String, String> res, Long userId) throws Exception;
+    void shareWrite(Map<String, String> res, Long userId, Boolean temp) throws Exception;
 
     //routes
     Page<ForumDTO> getRoutes(Long userId, Pageable pageable) throws Exception;
@@ -61,7 +60,7 @@ public interface ForumService {
     //revivews
     Page<ReviewDTO> getReviews(Long userId, Pageable pageable) throws Exception;
 
-    void routeModify(ForumDTO forumDTO, Long userId, Long id) throws Exception;
+    void routeModify(ForumDTO forumDTO, Long userId, Long id, Boolean temp) throws Exception;
 
     //share scrap
     Boolean setForumScrap(Long forumId, Long userId) throws Exception;
@@ -74,4 +73,5 @@ public interface ForumService {
 
     Boolean myForumDelete(Long forumId) throws Exception;
 
+    List<Forum> getMyforumScrap(Long userId) throws Exception;
 }
