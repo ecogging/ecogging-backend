@@ -13,7 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 import java.util.Map;
 
-public interface ForumService{
+public interface ForumService {
 //    List<ReviewDTO> getReviews(Long page, Pageable pageInfo) throws Exception;
 
     Map<String,Object> getMyForumList(Long userId, Integer page, String order) throws Exception;
