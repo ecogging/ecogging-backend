@@ -1,7 +1,6 @@
 package com.pickupluck.ecogging.domain.forum.service;
 
-import com.pickupluck.ecogging.domain.forum.dto.*;
-import com.pickupluck.ecogging.domain.forum.entity.Forum;
+import com.pickupluck.ecogging.domain.forum.dto.ForumDTO;
 import com.pickupluck.ecogging.domain.forum.dto.MainForumsResponseDto;
 import com.pickupluck.ecogging.domain.forum.dto.MyForumRouteResponseDto;
 import com.pickupluck.ecogging.domain.forum.dto.MyForumShareResponseDto;
@@ -9,7 +8,6 @@ import com.pickupluck.ecogging.domain.forum.entity.Forum;
 import com.pickupluck.ecogging.domain.forum.entity.ForumFile;
 import com.pickupluck.ecogging.domain.forum.repository.ForumFileRepository;
 import com.pickupluck.ecogging.domain.forum.repository.ForumRepository;
-import com.pickupluck.ecogging.domain.plogging.dto.AccompanyDTO;
 import com.pickupluck.ecogging.domain.plogging.dto.ReviewDTO;
 import com.pickupluck.ecogging.domain.plogging.repository.AccompanyRepository;
 import com.pickupluck.ecogging.domain.scrap.entity.Scrap;
@@ -28,10 +26,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.io.File;
 import java.util.*;
 
@@ -491,6 +485,7 @@ public class ForumServiceImpl implements ForumService{
                 .build();
         forumRepository.save(review);
     }
+
 
     @Override
     public void reviewDel(long id) throws Exception {
