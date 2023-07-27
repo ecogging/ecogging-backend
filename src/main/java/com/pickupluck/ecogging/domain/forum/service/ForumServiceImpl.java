@@ -1,6 +1,7 @@
 package com.pickupluck.ecogging.domain.forum.service;
 
-import com.pickupluck.ecogging.domain.forum.dto.ForumDTO;
+import com.pickupluck.ecogging.domain.forum.dto.*;
+import com.pickupluck.ecogging.domain.forum.entity.Forum;
 import com.pickupluck.ecogging.domain.forum.dto.MainForumsResponseDto;
 import com.pickupluck.ecogging.domain.forum.dto.MyForumRouteResponseDto;
 import com.pickupluck.ecogging.domain.forum.dto.MyForumShareResponseDto;
@@ -8,6 +9,7 @@ import com.pickupluck.ecogging.domain.forum.entity.Forum;
 import com.pickupluck.ecogging.domain.forum.entity.ForumFile;
 import com.pickupluck.ecogging.domain.forum.repository.ForumFileRepository;
 import com.pickupluck.ecogging.domain.forum.repository.ForumRepository;
+import com.pickupluck.ecogging.domain.plogging.dto.AccompanyDTO;
 import com.pickupluck.ecogging.domain.plogging.dto.ReviewDTO;
 import com.pickupluck.ecogging.domain.plogging.repository.AccompanyRepository;
 import com.pickupluck.ecogging.domain.scrap.entity.Scrap;
@@ -26,6 +28,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.io.File;
 import java.util.*;
 
@@ -47,30 +53,35 @@ public class ForumServiceImpl implements ForumService{
     private ForumscrapRepository forumscrapRepository;
 
     @Override
-    public Page<ReviewDTO> getReviews(Long userId, Pageable pageable) throws Exception{
-        Page<Forum> pages = forumRepository.findAllByType("후기",pageable);
+    public Map<String, Object> getReviews(Pageable pageable) throws Exception {
+        // 조건에 맞는 데이터 확보 ( 조건: 5개, 최신순 )
+        String thisType = "후기";
+//            Page<Forum> routesEntity = forumRepository.findAllByType(thisType,pageable);
+        Page<Forum> reviewEntity = forumRepository.findByType(thisType,pageable);
+        System.out.println(reviewEntity);
+        long count = reviewEntity.getTotalElements();
 
-        for(Forum a:pages){
-            System.out.println("test : "+a);
-        }
-        Page<ReviewDTO> list =pages.map(pagess->{
-            User contact=userRepository.findById(userId).get();
 
-            return ReviewDTO.builder()
-                    .forumId(pagess.getId())
-                    .views(pagess.getViews())
-                    .forumType(pagess.getType())
-                    .isTemp(pagess.getIsTemporary())
-                    .content(pagess.getContent())
-                    .createdAt(pagess.getCreatedAt())
-                    .title(pagess.getTitle())
-                    .writerNickname(contact.getNickname())
-                    .writerPic(contact.getProfileImageUrl())
+        // Entity -> DTO
+        Page<ForumDTO> reviewDto = reviewEntity.map(review -> {
+            return ForumDTO.builder()
+                    .forumId(review.getId())
+                    .title(review.getTitle())
+                    .content(review.getContent())
+                    .createdAt(review.getCreatedAt())
+                    .views(review.getViews())
+                    .routeLocation(review.getRouteLocation())
+                    .routeLocation(review.getRouteLocation())
+                    .writerNickname(review.getWriter().getNickname())
                     .build();
-
         });
 
-        return list;
+        // 결과 담아서 넘기는 맵
+        Map<String, Object> result = new HashMap<>();
+        result.put("res", reviewDto); // 해당 페이지에 띄울 글 목록
+        result.put("all", count); // 페이징을 위한 전체 데이터 개수
+
+        return result;
     }
 
     @Override
@@ -110,7 +121,7 @@ public class ForumServiceImpl implements ForumService{
     }
 
     @Override
-    public void routeWrite(Map<String, String> res, Long userId) throws Exception {
+    public void routeWrite(Map<String, String> res, Long userId, Boolean temp) throws Exception {
         System.out.println("루틴작성서비스");
 
         String title=res.get("title");
@@ -123,7 +134,7 @@ public class ForumServiceImpl implements ForumService{
                 .type("경로")
                 .writer((userRepository.findById(userId).get()))
                 .routeLocation(routeLocation)
-                .isTemporary(false)
+                .isTemporary(temp)
                 .views(0)
                 .build();
         forumRepository.save(routeEntity);
@@ -139,13 +150,17 @@ public class ForumServiceImpl implements ForumService{
         Optional<User> writerOpt = userRepository.findById(route.getWriter().getId());
         User writer = writerOpt.get();
 
+        int views=route.getViews();
+        route.setViews(views+1);
+        forumRepository.save(route);
+
         // DTO 생성
         ForumDTO getRoute= ForumDTO.builder()
                 .forumId(route.getId())
                 .forumType(route.getType())
                 .title(route.getTitle())
                 .content(route.getContent())
-                .views(route.getViews()+1)
+                .views(views+1)
                 .isTemp(route.getIsTemporary())
                 .routeLocation(route.getRouteLocation())
                 .routeLocationDetail(route.getRouteLocationDetail())
@@ -157,7 +172,7 @@ public class ForumServiceImpl implements ForumService{
     }
 
     @Override
-    public void routeModify(ForumDTO forumDTO, Long userId, Long id) throws Exception {
+    public void routeModify(ForumDTO forumDTO, Long userId, Long id, Boolean temp) throws Exception {
         System.out.println("루틴수정서비스");
         System.out.println(forumDTO);
         System.out.println("userId : "+userId);
@@ -171,7 +186,7 @@ public class ForumServiceImpl implements ForumService{
                 .writer(user)
                 .routeLocation(forumDTO.getRouteLocation())
                 .routeLocationDetail(forumDTO.getRouteLocationDetail())
-                .isTemporary(forumDTO.getIsTemp())
+                .isTemporary(temp)
                 .views(forumDTO.getViews())
 //                .createdAt
                 .build();
@@ -183,31 +198,36 @@ public class ForumServiceImpl implements ForumService{
     // ShareServiceImpl ------------------------------------------------------------------------------------
 
     @Override
-    public Page<ForumDTO> getShares(Long userId, Pageable pageable) throws Exception {
-        Page<Forum> pages = forumRepository.findAllByType("나눔",pageable);
+    public Map<String, Object> getShares(Pageable pageable) throws Exception {
 
-        for(Forum a:pages){
-            System.out.println("test : "+a);
-        }
+        // 조건에 맞는 데이터 확보 ( 조건: 5개, 최신순 )
+        String thisType = "나눔";
+//            Page<Forum> routesEntity = forumRepository.findAllByType(thisType,pageable);
+        Page<Forum> sharesEntity = forumRepository.findByType(thisType,pageable);
+        System.out.println(sharesEntity);
+        long count = sharesEntity.getTotalElements();
 
-        Page<ForumDTO> list =pages.map(pagess->{
-            User contact=userRepository.findById(userId).get();
 
+        // Entity -> DTO
+        Page<ForumDTO> sharesDto = sharesEntity.map(share -> {
             return ForumDTO.builder()
-                    .forumId(pagess.getId())
-                    .views(pagess.getViews())
-                    .forumType(pagess.getType())
-                    .isTemp(pagess.getIsTemporary())
-                    .content(pagess.getContent())
-                    .createdAt(pagess.getCreatedAt())
-                    .title(pagess.getTitle())
-                    .writerNickname(contact.getNickname())
-                    .writerPic(contact.getProfileImageUrl())
+                    .forumId(share.getId())
+                    .title(share.getTitle())
+                    .content(share.getContent())
+                    .createdAt(share.getCreatedAt())
+                    .views(share.getViews())
+                    .routeLocation(share.getRouteLocation())
+                    .routeLocation(share.getRouteLocation())
+                    .writerNickname(share.getWriter().getNickname())
                     .build();
-
         });
 
-        return list;
+        // 결과 담아서 넘기는 맵
+        Map<String, Object> result = new HashMap<>();
+        result.put("res", sharesDto); // 해당 페이지에 띄울 글 목록
+        result.put("all", count); // 페이징을 위한 전체 데이터 개수
+
+        return result;
     }
 
     @Override
@@ -245,13 +265,17 @@ public class ForumServiceImpl implements ForumService{
         Optional<User> writerOpt = userRepository.findById(share.getWriter().getId());
         User writer = writerOpt.get();
 
+        int views=share.getViews();
+        share.setViews(views+1);
+        forumRepository.save(share);
+
         // DTO 생성
         ForumDTO getShare= ForumDTO.builder()
                 .forumId(share.getId())
                 .forumType(share.getType())
                 .title(share.getTitle())
                 .content(share.getContent())
-                .views(Integer.parseInt(share.getViews()+""))
+                .views(views+1)
                 .isTemp(share.getIsTemporary())
                 .createdAt(share.getCreatedAt())
                 .build();
@@ -290,7 +314,7 @@ public class ForumServiceImpl implements ForumService{
     }
 
     @Override
-    public void shareWrite(Map<String, String> res, Long userId) throws Exception {
+    public void shareWrite(Map<String, String> res, Long userId, Boolean temp) throws Exception {
         System.out.println("나눔작성서비스");
 
         String title=res.get("title");
@@ -301,7 +325,7 @@ public class ForumServiceImpl implements ForumService{
                 .content(content)
                 .type("나눔")
                 .writer(userRepository.findById(userId).get())
-                .isTemporary(false)
+                .isTemporary(temp)
                 .views(0)
                 .build();
         forumRepository.save(shareEntity);
@@ -309,31 +333,38 @@ public class ForumServiceImpl implements ForumService{
 
     // routes
     @Override
-    public Page<ForumDTO> getRoutes(Long userId, Pageable pageable) throws Exception {
+    public Map<String, Object> getRoutes(Pageable pageable) throws Exception {
 
-        Page<Forum> pages = forumRepository.findAllByType("경로",pageable);
+            // 조건에 맞는 데이터 확보 ( 조건: 5개, 최신순 )
+            String thisType = "경로";
+//            Page<Forum> routesEntity = forumRepository.findAllByType(thisType,pageable);
+        Page<Forum> routesEntity = forumRepository.findByType(thisType,pageable);
+        System.out.println(routesEntity);
+            long count = routesEntity.getTotalElements();
 
-        for(Forum a:pages){
-            System.out.println("test : "+a);
-        }
-        Page<ForumDTO> list =pages.map(pagess->{
-            User contact=userRepository.findById(userId).get();
 
-            return ForumDTO.builder()
-                    .forumId(pagess.getId())
-                    .views(pagess.getViews())
-                    .forumType(pagess.getType())
-                    .isTemp(pagess.getIsTemporary())
-                    .content(pagess.getContent())
-                    .createdAt(pagess.getCreatedAt())
-                    .title(pagess.getTitle())
-                    .writerNickname(contact.getNickname())
-                    .writerPic(contact.getProfileImageUrl())
-                    .build();
+            // Entity -> DTO
+            Page<ForumDTO> routeDto = routesEntity.map(route -> {
+                return ForumDTO.builder()
+                        .forumId(route.getId())
+                        .title(route.getTitle())
+                        .content(route.getContent())
+                        .createdAt(route.getCreatedAt())
+                        .views(route.getViews())
+                        .routeLocation(route.getRouteLocation())
+                        .routeLocation(route.getRouteLocation())
+                        .writerNickname(route.getWriter().getNickname())
+                        .build();
+            });
 
-        });
-        return list;
+            // 결과 담아서 넘기는 맵
+            Map<String, Object> result = new HashMap<>();
+            result.put("res", routeDto); // 해당 페이지에 띄울 글 목록
+            result.put("all", count); // 페이징을 위한 전체 데이터 개수
+
+            return result;
     }
+
 
 
     // ReviewServiceImpl ------------------------------------------------------------------------------------
@@ -364,13 +395,17 @@ public class ForumServiceImpl implements ForumService{
         if(reviewInfo.isEmpty()) return null;
         Forum review=reviewInfo.get();
 
+        int views=review.getViews();
+        review.setViews(views+1);
+        forumRepository.save(review);
+
         // DTO 생성
         ReviewDTO getReview= ReviewDTO.builder()
                 .forumId(review.getId())
                 .forumType(review.getType())
                 .title(review.getTitle())
                 .content(review.getContent())
-                .views(Integer.parseInt(review.getViews()+""))
+                .views(views+1)
                 .isTemp(review.getIsTemporary())
                 .createdAt(review.getCreatedAt())
                 .writerNickname(String.valueOf(userRepository.findById(userId).get()))
@@ -582,8 +617,10 @@ public class ForumServiceImpl implements ForumService{
     @Override
     public Boolean myForumDelete(Long forumId) throws Exception {
         forumRepository.deleteById(forumId);
-        return  true;
+        return true;
     }
+
+
 
 
     //  scrap
@@ -612,5 +649,37 @@ public class ForumServiceImpl implements ForumService{
         if(oscrap.isEmpty()) return false;
 
         return true;
+    }
+
+
+    //myScrap
+    @Override
+    public List<Forum> getMyforumScrap(Long userId) throws Exception {
+
+        List<Forum> forumList=forumscrapRepository.findAllByUserId(userId);
+
+        for(Forum a:forumList){
+            System.out.println("스크랩 포럼 아이디 : "+a);
+        }
+
+//        for()
+//        ForumDTO list =forumList.map(pagess->{
+//            User contact=userRepository.findById(userId).get();
+//
+//            return ForumDTO.builder()
+//                    .forumId(pagess.getId())
+//                    .views(pagess.getViews())
+//                    .forumType(pagess.getType())
+//                    .isTemp(pagess.getIsTemporary())
+//                    .content(pagess.getContent())
+//                    .createdAt(pagess.getCreatedAt())
+//                    .title(pagess.getTitle())
+//                    .writerNickname(contact.getNickname())
+//                    .writerPic(contact.getProfileImageUrl())
+//                    .build();
+//
+//        });
+//        return list;
+        return forumList;
     }
 }

@@ -1,5 +1,6 @@
 package com.pickupluck.ecogging.domain.forum.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.pickupluck.ecogging.domain.BaseEntity;
 import com.pickupluck.ecogging.domain.plogging.entity.Accompany;
 import com.pickupluck.ecogging.domain.user.entity.User;
@@ -22,7 +23,7 @@ public class Forum extends BaseEntity {
     @Column(nullable = false) // null 불가능 -> 기본값 0 설정됨
     private String type; // Forum 글 타입 (후기/경로/나눔)
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "writer_id")
     private User writer; // Forum 테이블의 writer_id : FK -> User 테이블의 PK인 userId 가져와서 저장
 
@@ -42,6 +43,7 @@ public class Forum extends BaseEntity {
     @Column(name = "file_id", insertable = false, updatable = false)
     private Long fileId; // 나눔 - 첨부파일 ID
 
+    @JsonIgnore
     @Column(name = "is_temporary", nullable = false)
     private Boolean isTemporary; // 임시저장 여부 (기본값 0 == false)
 
@@ -55,8 +57,11 @@ public class Forum extends BaseEntity {
     @JoinColumn(name = "accomp_id")
     private Accompany thisAccompany; // 후기 - 해당 플로깅 모임글 -> DB: Accomapny PK인 글 ID 저장
 
+    @Column(name="progress")
+    private String progress;  //무료나눔 - 진행상황 (진행증, 완료)
+
     @Builder
-    public Forum(Long id, String type, User writer, String title, String content, Integer views, ForumFile file, Boolean isTemporary, String routeLocation, String routeLocationDetail, Accompany thisAccompany) {
+    public Forum(Long id, String type, User writer, String title, String content, Integer views, ForumFile file, Boolean isTemporary, String routeLocation, String routeLocationDetail, Accompany thisAccompany, String progress) {
         this.id = id;
         this.type = type;
         this.writer = writer;
@@ -68,6 +73,7 @@ public class Forum extends BaseEntity {
         this.routeLocation = routeLocation;
         this.routeLocationDetail = routeLocationDetail;
         this.thisAccompany = thisAccompany;
+        this.progress=progress;
     }
 
     public Boolean getIsTemporary() {
