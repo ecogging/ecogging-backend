@@ -581,7 +581,6 @@ public class ForumServiceImpl implements ForumService{
         return result;
     }
 
-
     @Override
     public Boolean myForumDelete(Long forumId) throws Exception {
         forumRepository.deleteById(forumId);
