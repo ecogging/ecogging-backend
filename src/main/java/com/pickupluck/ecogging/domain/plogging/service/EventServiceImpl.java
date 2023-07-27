@@ -123,8 +123,8 @@ public class EventServiceImpl implements EventService{
         }
 
         pageInfo.setCurPage(page);
-        int startPage = (page-1)/2*2+1;
-        int endPage = startPage+2-1;
+        int startPage = (page-1)/10*10+1;
+        int endPage = startPage+10-1;
         if(endPage>pageInfo.getAllPage()) endPage=pageInfo.getAllPage();
         pageInfo.setStartPage(startPage);
         pageInfo.setEndPage(endPage);

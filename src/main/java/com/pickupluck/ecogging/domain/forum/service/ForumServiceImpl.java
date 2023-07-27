@@ -10,7 +10,6 @@ import com.pickupluck.ecogging.domain.forum.repository.ForumFileRepository;
 import com.pickupluck.ecogging.domain.forum.repository.ForumRepository;
 import com.pickupluck.ecogging.domain.plogging.dto.ReviewDTO;
 import com.pickupluck.ecogging.domain.plogging.repository.AccompanyRepository;
-import com.pickupluck.ecogging.domain.scrap.dto.ScrapDTO;
 import com.pickupluck.ecogging.domain.scrap.entity.Scrap;
 import com.pickupluck.ecogging.domain.scrap.repository.ForumscrapRepository;
 import com.pickupluck.ecogging.domain.user.entity.User;
@@ -583,7 +582,8 @@ public class ForumServiceImpl implements ForumService{
     @Override
     public Boolean myForumDelete(Long forumId) throws Exception {
         forumRepository.deleteById(forumId);
-
+        return  true;
+    }
 
 
     //  scrap
