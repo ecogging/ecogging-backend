@@ -60,6 +60,7 @@ public class EventServiceImpl implements EventService{
 
         // corporate 값이 존재하지 않으면 접근 거부
         if (user.getCorporate() == null) {
+            System.out.println(user.getCorporate());
             throw new Exception("corporate 값이 없어 행사글 작성이 불가능합니다.");
         }
         if(file!=null && !file.isEmpty()) {
@@ -123,8 +124,8 @@ public class EventServiceImpl implements EventService{
         }
 
         pageInfo.setCurPage(page);
-        int startPage = (page-1)/2*2+1;
-        int endPage = startPage+2-1;
+        int startPage = (page-1)/5*5+1;
+        int endPage = startPage+5-1;
         if(endPage>pageInfo.getAllPage()) endPage=pageInfo.getAllPage();
         pageInfo.setStartPage(startPage);
         pageInfo.setEndPage(endPage);
