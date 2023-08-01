@@ -46,10 +46,6 @@ public class ForumController {
         try {
             Map<String, Object> routes=forumService.getRoutes(pageable);
 
-//            for(ForumDTO a: routes){
-//                System.out.println("루트 테스트 : "+a.getContent());
-//            }
-
             return new ResponseEntity<Map<String,Object>>(routes, HttpStatus.OK);
         } catch (Exception e) {
             e.printStackTrace();
@@ -130,7 +126,7 @@ public class ForumController {
             Map<String,Object> map=new HashMap<>();
             ForumDTO routeInfo=forumService.getRouteInfo(id);
             map.put("routeInfo",routeInfo);
-            map.put("isScrap", forumService.isForumScrap(id,userId));
+//            map.put("isScrap", forumService.isForumScrap(id,userId));
             System.out.println("루트 인포포오ㅗㅇ : "+routeInfo.getContent());
             return new ResponseEntity<>(map,HttpStatus.OK);
         }catch (Exception e){
@@ -217,7 +213,7 @@ public class ForumController {
             Map<String,Object> map=new HashMap<>();
             ForumDTO shareInfo=forumService.getShareInfo(id);
             map.put("shareInfo",shareInfo);
-            map.put("isScrap", forumService.isForumScrap(id,userId));
+//            map.put("isScrap", forumService.isForumScrap(id,userId));
             return new ResponseEntity<>(map,HttpStatus.OK);
         }catch (Exception e){
             e.printStackTrace();
@@ -264,8 +260,9 @@ public class ForumController {
 
         try {
             System.out.println("나눔 스크랩 컨트롤러 들어오기 성고옹");
-            Boolean isScrap = forumService.setForumScrap(forumId,userId);
-            return new ResponseEntity<>(isScrap,HttpStatus.OK);
+//            Boolean isScrap = forumService.setForumScrap(forumId,userId);
+//            return new ResponseEntity<>(isScrap,HttpStatus.OK);
+            return null;
         }catch (Exception e){
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -276,9 +273,10 @@ public class ForumController {
     public ResponseEntity<List<Forum>> myforumscrapInfo(@PathVariable Long userId) {
         try {
             System.out.println("마이페이지 스크랩 처리");
-            List<Forum> list=forumService.getMyforumScrap(userId);
+//            List<Forum> list=forumService.getMyforumScrap(userId);
 //            Map<String,Object> map=forumService.getMyforumScrap(userId);
-            return new ResponseEntity<>(list,HttpStatus.OK);
+//            return new ResponseEntity<>(list,HttpStatus.OK);
+            return null;
         }catch (Exception e){
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

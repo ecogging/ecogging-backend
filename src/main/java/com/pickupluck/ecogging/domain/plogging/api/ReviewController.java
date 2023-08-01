@@ -64,7 +64,7 @@ public class ReviewController {
             ReviewDTO reviewInfo=forumService.getReviewInfo(id,userId);
             map.put("reviewInfo",reviewInfo);
             System.out.println("후기 인포 테스트 : "+reviewInfo.getContent());
-            map.put("isScrap", forumService.isForumScrap(id,userId));
+//            map.put("isScrap", forumService.isForumScrap(id,userId));
             return new ResponseEntity<>(map,HttpStatus.OK);
         }catch (Exception e){
             e.printStackTrace();

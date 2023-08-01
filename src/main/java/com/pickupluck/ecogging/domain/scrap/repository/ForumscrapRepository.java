@@ -1,8 +1,7 @@
 package com.pickupluck.ecogging.domain.scrap.repository;
 
-import com.pickupluck.ecogging.domain.forum.dto.ForumDTO;
 import com.pickupluck.ecogging.domain.forum.entity.Forum;
-import com.pickupluck.ecogging.domain.scrap.entity.Scrap;
+import com.pickupluck.ecogging.domain.scrap.entity.ForumScrap;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -10,10 +9,10 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 import java.util.Optional;
 
-public interface ForumscrapRepository extends JpaRepository<Scrap, Long> {
+public interface ForumscrapRepository extends JpaRepository<ForumScrap, Long> {
 
-    Optional<Scrap>  findByForumIdAndUserId(Long forumId, Long userId);
+//    Optional<ForumScrap>  findByForumIdAndUserId(Long forumId, Long userId);
 
-    @Query("select fs.forum from Scrap fs where fs.userId=:userId")
-    List<Forum> findAllByUserId(@Param("userId")Long userId);
+//    @Query("select fs.forum from ForumScrap fs where fs.userId=:userId")
+//    List<Forum> findAllByUserId(@Param("userId")Long userId);
 }

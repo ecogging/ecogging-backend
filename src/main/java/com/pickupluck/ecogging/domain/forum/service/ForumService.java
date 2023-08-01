@@ -63,8 +63,8 @@ public interface ForumService {
     void routeModify(ForumDTO forumDTO, Long userId, Long id, Boolean temp) throws Exception;
 
     //share scrap
-    Boolean setForumScrap(Long forumId, Long userId) throws Exception;
-    Boolean isForumScrap(Long forumId, Long userId) throws Exception;
+//    Boolean setForumScrap(Long forumId, Long userId) throws Exception;
+//    Boolean isForumScrap(Long forumId, Long userId) throws Exception;
 
     // MyForum(SHARE, ROUTE)  --------------------------------------------------------
     Map<String, Object> getMyShares(Long userId, Pageable pageable);
@@ -73,5 +73,5 @@ public interface ForumService {
 
     Boolean myForumDelete(Long forumId) throws Exception;
 
-    List<Forum> getMyforumScrap(Long userId) throws Exception;
+//    List<Forum> getMyforumScrap(Long userId) throws Exception;
 }
