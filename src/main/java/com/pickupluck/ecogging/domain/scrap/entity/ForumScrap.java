@@ -18,16 +18,16 @@ public class ForumScrap extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="user_id")
-    private User userId;
+    private User user;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="forum_id")
     private Forum forum;
 
     @Builder
-    public ForumScrap(Long scrapId, User userId, Forum forum) {
+    public ForumScrap(Long scrapId, User user, Forum forum) {
         this.id=scrapId;
-        this.userId=userId;
+        this.user=user;
         this.forum=forum;
     }
 
