@@ -6,10 +6,9 @@ import com.pickupluck.ecogging.domain.forum.dto.MainForumsResponseDto;
 import com.pickupluck.ecogging.domain.forum.entity.ForumFile;
 import com.pickupluck.ecogging.domain.forum.repository.ForumFileRepository;
 import com.pickupluck.ecogging.domain.forum.repository.ForumRepository;
-import com.pickupluck.ecogging.domain.plogging.dto.AccompanyDTO;
 import com.pickupluck.ecogging.domain.plogging.dto.ReviewDTO;
 import com.pickupluck.ecogging.domain.plogging.repository.AccompanyRepository;
-import com.pickupluck.ecogging.domain.scrap.entity.Scrap;
+import com.pickupluck.ecogging.domain.scrap.entity.ForumScrap;
 import com.pickupluck.ecogging.domain.scrap.repository.ForumscrapRepository;
 import com.pickupluck.ecogging.domain.user.entity.User;
 import com.pickupluck.ecogging.domain.user.repository.UserRepository;
@@ -619,62 +618,43 @@ public class ForumServiceImpl implements ForumService{
 
 
     //  scrap
-    @Override
-    public Boolean setForumScrap(Long forumId, Long userId) throws Exception {
-        System.out.println("나눔 스크랩 서비스");
+//    @Override
+//    public Boolean setForumScrap(Long forumId, Long userId) throws Exception {
+//        System.out.println("나눔 스크랩 서비스");
+//
+//        Optional<ForumScrap> oscrap = forumscrapRepository.findByForumIdAndUserId(forumId, userId);
+//
+//        if(oscrap.isEmpty()) {
+//            Forum forum = forumRepository.findById(forumId).get();
+//            ForumScrap forumscrap = ForumScrap.builder()
+//                    .forum(forum).userId(userId)
+//                    .build();
+//            forumscrapRepository.save(forumscrap);
+//            return true;
+//        } else {
+//            forumscrapRepository.delete(oscrap.get());
+//            return false;
+//        }
+//    }
 
-        Optional<Scrap> oscrap = forumscrapRepository.findByForumIdAndUserId(forumId, userId);
-
-        if(oscrap.isEmpty()) {
-            Forum forum = forumRepository.findById(forumId).get();
-            Scrap scrap = Scrap.builder()
-                    .forum(forum).userId(userId)
-                    .build();
-            forumscrapRepository.save(scrap);
-            return true;
-        } else {
-            forumscrapRepository.delete(oscrap.get());
-            return false;
-        }
-    }
-
-    @Override
-    public Boolean isForumScrap(Long forumId, Long userId) throws Exception {
-        Optional<Scrap> oscrap = forumscrapRepository.findByForumIdAndUserId(forumId, userId);
-        if(oscrap.isEmpty()) return false;
-
-        return true;
-    }
+//    @Override
+//    public Boolean isForumScrap(Long forumId, Long userId) throws Exception {
+//        Optional<ForumScrap> oscrap = forumscrapRepository.findByForumIdAndUserId(forumId, userId);
+//        if(oscrap.isEmpty()) return false;
+//
+//        return true;
+//    }
 
 
     //myScrap
-    @Override
-    public List<Forum> getMyforumScrap(Long userId) throws Exception {
-
-        List<Forum> forumList=forumscrapRepository.findAllByUserId(userId);
-
-        for(Forum a:forumList){
-            System.out.println("스크랩 포럼 아이디 : "+a);
-        }
-
-//        for()
-//        ForumDTO list =forumList.map(pagess->{
-//            User contact=userRepository.findById(userId).get();
+//    @Override
+//    public List<Forum> getMyforumScrap(Long userId) throws Exception {
 //
-//            return ForumDTO.builder()
-//                    .forumId(pagess.getId())
-//                    .views(pagess.getViews())
-//                    .forumType(pagess.getType())
-//                    .isTemp(pagess.getIsTemporary())
-//                    .content(pagess.getContent())
-//                    .createdAt(pagess.getCreatedAt())
-//                    .title(pagess.getTitle())
-//                    .writerNickname(contact.getNickname())
-//                    .writerPic(contact.getProfileImageUrl())
-//                    .build();
+//        List<Forum> forumList=forumscrapRepository.findAllByUserId(userId);
 //
-//        });
-//        return list;
-        return forumList;
-    }
+//        for(Forum a:forumList){
+//            System.out.println("스크랩 포럼 아이디 : "+a);
+//        }
+//        return forumList;
+//    }
 }
