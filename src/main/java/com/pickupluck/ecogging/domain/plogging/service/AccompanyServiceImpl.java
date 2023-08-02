@@ -156,7 +156,7 @@ public class AccompanyServiceImpl implements AccompanyService {
         Optional<Accompanyscrap> accompanyscrap = accompanyscrapRepository.findByUserAndAccompany(user,accompany);
 
         if(accompanyscrap.isEmpty()) { //참여신청
-            accompanyscrapRepository.save(new Accompanyscrap(null, user,accompany));
+            accompanyscrapRepository.save(new Accompanyscrap(user, accompany));
             return true;
         } else { //참여중, 참여취소
             accompanyscrapRepository.deleteById(accompanyscrap.get().getScrapId());

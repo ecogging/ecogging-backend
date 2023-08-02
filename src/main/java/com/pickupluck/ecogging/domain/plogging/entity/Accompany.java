@@ -53,7 +53,7 @@ public class Accompany extends BaseEntity {
     @ColumnDefault("0")
     private  Integer joincnt;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId")
     private User user;
 

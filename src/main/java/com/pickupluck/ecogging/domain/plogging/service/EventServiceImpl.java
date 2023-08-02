@@ -293,7 +293,7 @@ public class EventServiceImpl implements EventService{
         Optional<Eventscrap> eventscrap = eventscrapRepository.findByUserAndEvent(user, event);
 
         if(eventscrap.isEmpty()) {
-            eventscrapRepository.save(new Eventscrap(null, user, event));
+            eventscrapRepository.save(new Eventscrap(user, event));
             return true;
         } else {
             eventscrapRepository.deleteById(eventscrap.get().getScrapId());
