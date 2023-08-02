@@ -1,5 +1,6 @@
 package com.pickupluck.ecogging.domain.forum.api;
 import com.pickupluck.ecogging.domain.forum.dto.ForumDTO;
+import com.pickupluck.ecogging.domain.forum.entity.Forum;
 import com.pickupluck.ecogging.domain.forum.service.ForumService;
 
 import com.pickupluck.ecogging.util.PageInfo;
@@ -7,6 +8,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -34,26 +36,17 @@ public class ForumController {
 
 
     // RouteController ---------------------------------------------------------------------------------
-    @GetMapping("/routes/{page}/{userId}")
-    public ResponseEntity<Map<String,Object>> routes(@PathVariable Long userId,
-                                                     @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) final Pageable pageable){
-
+    @GetMapping("/routes/{pageNo}")
+    public ResponseEntity<Map<String,Object>> routes(@PathVariable Integer pageNo) {
         System.out.println("루트 목록");
-//        System.out.println("page : "+page);
-        System.out.println("routes test");
+        pageNo = pageNo==0 ? 0 : (pageNo-1); // -> 프론트: 1부터 시작 BUT Page: 0부터 시작 -> Page에 맞춰주기
+        Pageable pageable = PageRequest.of(pageNo, 5, Sort.by("createdAt").descending()); // Pageable 객체 조건 맞춰 생성
+
+
         try {
-            PageInfo pageInfo=new PageInfo();
-//            List<ForumDTO> routes=forumService.getRoutes(page, pageInfo);
-            Page<ForumDTO> routes=forumService.getRoutes(userId, pageable);
+            Map<String, Object> routes=forumService.getRoutes(pageable);
 
-            Map<String,Object> res=new HashMap<>();
-            res.put("pageInfo",pageInfo);
-            res.put("routes",routes);
-            for(ForumDTO a: routes){
-                System.out.println("루트 테스트 : "+a.getContent());
-            }
-
-            return new ResponseEntity<Map<String,Object>>(res, HttpStatus.OK);
+            return new ResponseEntity<Map<String,Object>>(routes, HttpStatus.OK);
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("shares error");
@@ -84,8 +77,8 @@ public class ForumController {
 //        }
 //    }
 
-    @PostMapping("/routeWrite/{userId}")
-    public ResponseEntity<String> routeWrite(@RequestBody Map<String, String> requestData, @PathVariable Long userId){
+    @PostMapping("/routeWrite/{userId}/{temp}")
+    public ResponseEntity<String> routeWrite(@RequestBody Map<String, String> requestData, @PathVariable Long userId, @PathVariable Boolean temp){
         String content=requestData.get("content");
         String title=requestData.get("title");
         String routeLocation=requestData.get("route_location");
@@ -96,7 +89,7 @@ public class ForumController {
             res.put("title",title);
             res.put("content",content);
             res.put("routeLocation",routeLocation);
-            forumService.routeWrite(res,userId);
+            forumService.routeWrite(res,userId,temp);
             return new ResponseEntity<>("controller message : 루틴 등록 성공",HttpStatus.OK);
         }catch (Exception e){
             e.printStackTrace();
@@ -106,8 +99,8 @@ public class ForumController {
 
     }
 
-    @PostMapping("/routeModify/{userId}/{id}")
-    public ResponseEntity<String> routeModify(@RequestBody ForumDTO forumDTO, @PathVariable Long userId, @PathVariable Long id){
+    @PostMapping("/routeModify/{userId}/{forumId}/{temp}")
+    public ResponseEntity<String> routeModify(@RequestBody ForumDTO forumDTO, @PathVariable Long userId, @PathVariable Long forumId, @PathVariable Boolean temp){
 //        String content=requestData.get("content");
 //        String title=requestData.get("title");
 //        String routeLocation=requestData.get("route_location");
@@ -118,7 +111,7 @@ public class ForumController {
 //            res.put("title",title);
 //            res.put("content",content);
 //            res.put("routeLocation",routeLocation);
-            forumService.routeModify(forumDTO,userId,id);
+            forumService.routeModify(forumDTO,userId,forumId,temp);
             return new ResponseEntity<>("controller message : 루틴 등록 성공",HttpStatus.OK);
         }catch (Exception e){
             e.printStackTrace();
@@ -126,13 +119,14 @@ public class ForumController {
         }
     }
 
-    @PostMapping ("/routeInfo/{id}")
-    public ResponseEntity<Map<String,Object>> routeInfo(@PathVariable Long id){
+    @PostMapping ("/routeInfo/{id}/{userId}")
+    public ResponseEntity<Map<String,Object>> routeInfo(@PathVariable Long id,@PathVariable Long userId){
 
         try {
             Map<String,Object> map=new HashMap<>();
             ForumDTO routeInfo=forumService.getRouteInfo(id);
             map.put("routeInfo",routeInfo);
+//            map.put("isScrap", forumService.isForumScrap(id,userId));
             System.out.println("루트 인포포오ㅗㅇ : "+routeInfo.getContent());
             return new ResponseEntity<>(map,HttpStatus.OK);
         }catch (Exception e){
@@ -148,25 +142,21 @@ public class ForumController {
 
 
     // ShareController ---------------------------------------------------------------------------------------
-    @GetMapping("/shares/{page}/{userId}")
-    public ResponseEntity<Map<String,Object>> shares(@PathVariable Long userId,
-                                                     @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) final Pageable pageable){
+    @GetMapping("/shares/{pageNo}")
+    public ResponseEntity<Map<String,Object>> shares(@PathVariable Integer pageNo) {
+        System.out.println("루트 목록");
+        pageNo = pageNo==0 ? 0 : (pageNo-1); // -> 프론트: 1부터 시작 BUT Page: 0부터 시작 -> Page에 맞춰주기
+        Pageable pageable = PageRequest.of(pageNo, 5, Sort.by("createdAt").descending()); // Pageable 객체 조건 맞춰 생성
 
-        System.out.println("나눔 목록");
-//        System.out.println("page : "+page);
-        System.out.println("shares test");
+
         try {
-            PageInfo pageInfo=new PageInfo();
-            Page<ForumDTO> shares=forumService.getShares(userId, pageable);
+            Map<String, Object> shares=forumService.getShares(pageable);
 
-            Map<String,Object> res=new HashMap<>();
-            res.put("pageInfo",pageInfo);
-            res.put("shares",shares);
-            for(ForumDTO a: shares){
-                System.out.println("나눔 리스트~~~ : "+a.getContent());
-            }
+//            for(ForumDTO a: routes){
+//                System.out.println("루트 테스트 : "+a.getContent());
+//            }
 
-            return new ResponseEntity<Map<String,Object>>(res, HttpStatus.OK);
+            return new ResponseEntity<Map<String,Object>>(shares, HttpStatus.OK);
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("shares error");
@@ -196,8 +186,8 @@ public class ForumController {
         }
     }
 
-    @PostMapping("/shareWrite/{userId}")
-    public ResponseEntity<String> sharewWrite(@PathVariable Long userId, @RequestBody Map<String, String> requestData){
+    @PostMapping("/shareWrite/{userId}/{temp}")
+    public ResponseEntity<String> sharewWrite(@PathVariable Long userId,@PathVariable Boolean temp, @RequestBody Map<String, String> requestData){
         String content=requestData.get("content");
         String title=requestData.get("title");
         System.out.println("userId : "+userId);
@@ -207,7 +197,7 @@ public class ForumController {
             Map<String,String> res=new HashMap<>();
             res.put("title",title);
             res.put("content",content);
-            forumService.shareWrite(res,userId);
+            forumService.shareWrite(res,userId,temp);
             return new ResponseEntity<>("controller message : 나눔 등록 성공",HttpStatus.OK);
         }catch (Exception e){
             e.printStackTrace();
@@ -216,13 +206,14 @@ public class ForumController {
 
 
     }
-    @PostMapping ("/shareInfo/{id}")
-    public ResponseEntity<Map<String,Object>> shareInfo(@PathVariable Long id){
+    @PostMapping ("/shareInfo/{id}/{userId}")
+    public ResponseEntity<Map<String,Object>> shareInfo(@PathVariable Long id, @PathVariable Long userId){
         System.out.println("나눔 컨트롤러어러러어러얼");
         try {
             Map<String,Object> map=new HashMap<>();
             ForumDTO shareInfo=forumService.getShareInfo(id);
             map.put("shareInfo",shareInfo);
+//            map.put("isScrap", forumService.isForumScrap(id,userId));
             return new ResponseEntity<>(map,HttpStatus.OK);
         }catch (Exception e){
             e.printStackTrace();
@@ -269,13 +260,27 @@ public class ForumController {
 
         try {
             System.out.println("나눔 스크랩 컨트롤러 들어오기 성고옹");
-            Boolean isScrap = forumService.setForumScrap(forumId,userId);
-            return new ResponseEntity<>(isScrap,HttpStatus.OK);
+//            Boolean isScrap = forumService.setForumScrap(forumId,userId);
+//            return new ResponseEntity<>(isScrap,HttpStatus.OK);
+            return null;
         }catch (Exception e){
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
 
+    @GetMapping ("/myforumscrapInfo/{userId}")
+    public ResponseEntity<List<Forum>> myforumscrapInfo(@PathVariable Long userId) {
+        try {
+            System.out.println("마이페이지 스크랩 처리");
+//            List<Forum> list=forumService.getMyforumScrap(userId);
+//            Map<String,Object> map=forumService.getMyforumScrap(userId);
+//            return new ResponseEntity<>(list,HttpStatus.OK);
+            return null;
+        }catch (Exception e){
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
 
 }

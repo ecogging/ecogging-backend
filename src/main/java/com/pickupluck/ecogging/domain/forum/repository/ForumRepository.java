@@ -30,6 +30,8 @@ public interface ForumRepository extends JpaRepository<Forum,Long> {
     @Query("SELECT f FROM Forum f WHERE f.type=:type")
     Page<Forum> findAllByType(@Param("type")String type, Pageable pageable);
 
+    Page<Forum> findByType(String type, Pageable pageable);
+
 
     // ShareRepository 에서 옮겨온거
 //    Page<Forum> findAllByType(String 나눔, PageRequest pageRequest, Sort sortByCreateAtDesc);
