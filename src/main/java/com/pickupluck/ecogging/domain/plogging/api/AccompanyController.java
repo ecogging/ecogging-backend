@@ -76,15 +76,17 @@ public class AccompanyController {
             Map<String,Object> map = new HashMap<>();
             AccompanyDTO accompanyDTO = accompanyService.getAccompany(param.get("accompanyId"));
             map.put("accompany", accompanyDTO);
+            // comment
+            List<CommentResponse> comments = commentService.findByAccompanyId(param.get("accompanyId"));
+            map.put("comments", comments);
+
             if(param.get("userId")!=null) {
                 Boolean isParticipation = accompanyService.isParticipation(param.get("userId"), param.get("accompanyId"));
                 map.put("isParticipation", isParticipation);
                 Boolean isAccompanyscrap = accompanyService.isAccompanyScrap(param.get("userId"), param.get("accompanyId"));
                 map.put("isAccompanyscrap", isAccompanyscrap);
-                // comment
-                List<CommentResponse> comments = commentService.findByAccompanyId(param.get("accompanyId"));
-                map.put("comments", comments);
             }
+
             return new ResponseEntity<>(map, HttpStatus.OK);
         } catch (Exception e) {
             e.printStackTrace();
