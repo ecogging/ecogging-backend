@@ -22,7 +22,7 @@ public class Accompanyscrap {
     @JoinColumn(name="userId")
     private User user;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="accompanyId")
     private Accompany accompany;
 }

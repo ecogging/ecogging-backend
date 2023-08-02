@@ -36,7 +36,7 @@ public class Participation {
         this.confirm = confirm;
     }
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "accompanyId")
     private Accompany accompany;
 }

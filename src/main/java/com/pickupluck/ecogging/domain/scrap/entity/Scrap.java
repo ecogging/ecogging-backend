@@ -25,7 +25,7 @@ public class Scrap  {
 //    @JoinColumn(name="eventId")
 //    private Event eventScrap;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="forum_id")
     private Forum forum;
 

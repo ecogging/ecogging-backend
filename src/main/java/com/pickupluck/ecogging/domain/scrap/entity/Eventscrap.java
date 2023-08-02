@@ -23,7 +23,7 @@ public class Eventscrap extends BaseEntity {
     @JoinColumn(name="user_id")
     private User user;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name="eventId")
     private Event event;
 }
