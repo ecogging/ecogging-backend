@@ -50,10 +50,9 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public List<CommentResponse> findByAccompanyId(Long id) throws Exception {
-        final BoardType boardType = BoardType.ACCOMPANY;
+    public List<CommentResponse> findByBoardTypeAndArticleId(BoardType boardType, Long articleId) throws Exception {
 
-        return commentRepository.findByBoardTypeAndArticleId(boardType, id)
+        return commentRepository.findByBoardTypeAndArticleId(boardType, articleId)
                 .stream()
                 .filter(comment -> !comment.isParentExist())
                 .map(CommentResponse::from)
@@ -138,5 +137,10 @@ public class CommentServiceImpl implements CommentService {
         else
             commentRepository.delete(findComment);
 
+    }
+
+    @Override
+    public void deleteByBoardTypeAndArticleId(BoardType boardType, Long articleId) {
+        commentRepository.deleteByBoardTypeAndArticleId(boardType, articleId);
     }
 }

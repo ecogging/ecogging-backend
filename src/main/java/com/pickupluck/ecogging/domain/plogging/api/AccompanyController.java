@@ -1,9 +1,9 @@
 package com.pickupluck.ecogging.domain.plogging.api;
 
+import com.pickupluck.ecogging.domain.BoardType;
 import com.pickupluck.ecogging.domain.comment.dto.CommentResponse;
 import com.pickupluck.ecogging.domain.comment.service.CommentService;
 import com.pickupluck.ecogging.domain.forum.service.ForumService;
-import com.pickupluck.ecogging.domain.notification.service.NotificationService;
 import com.pickupluck.ecogging.domain.plogging.dto.AccompanyDTO;
 import com.pickupluck.ecogging.domain.plogging.service.AccompanyService;
 import lombok.RequiredArgsConstructor;
@@ -77,10 +77,11 @@ public class AccompanyController {
             AccompanyDTO accompanyDTO = accompanyService.getAccompany(param.get("accompanyId"));
             map.put("accompany", accompanyDTO);
             // comment
-            List<CommentResponse> comments = commentService.findByAccompanyId(param.get("accompanyId"));
+            List<CommentResponse> comments = commentService
+                    .findByBoardTypeAndArticleId(BoardType.ACCOMPANY, param.get("accompanyId"));
             map.put("comments", comments);
 
-            if(param.get("userId")!=null) {
+            if (param.get("userId") != null) {
                 Boolean isParticipation = accompanyService.isParticipation(param.get("userId"), param.get("accompanyId"));
                 map.put("isParticipation", isParticipation);
                 Boolean isAccompanyscrap = accompanyService.isAccompanyScrap(param.get("userId"), param.get("accompanyId"));

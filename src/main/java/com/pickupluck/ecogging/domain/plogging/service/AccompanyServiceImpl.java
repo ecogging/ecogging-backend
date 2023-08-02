@@ -1,5 +1,7 @@
 package com.pickupluck.ecogging.domain.plogging.service;
 
+import com.pickupluck.ecogging.domain.BoardType;
+import com.pickupluck.ecogging.domain.comment.repository.CommentRepository;
 import com.pickupluck.ecogging.domain.notification.dto.NotificationSaveDto;
 import com.pickupluck.ecogging.domain.notification.entity.NotificationType;
 import com.pickupluck.ecogging.domain.notification.service.NotificationService;
@@ -19,6 +21,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
@@ -34,6 +37,7 @@ public class AccompanyServiceImpl implements AccompanyService {
     private final Integer onePage = 10;
 
     private final NotificationService notificationService;
+    private final CommentRepository commentRepository;
 
     @Override
     public Map<String, Object> getAccompanyList(Integer page, String orderby) throws Exception {
@@ -87,8 +91,10 @@ public class AccompanyServiceImpl implements AccompanyService {
     }
 
     @Override
+    @Transactional
     public void removeAccompany(Long id) throws Exception {
         accompanyRepository.deleteById(id);
+        commentRepository.deleteByBoardTypeAndArticleId(BoardType.ACCOMPANY, id);
     }
 
     @Override
