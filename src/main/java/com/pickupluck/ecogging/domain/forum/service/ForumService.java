@@ -35,7 +35,7 @@ public interface ForumService {
     // ReviewService ----------------------------------------------------------
     List<ReviewDTO> getReviewsRv(Integer page, PageInfo pageInfo) throws Exception;
 
-    ReviewDTO getReviewInfo(Long id, Long userId) throws Exception;
+    ReviewDTO getReviewInfo(Long id) throws Exception;
 
     void modifyReviewInfo(ReviewDTO reviewDTO) throws Exception;
 

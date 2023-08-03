@@ -58,15 +58,15 @@ public class ReviewController {
 
     }
 
-    @PostMapping ("/reviewInfo/{id}/{userId}")
-    public ResponseEntity<Map<String,Object>> reviewInfo(@PathVariable Long id,@PathVariable Long userId){
+    @PostMapping ("/reviewInfo/{id}")
+    public ResponseEntity<Map<String,Object>> reviewInfo(@PathVariable Long id, @RequestBody Map<String, Long> param){
 
         try {
             Map<String,Object> map=new HashMap<>();
-            ReviewDTO reviewInfo=forumService.getReviewInfo(id,userId);
+            ReviewDTO reviewInfo=forumService.getReviewInfo(id);
             map.put("reviewInfo",reviewInfo);
             System.out.println("후기 인포 테스트 : "+reviewInfo.getContent());
-            map.put("isScrap", forumScrapService.isForumScrap(id,userId));
+            map.put("isScrap", forumScrapService.isForumScrap(id,param.get("userId")));
             return new ResponseEntity<>(map,HttpStatus.OK);
         }catch (Exception e){
             e.printStackTrace();
