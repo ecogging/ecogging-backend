@@ -394,6 +394,10 @@ public class ForumServiceImpl implements ForumService{
         int views=review.getViews();
         review.setViews(views+1);
         forumRepository.save(review);
+        User writer=review.getWriter();
+
+//        User userEntity=userRepository.findById(writer);
+
 
         // DTO 생성
         ReviewDTO getReview= ReviewDTO.builder()
@@ -404,8 +408,10 @@ public class ForumServiceImpl implements ForumService{
                 .views(views+1)
                 .isTemp(review.getIsTemporary())
                 .createdAt(review.getCreatedAt())
-                .writerNickname(String.valueOf(userRepository.findById(userId).get()))
+//                .writerNickname(String.valueOf(userRepository.findById(userId).get()))
+//                .writerNickname(userEntity.getNickname())
                 .writerPic(String.valueOf(userRepository.findById(userId).get()))
+
                 .build();
         return getReview;
     }
@@ -615,46 +621,4 @@ public class ForumServiceImpl implements ForumService{
         return true;
     }
 
-
-
-    //  scrap
-//    @Override
-//    public Boolean setForumScrap(Long forumId, Long userId) throws Exception {
-//        System.out.println("나눔 스크랩 서비스");
-//
-//        Optional<ForumScrap> oscrap = forumscrapRepository.findByForumIdAndUserId(forumId, userId);
-//
-//        if(oscrap.isEmpty()) {
-//            Forum forum = forumRepository.findById(forumId).get();
-//            ForumScrap forumscrap = ForumScrap.builder()
-//                    .forum(forum).userId(userId)
-//                    .build();
-//            forumscrapRepository.save(forumscrap);
-//            return true;
-//        } else {
-//            forumscrapRepository.delete(oscrap.get());
-//            return false;
-//        }
-//    }
-
-//    @Override
-//    public Boolean isForumScrap(Long forumId, Long userId) throws Exception {
-//        Optional<ForumScrap> oscrap = forumscrapRepository.findByForumIdAndUserId(forumId, userId);
-//        if(oscrap.isEmpty()) return false;
-//
-//        return true;
-//    }
-
-
-    //myScrap
-//    @Override
-//    public List<Forum> getMyforumScrap(Long userId) throws Exception {
-//
-//        List<Forum> forumList=forumscrapRepository.findAllByUserId(userId);
-//
-//        for(Forum a:forumList){
-//            System.out.println("스크랩 포럼 아이디 : "+a);
-//        }
-//        return forumList;
-//    }
 }
