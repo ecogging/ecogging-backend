@@ -118,14 +118,14 @@ public class ForumController {
         }
     }
 
-    @PostMapping ("/routeInfo/{id}/{userId}")
-    public ResponseEntity<Map<String,Object>> routeInfo(@PathVariable Long id,@PathVariable Long userId){
+    @PostMapping ("/routeInfo/{id}")
+    public ResponseEntity<Map<String,Object>> routeInfo(@PathVariable Long id,@RequestBody Map<String,Long>param){
 
         try {
             Map<String,Object> map=new HashMap<>();
             ForumDTO routeInfo=forumService.getRouteInfo(id);
             map.put("routeInfo",routeInfo);
-            map.put("isScrap", forumScrapService.isForumScrap(id,userId));
+            map.put("isScrap", forumScrapService.isForumScrap(id,param.get("userId")));
             System.out.println("루트 인포포오ㅗㅇ : "+routeInfo.getContent());
             return new ResponseEntity<>(map,HttpStatus.OK);
         }catch (Exception e){
@@ -205,14 +205,14 @@ public class ForumController {
 
 
     }
-    @PostMapping ("/shareInfo/{id}/{userId}")
-    public ResponseEntity<Map<String,Object>> shareInfo(@PathVariable Long id, @PathVariable Long userId){
+    @PostMapping ("/shareInfo/{id}")
+    public ResponseEntity<Map<String,Object>> shareInfo(@PathVariable Long id, @RequestBody Map<String,Long>param){
         System.out.println("나눔 컨트롤러어러러어러얼");
         try {
             Map<String,Object> map=new HashMap<>();
             ForumDTO shareInfo=forumService.getShareInfo(id);
             map.put("shareInfo",shareInfo);
-            map.put("isScrap", forumScrapService.isForumScrap(id,userId));
+            map.put("isScrap", forumScrapService.isForumScrap(id,param.get("userId")));
             return new ResponseEntity<>(map,HttpStatus.OK);
         }catch (Exception e){
             e.printStackTrace();

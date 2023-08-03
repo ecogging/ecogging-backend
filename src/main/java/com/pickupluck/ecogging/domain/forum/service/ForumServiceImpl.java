@@ -386,7 +386,7 @@ public class ForumServiceImpl implements ForumService{
     }
 
     @Override
-    public ReviewDTO getReviewInfo(Long id, Long userId) throws Exception {
+    public ReviewDTO getReviewInfo(Long id) throws Exception {
         Optional<Forum> reviewInfo=forumRepository.findById(id);
         if(reviewInfo.isEmpty()) return null;
         Forum review=reviewInfo.get();
@@ -394,10 +394,8 @@ public class ForumServiceImpl implements ForumService{
         int views=review.getViews();
         review.setViews(views+1);
         forumRepository.save(review);
+
         User writer=review.getWriter();
-
-//        User userEntity=userRepository.findById(writer);
-
 
         // DTO 생성
         ReviewDTO getReview= ReviewDTO.builder()
@@ -409,9 +407,8 @@ public class ForumServiceImpl implements ForumService{
                 .isTemp(review.getIsTemporary())
                 .createdAt(review.getCreatedAt())
 //                .writerNickname(String.valueOf(userRepository.findById(userId).get()))
-//                .writerNickname(userEntity.getNickname())
-                .writerPic(String.valueOf(userRepository.findById(userId).get()))
-
+                .writerNickname(writer.getNickname())
+//                .writerPic(String.valueOf(userRepository.findById(userId).get()))
                 .build();
         return getReview;
     }
