@@ -4,6 +4,8 @@ import com.pickupluck.ecogging.domain.forum.dto.MyForumRouteResponseDto;
 import com.pickupluck.ecogging.domain.forum.dto.MyForumShareResponseDto;
 import com.pickupluck.ecogging.domain.forum.repository.ForumRepository;
 import com.pickupluck.ecogging.domain.forum.service.ForumService;
+import com.pickupluck.ecogging.domain.scrap.dto.MyForumScrapsResponseDto;
+import com.pickupluck.ecogging.domain.scrap.service.ForumScrapService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +31,8 @@ public class MyForumController {
 
     private final ForumService forumService;
     private final ForumRepository forumRepository;
+
+    private final ForumScrapService forumScrapService;
 
     // 내가 작성한 나눔
     @GetMapping("/mypage/{userId}/shares")
@@ -74,6 +78,30 @@ public class MyForumController {
         Map<String, Object> responseBody = new HashMap<>();
         responseBody.put("msg", "MYFORUM 경로추천 조회 완료");
         responseBody.put("data", myRoutes.getContent());
+        responseBody.put("allCount", all); // 전체 데이터 개수 같이 넘겨주기
+
+        return ResponseEntity.ok(responseBody);
+    }
+
+    // 내가 스크랩한 경로와 나눔 (커뮤니티)
+    @GetMapping("/mypage/{userId}/forumscraps")
+    public ResponseEntity<Map<String, Object>> getMyForumScraps(@PathVariable("userId") Long userId,
+                                                                @RequestParam("pageNo") int pageNo) {
+        // pagination
+        pageNo = pageNo==0 ? 0 : (pageNo-1);
+        Pageable pageable = PageRequest.of(pageNo, 5, Sort.by("createdAt").descending());
+
+        // get data from DB
+        Map<String, Object> myForumScrapsMap = forumScrapService.getMyForumScrapsAll(userId, pageable);
+        Page<MyForumScrapsResponseDto> myForumScraps = ( Page<MyForumScrapsResponseDto> )myForumScrapsMap.get("res");
+        if (myForumScraps.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        Long all = (Long) myForumScrapsMap.get("all");
+
+        Map<String, Object> responseBody = new HashMap<>();
+        responseBody.put("msg", "MYFORUM 스크랩한 글 조회 완료");
+        responseBody.put("data", myForumScraps.getContent());
         responseBody.put("allCount", all); // 전체 데이터 개수 같이 넘겨주기
 
         return ResponseEntity.ok(responseBody);
