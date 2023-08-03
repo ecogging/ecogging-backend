@@ -1,5 +1,6 @@
 package com.pickupluck.ecogging.domain.user.repository;
 
+import com.pickupluck.ecogging.domain.forum.entity.Forum;
 import com.pickupluck.ecogging.domain.user.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 

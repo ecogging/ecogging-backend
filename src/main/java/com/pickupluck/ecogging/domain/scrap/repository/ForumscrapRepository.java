@@ -11,8 +11,5 @@ import java.util.Optional;
 
 public interface ForumscrapRepository extends JpaRepository<ForumScrap, Long> {
 
-//    Optional<ForumScrap>  findByForumIdAndUserId(Long forumId, Long userId);
-
-//    @Query("select fs.forum from ForumScrap fs where fs.userId=:userId")
-//    List<Forum> findAllByUserId(@Param("userId")Long userId);
+    Optional<ForumScrap>  findByForumIdAndUserId(Long forumId, Long userId);
 }
