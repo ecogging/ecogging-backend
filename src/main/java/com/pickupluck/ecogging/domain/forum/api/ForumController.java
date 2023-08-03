@@ -3,6 +3,7 @@ import com.pickupluck.ecogging.domain.forum.dto.ForumDTO;
 import com.pickupluck.ecogging.domain.forum.entity.Forum;
 import com.pickupluck.ecogging.domain.forum.service.ForumService;
 
+import com.pickupluck.ecogging.domain.scrap.service.ForumScrapService;
 import com.pickupluck.ecogging.util.PageInfo;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -31,10 +32,8 @@ public class ForumController {
 
     @Autowired
     private ForumService forumService;
-
-
-
-
+    @Autowired
+    private ForumScrapService forumScrapService;
     // RouteController ---------------------------------------------------------------------------------
     @GetMapping("/routes/{pageNo}")
     public ResponseEntity<Map<String,Object>> routes(@PathVariable Integer pageNo) {
@@ -126,7 +125,7 @@ public class ForumController {
             Map<String,Object> map=new HashMap<>();
             ForumDTO routeInfo=forumService.getRouteInfo(id);
             map.put("routeInfo",routeInfo);
-//            map.put("isScrap", forumService.isForumScrap(id,userId));
+            map.put("isScrap", forumScrapService.isForumScrap(id,userId));
             System.out.println("루트 인포포오ㅗㅇ : "+routeInfo.getContent());
             return new ResponseEntity<>(map,HttpStatus.OK);
         }catch (Exception e){
@@ -213,7 +212,7 @@ public class ForumController {
             Map<String,Object> map=new HashMap<>();
             ForumDTO shareInfo=forumService.getShareInfo(id);
             map.put("shareInfo",shareInfo);
-//            map.put("isScrap", forumService.isForumScrap(id,userId));
+            map.put("isScrap", forumScrapService.isForumScrap(id,userId));
             return new ResponseEntity<>(map,HttpStatus.OK);
         }catch (Exception e){
             e.printStackTrace();
@@ -254,33 +253,6 @@ public class ForumController {
         }
     }
 
-    //forum scrap
-    @PostMapping("/forumscrap/{forumId}/{userId}")
-    public ResponseEntity<Boolean> forumScrap(@PathVariable Long forumId, @PathVariable Long userId){
 
-        try {
-            System.out.println("나눔 스크랩 컨트롤러 들어오기 성고옹");
-//            Boolean isScrap = forumService.setForumScrap(forumId,userId);
-//            return new ResponseEntity<>(isScrap,HttpStatus.OK);
-            return null;
-        }catch (Exception e){
-            e.printStackTrace();
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-    }
-
-    @GetMapping ("/myforumscrapInfo/{userId}")
-    public ResponseEntity<List<Forum>> myforumscrapInfo(@PathVariable Long userId) {
-        try {
-            System.out.println("마이페이지 스크랩 처리");
-//            List<Forum> list=forumService.getMyforumScrap(userId);
-//            Map<String,Object> map=forumService.getMyforumScrap(userId);
-//            return new ResponseEntity<>(list,HttpStatus.OK);
-            return null;
-        }catch (Exception e){
-            e.printStackTrace();
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-    }
 
 }

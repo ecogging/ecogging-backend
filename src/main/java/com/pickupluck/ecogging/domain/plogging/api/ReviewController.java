@@ -3,6 +3,7 @@ package com.pickupluck.ecogging.domain.plogging.api;
 import com.pickupluck.ecogging.domain.forum.entity.Forum;
 import com.pickupluck.ecogging.domain.plogging.dto.ReviewDTO;
 import com.pickupluck.ecogging.domain.forum.service.ForumService;
+import com.pickupluck.ecogging.domain.scrap.service.ForumScrapService;
 import com.pickupluck.ecogging.util.PageInfo;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +31,8 @@ public class ReviewController {
 
     @Autowired
     private ForumService forumService;
-
+    @Autowired
+    private ForumScrapService forumScrapService;
 
     @GetMapping("/reviews/{pageNo}")
     public ResponseEntity<Map<String,Object>> reviews(@PathVariable Integer pageNo) {
@@ -64,7 +66,7 @@ public class ReviewController {
             ReviewDTO reviewInfo=forumService.getReviewInfo(id,userId);
             map.put("reviewInfo",reviewInfo);
             System.out.println("후기 인포 테스트 : "+reviewInfo.getContent());
-//            map.put("isScrap", forumService.isForumScrap(id,userId));
+            map.put("isScrap", forumScrapService.isForumScrap(id,userId));
             return new ResponseEntity<>(map,HttpStatus.OK);
         }catch (Exception e){
             e.printStackTrace();
