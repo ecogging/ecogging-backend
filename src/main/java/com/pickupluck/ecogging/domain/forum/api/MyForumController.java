@@ -16,10 +16,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -133,6 +130,20 @@ public class MyForumController {
         responseBody.put("allCount", all); // 전체 데이터 개수 같이 넘겨주기
 
         return ResponseEntity.ok(responseBody);
+    }
+
+
+    // 스크랩 토글
+    @PutMapping("/mypage/{userId}/forumscraps")
+    public ResponseEntity<Boolean> updateMyForumScrapOnOff(@PathVariable("userId") Long userId,
+                                                                       @RequestParam("forumId") Long forumId) {
+        try {
+            Boolean isScrap = forumScrapService.setForumScrap(forumId,userId);
+            return new ResponseEntity<>(isScrap,HttpStatus.OK);
+        }catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
     }
 
 }
