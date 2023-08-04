@@ -15,4 +15,7 @@ public interface ForumScrapService {
   
     // MyPage 나의 커뮤니티 - 스크랩 ---------------------------------------------
     Map<String, Object> getMyForumScrapsAll(Long userId, Pageable pageable);
+    // -- 검색
+    Map<String, Object> searchMyForumScraps(Long userId, String criteria, String words, Pageable pageable);
+
 }

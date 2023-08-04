@@ -114,4 +114,57 @@ public class ForumScrapServiceImpl implements ForumScrapService{
         return result;
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public Map<String, Object> searchMyForumScraps(Long userId, String criteria, String words, Pageable pageable) {
+
+        Page<ForumScrap> myForumScrapsEntity = null;
+        Long countScraps = null;
+
+        // 전체 검색 or 나눔/경로 검색
+        if(criteria.equals("전체")) {
+            myForumScrapsEntity = forumscrapRepository.findByUserIdAndWords(userId, words, pageable);
+            countScraps = forumscrapRepository.findByUserIdAndWordsForCount(userId, words);
+        } else {
+            myForumScrapsEntity = forumscrapRepository.findByUserIdAndTypeAndWords(userId, criteria, words, pageable);
+            countScraps = forumscrapRepository.findByUserIdAndTypeAndWordsForCount(userId, criteria, words);
+        }
+
+        // Entity -> DTO
+        Page<MyForumScrapsResponseDto> myForumScrapDto = myForumScrapsEntity.map(s -> {
+            if (s.getForum().getType().equals("경로")) {
+                return MyForumScrapsResponseDto.builder()
+                        .scrapId(s.getId())
+                        .forumId(s.getForum().getId())
+                        .title(s.getForum().getTitle())
+                        .content(s.getForum().getContent())
+                        .createdAt(s.getCreatedAt()) // 스크랩한 순으로 정렬
+                        .views(s.getForum().getViews())
+                        .type(s.getForum().getType())
+                        .userId(s.getForum().getWriter().getId())
+                        .nickname(s.getForum().getWriter().getNickname())
+                        .location(s.getForum().getRouteLocation())
+                        .build();
+            } else if (s.getForum().getType().equals("나눔")) {
+                return MyForumScrapsResponseDto.builder()
+                        .scrapId(s.getId())
+                        .forumId(s.getForum().getId())
+                        .title(s.getForum().getTitle())
+                        .content(s.getForum().getContent())
+                        .createdAt(s.getCreatedAt()) // 스크랩한 순으로 정렬
+                        .views(s.getForum().getViews())
+                        .type(s.getForum().getType())
+                        .userId(s.getForum().getWriter().getId())
+                        .nickname(s.getForum().getWriter().getNickname())
+                        .build();
+            }
+            return null;
+        });
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("res", myForumScrapDto);
+        result.put("all", countScraps);
+
+        return result;
+    }
 }

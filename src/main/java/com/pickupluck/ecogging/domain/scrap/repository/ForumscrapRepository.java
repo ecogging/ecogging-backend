@@ -26,4 +26,18 @@ public interface ForumscrapRepository extends JpaRepository<ForumScrap, Long> {
     @Query("select count(*) from ForumScrap s where s.user.id=:userId")
     Long findAllByUserIdForCount(@Param("userId") Long userId);
 
+    // 검색
+    // 1. 전체일 경우
+    @Query("select s from ForumScrap s where s.user.id=:userId and s.forum.title like %:words%")
+    Page<ForumScrap> findByUserIdAndWords(@Param("userId") Long userId, @Param("words") String words, Pageable pageable);
+    @Query("select count(*) from ForumScrap s where s.user.id=:userId and s.forum.title like %:words%")
+    Long findByUserIdAndWordsForCount(@Param("userId") Long userId, @Param("words") String words);
+
+    // 2. 경로 or 나눔일 경우
+    @Query("select s from ForumScrap s where s.user.id=:userId and s.forum.type=:criteria and s.forum.title like %:words%")
+    Page<ForumScrap> findByUserIdAndTypeAndWords(@Param("userId") Long userId, @Param("criteria") String criteria,
+                                                 @Param("words") String words, Pageable pageable);
+    @Query("select count(*) from ForumScrap s where s.user.id=:userId and s.forum.type=:criteria and s.forum.title like %:words%")
+    Long findByUserIdAndTypeAndWordsForCount(@Param("userId") Long userId, @Param("criteria") String criteria,
+                                            @Param("words") String words);
 }
