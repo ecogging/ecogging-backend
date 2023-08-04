@@ -191,6 +191,19 @@ public class MessageRoomController {
         return ResponseEntity.ok(response);
     }
 
+    // 6-a. 상세쪽지함 읽음 처리
+    @PutMapping("/{userId}/messageroom/{messageRoomId}/read")
+    public ResponseEntity<Map<String, Object>> updateMessagesReadInMsgDetail(@PathVariable("userId")Long userId,
+                                                                  @PathVariable("messageRoomId") Long messageRoomId) {
+
+        messageRoomService.updateMessagesRead(userId, messageRoomId);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("msg", "쪽지함 읽기 완료");
+
+        return ResponseEntity.ok(response);
+    }
+
     // 7. 복수 쪽지함 읽음 처리
     @PutMapping("/mypage/{userId}/messagerooms/read")
     public ResponseEntity<Map<String, Object>> updateMessagesReadAll(@PathVariable("userId")Long userId,
