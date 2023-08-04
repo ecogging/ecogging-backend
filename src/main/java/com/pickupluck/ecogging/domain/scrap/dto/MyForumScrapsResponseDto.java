@@ -19,16 +19,12 @@ public class MyForumScrapsResponseDto {
     // User
     private final Long userId;
     private final String nickname;
-    private final String userPic;
 
     // Route
     private final String location;
 
-    // Share
-    private final String filePath;
-
     @Builder
-    public MyForumScrapsResponseDto(Long scrapId, Long forumId, String title, String content, LocalDateTime createdAt, Integer views, String type, Long userId, String nickname, String userPic, String location, String filePath) {
+    public MyForumScrapsResponseDto(Long scrapId, Long forumId, String title, String content, LocalDateTime createdAt, Integer views, String type, Long userId, String nickname, String location) {
         this.scrapId = scrapId;
         this.forumId = forumId;
         this.title = title;
@@ -38,8 +34,6 @@ public class MyForumScrapsResponseDto {
         this.type = type;
         this.userId = userId;
         this.nickname = nickname;
-        this.userPic = userPic;
         this.location = location;
-        this.filePath = filePath;
     }
 }

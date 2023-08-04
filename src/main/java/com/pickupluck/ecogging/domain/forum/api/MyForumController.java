@@ -16,10 +16,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -83,6 +80,8 @@ public class MyForumController {
         return ResponseEntity.ok(responseBody);
     }
 
+
+
     // 내가 스크랩한 경로와 나눔 (커뮤니티)
     @GetMapping("/mypage/{userId}/forumscraps")
     public ResponseEntity<Map<String, Object>> getMyForumScraps(@PathVariable("userId") Long userId,
@@ -106,4 +105,45 @@ public class MyForumController {
 
         return ResponseEntity.ok(responseBody);
     }
+
+    // 내가 스크랩한 경로와 나눔 검색
+    @GetMapping("/mypage/{userId}/forumscraps/search")
+    public ResponseEntity<Map<String, Object>> getMyForumScrapsSearch(@PathVariable("userId") Long userId,
+                                                                      @RequestParam("pageNo") int pageNo,
+                                                                      @RequestParam("searchCriteria") String criteria,
+                                                                      @RequestParam("searchWords") String words) {
+        // pagination
+        pageNo = pageNo==0 ? 0 : (pageNo-1);
+        Pageable pageable = PageRequest.of(pageNo, 5, Sort.by("createdAt").descending());
+
+        // get data from DB
+        Map<String, Object> myForumScrapSearchMap = forumScrapService.searchMyForumScraps(userId, criteria, words, pageable);
+        Page<MyForumScrapsResponseDto> myForumScraps = ( Page<MyForumScrapsResponseDto> )myForumScrapSearchMap.get("res");
+        if (myForumScraps.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        Long all = (Long) myForumScrapSearchMap.get("all");
+
+        Map<String, Object> responseBody = new HashMap<>();
+        responseBody.put("msg", "MYFORUMSCRAP 검색 조회 완료");
+        responseBody.put("data", myForumScraps.getContent());
+        responseBody.put("allCount", all); // 전체 데이터 개수 같이 넘겨주기
+
+        return ResponseEntity.ok(responseBody);
+    }
+
+
+    // 스크랩 토글
+    @PutMapping("/mypage/{userId}/forumscraps")
+    public ResponseEntity<Boolean> updateMyForumScrapOnOff(@PathVariable("userId") Long userId,
+                                                                       @RequestParam("forumId") Long forumId) {
+        try {
+            Boolean isScrap = forumScrapService.setForumScrap(forumId,userId);
+            return new ResponseEntity<>(isScrap,HttpStatus.OK);
+        }catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
 }
