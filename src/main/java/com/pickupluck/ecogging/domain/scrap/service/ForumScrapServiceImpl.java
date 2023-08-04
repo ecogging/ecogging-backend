@@ -17,7 +17,6 @@ import com.pickupluck.ecogging.domain.scrap.dto.MyForumScrapsResponseDto;
 
 import java.util.Optional;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @Service
@@ -90,10 +89,9 @@ public class ForumScrapServiceImpl implements ForumScrapService{
                         .type(s.getForum().getType())
                         .userId(s.getForum().getWriter().getId())
                         .nickname(s.getForum().getWriter().getNickname())
-                        .userPic(s.getForum().getWriter().getProfileImageUrl())
                         .location(s.getForum().getRouteLocation())
                         .build();
-            } else if (s.getForum().getType().equals("나눔") && s.getForum().getFile() != null) {
+            } else if (s.getForum().getType().equals("나눔")) {
                 return MyForumScrapsResponseDto.builder()
                         .scrapId(s.getId())
                         .forumId(s.getForum().getId())
@@ -104,21 +102,6 @@ public class ForumScrapServiceImpl implements ForumScrapService{
                         .type(s.getForum().getType())
                         .userId(s.getForum().getWriter().getId())
                         .nickname(s.getForum().getWriter().getNickname())
-                        .userPic(s.getForum().getWriter().getProfileImageUrl())
-                        .filePath(s.getForum().getFile().getPath())
-                        .build();
-            } else if (s.getForum().getType().equals("나눔") && s.getForum().getFile() == null) {
-                return MyForumScrapsResponseDto.builder()
-                        .scrapId(s.getId())
-                        .forumId(s.getForum().getId())
-                        .title(s.getForum().getTitle())
-                        .content(s.getForum().getContent())
-                        .createdAt(s.getCreatedAt()) // 스크랩한 순으로 정렬
-                        .views(s.getForum().getViews())
-                        .type(s.getForum().getType())
-                        .userId(s.getForum().getWriter().getId())
-                        .nickname(s.getForum().getWriter().getNickname())
-                        .userPic(s.getForum().getWriter().getProfileImageUrl())
                         .build();
             }
             return null;
