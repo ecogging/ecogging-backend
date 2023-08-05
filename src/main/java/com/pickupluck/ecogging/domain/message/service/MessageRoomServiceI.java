@@ -24,10 +24,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.PermissionDeniedDataAccessException;
 import org.springframework.data.crossstore.ChangeSetPersister;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -206,7 +203,7 @@ public class MessageRoomServiceI implements MessageRoomService {
         // 페이징
         Pageable pageable = PageRequest.of(pageNo, 10, Sort.by("createdAt").descending());
 
-        Page<Message> messages = null;
+        Slice<Message> messages = null;
         List<Message> alls = null;
         Integer count = null;
 
@@ -214,13 +211,13 @@ public class MessageRoomServiceI implements MessageRoomService {
         if(messageRoom.getInitialSender().getId() == userId) {
             messages = messageRoomRepository.findMessagesByMessageRoomIdAndSender(
                     messageRoom.getId(), pageable);
-            alls = messageRoomRepository.findMessagesByMessageRoomIdAndSender(currentUser.getId());
+            alls = messageRoomRepository.findMessagesByMessageRoomIdAndSenderForCount(messageRoom.getId());
             count=alls.size();
         } else {
             messages = messageRoomRepository.findMessagesByMessageRoomIdAndReceiver(
                     messageRoom.getId(), pageable);
             // 쿼리에 맞는 모든 데이터 -> 전체 개수
-            alls = messageRoomRepository.findMessagesByMessageRoomIdAndReceiver(currentUser.getId());
+            alls = messageRoomRepository.findMessagesByMessageRoomIdAndReceiverForCount(messageRoom.getId());
             count=alls.size();
         }
 
