@@ -254,5 +254,20 @@ public class ForumController {
     }
 
 
+    @PostMapping("/shareStatus/{forumId}")
+    public void shareStatus(@RequestBody Map<String, String> data,@PathVariable Long forumId) {
+        System.out.println("나눔 상태");
+        System.out.println("status : "+data.get("stat"));
+//        System.out.println("shareInfo : "+data.get("shareInfo"));
+        try {
+//            Map<String,String> res=new HashMap<>();
+            forumService.shareStatus(forumId,data.get("stat"));
+//            return new ResponseEntity<>("나눔 수정 완료",HttpStatus.OK);
+        }catch (Exception e){
+            e.printStackTrace();
+//            return new ResponseEntity<>("나눔 수정 실패",HttpStatus.BAD_REQUEST);
+        }
+    }
+
 
 }
