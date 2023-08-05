@@ -57,11 +57,11 @@ public class Forum extends BaseEntity {
     @JoinColumn(name = "accomp_id")
     private Accompany thisAccompany; // 후기 - 해당 플로깅 모임글 -> DB: Accomapny PK인 글 ID 저장
 
-    @Column(name="progress")
-    private String progress;  //무료나눔 - 진행상황 (진행증, 완료)
+    @Column(name="status")
+    private String status;  //무료나눔 - 진행상황 (진행증, 완료)
 
     @Builder
-    public Forum(Long id, String type, User writer, String title, String content, Integer views, ForumFile file, Boolean isTemporary, String routeLocation, String routeLocationDetail, Accompany thisAccompany, String progress) {
+    public Forum(Long id, String type, User writer, String title, String content, Integer views, ForumFile file, Boolean isTemporary, String routeLocation, String routeLocationDetail, Accompany thisAccompany, String status) {
         this.id = id;
         this.type = type;
         this.writer = writer;
@@ -73,7 +73,7 @@ public class Forum extends BaseEntity {
         this.routeLocation = routeLocation;
         this.routeLocationDetail = routeLocationDetail;
         this.thisAccompany = thisAccompany;
-        this.progress=progress;
+        this.status=status;
     }
 
     public Boolean getIsTemporary() {

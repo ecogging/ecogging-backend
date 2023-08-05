@@ -69,4 +69,5 @@ public interface ForumService {
 
     Boolean myForumDelete(Long forumId) throws Exception;
 
+    void shareStatus(Long forumId, String stat) throws Exception;
 }

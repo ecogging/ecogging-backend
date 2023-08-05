@@ -212,6 +212,7 @@ public class ForumServiceImpl implements ForumService{
                     .content(share.getContent())
                     .createdAt(share.getCreatedAt())
                     .views(share.getViews())
+                    .status(share.getStatus())
                     .routeLocation(share.getRouteLocation())
                     .routeLocation(share.getRouteLocation())
                     .writerNickname(share.getWriter().getNickname())
@@ -272,6 +273,7 @@ public class ForumServiceImpl implements ForumService{
                 .title(share.getTitle())
                 .content(share.getContent())
                 .views(views+1)
+                .status(share.getStatus())
                 .isTemp(share.getIsTemporary())
                 .createdAt(share.getCreatedAt())
                 .build();
@@ -320,6 +322,7 @@ public class ForumServiceImpl implements ForumService{
                 .title(title)
                 .content(content)
                 .type("나눔")
+                .status("진행중")
                 .writer(userRepository.findById(userId).get())
                 .isTemporary(temp)
                 .views(0)
@@ -616,6 +619,25 @@ public class ForumServiceImpl implements ForumService{
     public Boolean myForumDelete(Long forumId) throws Exception {
         forumRepository.deleteById(forumId);
         return true;
+    }
+
+    @Override
+    public void shareStatus(Long forumId, String stat) throws Exception {
+        System.out.println("forumId : "+forumId);
+        System.out.println("stat : "+stat);
+
+        Optional<Forum> forum=forumRepository.findById(forumId);
+        Forum forum2= Forum.builder()
+                .id(forumId)
+                .content(forum.get().getContent())
+                .writer(forum.get().getWriter())
+                .isTemporary(forum.get().getIsTemporary())
+                .title(forum.get().getTitle())
+                .type(forum.get().getType())
+                .views(forum.get().getViews())
+                .status(stat)
+                .build();
+        forumRepository.save(forum2);
     }
 
 }
