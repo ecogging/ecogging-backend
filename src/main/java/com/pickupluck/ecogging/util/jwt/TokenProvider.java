@@ -4,6 +4,7 @@ import java.security.Key;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Map;
 
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,6 +13,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Component;
 
 import io.jsonwebtoken.*;
@@ -114,4 +116,29 @@ public class TokenProvider implements InitializingBean {
     }
 
 
+    public String createOAuth2KakaoToken(Authentication authentication) {
+        OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
+
+        Map<String, Object> kakaoAccount = (Map<String, Object>) oAuth2User.getAttributes().get("kakao_account");
+        String email = (String) kakaoAccount.get("email");
+
+        Map<String, Object> properties = (Map<String, Object>) oAuth2User.getAttributes().get("properties");
+        String nickname = (String) properties.get("nickname");
+
+        Long userId = (Long)properties.get("id");
+
+        String authorities = "USER"; // todo: 모든 사용자 권한은 유저로 임시 설정
+
+        long now = (new Date()).getTime(); // milliseconds 반환
+        Date validity = new Date(now + this.tokenValidityInMilliseconds);
+
+        return Jwts.builder()
+                .setSubject(email)
+                .claim(AUTHORITIES_KEY, authorities)
+                .claim("userId", userId)
+                .claim("nickname", nickname)
+                .signWith(key, SignatureAlgorithm.HS512)
+                .setExpiration(validity)
+                .compact();
+    }
 }
