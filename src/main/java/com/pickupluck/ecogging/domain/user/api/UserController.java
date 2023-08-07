@@ -1,24 +1,17 @@
 package com.pickupluck.ecogging.domain.user.api;
 
-import com.pickupluck.ecogging.domain.user.dto.UserProfileModifyRequest;
-import com.pickupluck.ecogging.domain.user.dto.UserProfileModifyResponse;
-import com.pickupluck.ecogging.domain.user.dto.UserProfileResponse;
-import com.pickupluck.ecogging.domain.user.dto.UserResponseDto;
-import com.pickupluck.ecogging.util.SecurityUtil;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import lombok.extern.slf4j.Slf4j;
 import lombok.RequiredArgsConstructor;
 
-import com.pickupluck.ecogging.domain.file.dto.AwsS3Dto;
-import com.pickupluck.ecogging.domain.file.service.AwsS3Service;
 import com.pickupluck.ecogging.domain.user.service.UserService;
-
-import java.io.IOException;
+import com.pickupluck.ecogging.domain.user.dto.UserProfileModifyRequest;
+import com.pickupluck.ecogging.domain.user.dto.UserProfileResponse;
 
 
 /**
