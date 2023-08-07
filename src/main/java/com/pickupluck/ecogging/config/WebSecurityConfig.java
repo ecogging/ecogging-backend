@@ -1,6 +1,8 @@
 package com.pickupluck.ecogging.config;
 
+import com.pickupluck.ecogging.domain.user.service.UserOAuthService;
 import com.pickupluck.ecogging.util.jwt.*;
+import com.pickupluck.ecogging.util.oauth.OAuth2AuthenticationSuccessHandler;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.context.annotation.Bean;
@@ -22,18 +24,19 @@ import org.springframework.web.filter.CorsFilter;
 @EnableMethodSecurity
 @RequiredArgsConstructor
 public class WebSecurityConfig {
+
     private final TokenProvider tokenProvider;
+
     private final CorsFilter corsFilter;
+
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+
     private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
 
-    @Bean
-    public WebSecurityCustomizer webSecurityCustomizer() {
-        return web -> web.ignoring()
-                .requestMatchers("/favicon.ico")
-                .requestMatchers("/error");
-    }
+    private final UserOAuthService userOauthService;
 
+    private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
+    
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -52,6 +55,14 @@ public class WebSecurityConfig {
 
                 .sessionManagement(sessionManagement
                         -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                )
+
+                .oauth2Login((oauth2Login) -> oauth2Login
+                        .defaultSuccessUrl("/")
+                        .successHandler(oAuth2AuthenticationSuccessHandler)
+                        .userInfoEndpoint(userInfo ->
+                            userInfo.userService(userOauthService)
+                        )
                 )
                 .apply(new JwtSecurityConfig(tokenProvider));
 
