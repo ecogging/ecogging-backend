@@ -1,15 +1,17 @@
 package com.pickupluck.ecogging.util.oauth;
 
-import com.pickupluck.ecogging.util.jwt.TokenProvider;
+import java.io.IOException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
-import org.springframework.stereotype.Component;
-import org.springframework.web.util.UriComponentsBuilder;
 
-import java.io.IOException;
+import org.springframework.stereotype.Component;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.util.UriComponentsBuilder;
+import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
+
+import lombok.RequiredArgsConstructor;
+
+import com.pickupluck.ecogging.util.jwt.TokenProvider;
 
 
 @Component
@@ -21,16 +23,6 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
                                         Authentication authentication) throws IOException {
-
-//        login 성공한 사용자 목록.
-//        OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
-
-//        Map<String, Object> kakaoAccount = (Map<String, Object>) oAuth2User.getAttributes().get("kakao_account");
-//        String email = (String) kakaoAccount.get("email");
-//        Map<String, Object> properties = (Map<String, Object>) oAuth2User.getAttributes().get("properties");
-//        String nickname = (String) properties.get("nickname");
-//
-//        Long userId = (Long)properties.get("id");
 
         String jwt = tokenProvider.createOAuth2KakaoToken(authentication);
 
