@@ -13,7 +13,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
-import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Component;
 
 import io.jsonwebtoken.*;
@@ -21,6 +20,8 @@ import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 
 import lombok.extern.slf4j.Slf4j;
+
+import com.pickupluck.ecogging.util.oauth.CustomOAuth2User;
 
 
 @Slf4j
@@ -117,15 +118,16 @@ public class TokenProvider implements InitializingBean {
 
 
     public String createOAuth2KakaoToken(Authentication authentication) {
-        OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
+        CustomOAuth2User oAuth2User = (CustomOAuth2User) authentication.getPrincipal();
 
-        Map<String, Object> kakaoAccount = (Map<String, Object>) oAuth2User.getAttributes().get("kakao_account");
+        Map<String, Object> userAttributes = oAuth2User.getAttributes();
+        Long userId = oAuth2User.getUserId();
+
+        Map<String, Object> kakaoAccount = (Map<String, Object>) userAttributes.get("kakao_account");
         String email = (String) kakaoAccount.get("email");
 
         Map<String, Object> properties = (Map<String, Object>) oAuth2User.getAttributes().get("properties");
         String nickname = (String) properties.get("nickname");
-
-        Long userId = (Long)properties.get("id");
 
         String authorities = "USER"; // todo: 모든 사용자 권한은 유저로 임시 설정
 
