@@ -1,17 +1,17 @@
 package com.pickupluck.ecogging.domain.user.entity;
 
-import com.pickupluck.ecogging.domain.user.dto.CorporateProfileModifyRequest;
-import com.pickupluck.ecogging.domain.user.dto.UserProfileModifyRequest;
+import java.util.List;
+import java.util.ArrayList;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+
+import static org.springframework.util.StringUtils.hasText;
+
 import lombok.*;
 
 import com.pickupluck.ecogging.domain.BaseEntity;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.springframework.util.StringUtils.hasText;
+import com.pickupluck.ecogging.domain.user.dto.CorporateProfileModifyRequest;
+import com.pickupluck.ecogging.domain.user.dto.UserProfileModifyRequest;
 
 @Entity
 @Getter

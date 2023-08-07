@@ -4,6 +4,7 @@ import java.security.Key;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Map;
 
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,6 +20,8 @@ import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 
 import lombok.extern.slf4j.Slf4j;
+
+import com.pickupluck.ecogging.util.oauth.CustomOAuth2User;
 
 
 @Slf4j
@@ -114,4 +117,30 @@ public class TokenProvider implements InitializingBean {
     }
 
 
+    public String createOAuth2KakaoToken(Authentication authentication) {
+        CustomOAuth2User oAuth2User = (CustomOAuth2User) authentication.getPrincipal();
+
+        Map<String, Object> userAttributes = oAuth2User.getAttributes();
+        Long userId = oAuth2User.getUserId();
+
+        Map<String, Object> kakaoAccount = (Map<String, Object>) userAttributes.get("kakao_account");
+        String email = (String) kakaoAccount.get("email");
+
+        Map<String, Object> properties = (Map<String, Object>) oAuth2User.getAttributes().get("properties");
+        String nickname = (String) properties.get("nickname");
+
+        String authorities = "USER"; // todo: 모든 사용자 권한은 유저로 임시 설정
+
+        long now = (new Date()).getTime(); // milliseconds 반환
+        Date validity = new Date(now + this.tokenValidityInMilliseconds);
+
+        return Jwts.builder()
+                .setSubject(email)
+                .claim(AUTHORITIES_KEY, authorities)
+                .claim("userId", userId)
+                .claim("nickname", nickname)
+                .signWith(key, SignatureAlgorithm.HS512)
+                .setExpiration(validity)
+                .compact();
+    }
 }
