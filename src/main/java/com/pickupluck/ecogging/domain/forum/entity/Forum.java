@@ -30,7 +30,7 @@ public class Forum extends BaseEntity {
     @Column(nullable = false)
     private String title; // 글 제목
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "LONGTEXT")
     private String content; // 글 내용
 
     @Column(nullable = false)
