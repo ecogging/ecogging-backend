@@ -100,6 +100,7 @@ public class ForumScrapServiceImpl implements ForumScrapService{
                         .createdAt(s.getCreatedAt()) // 스크랩한 순으로 정렬
                         .views(s.getForum().getViews())
                         .type(s.getForum().getType())
+                        .status(s.getForum().getStatus())
                         .userId(s.getForum().getWriter().getId())
                         .nickname(s.getForum().getWriter().getNickname())
                         .build();

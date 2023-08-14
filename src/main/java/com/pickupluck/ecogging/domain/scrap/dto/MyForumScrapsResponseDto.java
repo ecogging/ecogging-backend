@@ -23,8 +23,11 @@ public class MyForumScrapsResponseDto {
     // Route
     private final String location;
 
+    // Share
+    private final String status;
+
     @Builder
-    public MyForumScrapsResponseDto(Long scrapId, Long forumId, String title, String content, LocalDateTime createdAt, Integer views, String type, Long userId, String nickname, String location) {
+    public MyForumScrapsResponseDto(Long scrapId, Long forumId, String title, String content, LocalDateTime createdAt, Integer views, String type, Long userId, String nickname, String location, String status) {
         this.scrapId = scrapId;
         this.forumId = forumId;
         this.title = title;
@@ -35,5 +38,6 @@ public class MyForumScrapsResponseDto {
         this.userId = userId;
         this.nickname = nickname;
         this.location = location;
+        this.status = status;
     }
 }
