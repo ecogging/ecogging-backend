@@ -564,6 +564,7 @@ public class ForumServiceImpl implements ForumService{
                         .content(share.getContent())
                         .createdAt(share.getCreatedAt())
                         .views(share.getViews())
+                        .status(share.getStatus())
                         .fileName(null)
                         .filePath(null)
                         .build();
@@ -574,6 +575,7 @@ public class ForumServiceImpl implements ForumService{
                         .content(share.getContent())
                         .createdAt(share.getCreatedAt())
                         .views(share.getViews())
+                        .status(share.getStatus())
                         .fileName(shareFile.get().getFileName())
                         .filePath(shareFile.get().getPath())
                         .build();
