@@ -14,9 +14,10 @@ public class MyForumShareResponseDto {
     private final Integer views;
     private final String fileName;
     private final String filePath;
+    private final String status;
 
     @Builder
-    public MyForumShareResponseDto(Long forumId, String title, String content, LocalDateTime createdAt, Integer views, String fileName, String filePath) {
+    public MyForumShareResponseDto(Long forumId, String title, String content, LocalDateTime createdAt, Integer views, String fileName, String filePath, String status) {
         this.forumId = forumId;
         this.title = title;
         this.content = content;
@@ -24,5 +25,6 @@ public class MyForumShareResponseDto {
         this.views = views;
         this.fileName = fileName;
         this.filePath = filePath;
+        this.status  = status;
     }
 }
