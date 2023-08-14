@@ -15,7 +15,8 @@ public interface ForumRepository extends JpaRepository<Forum,Long> {
 
     Page<Forum> findByIsTemporaryFalseAndTypeAndWriterId(String type, Long userId, PageRequest pageRequest);
 
-    Page<Forum> findByType(String type, Pageable pageable);
+    @Query("select f from Forum f where f.isTemporary=false and f.type=:type")
+    Page<Forum> findAllByType(@Param("type")String type, Pageable pageable);
 
 
     // Main Forums -----------------------------------------------------------------------------------

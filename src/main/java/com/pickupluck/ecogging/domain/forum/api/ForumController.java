@@ -81,6 +81,7 @@ public class ForumController {
         String content=requestData.get("content");
         String title=requestData.get("title");
         String routeLocation=requestData.get("route_location");
+        String routeLocationDetail=requestData.get("route_location_detail");
 
         try {
             System.out.println("루틴 작성 컨트롤러");
@@ -88,6 +89,7 @@ public class ForumController {
             res.put("title",title);
             res.put("content",content);
             res.put("routeLocation",routeLocation);
+            res.put("routeLocationDetail",routeLocationDetail);
             forumService.routeWrite(res,userId,temp);
             return new ResponseEntity<>("controller message : 루틴 등록 성공",HttpStatus.OK);
         }catch (Exception e){

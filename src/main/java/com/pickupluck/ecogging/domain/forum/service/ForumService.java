@@ -2,7 +2,6 @@ package com.pickupluck.ecogging.domain.forum.service;
 
 import com.pickupluck.ecogging.domain.forum.dto.ForumDTO;
 import com.pickupluck.ecogging.domain.forum.dto.MainForumsResponseDto;
-import com.pickupluck.ecogging.domain.forum.entity.Forum;
 import com.pickupluck.ecogging.domain.plogging.dto.ReviewDTO;
 import com.pickupluck.ecogging.util.PageInfo;
 import org.springframework.data.domain.Page;
@@ -43,7 +42,7 @@ public interface ForumService {
 
     void reviewWrite(Map<String, String> res, Long id, Boolean temp, Long userId) throws Exception;
 
-    void reviewModify(Map<String, String> res, Long id, Long userId) throws Exception;
+    void reviewModify(Map<String, String> res, Long id, Long userId, Boolean temp) throws Exception;
 
     void reviewDel(long id) throws Exception;
 

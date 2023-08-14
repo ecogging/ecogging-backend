@@ -75,10 +75,10 @@ public class ReviewController {
     }
 
 
-    @PostMapping ("/reviewModify/{id}/{userId}")
-    public ResponseEntity<String> reviewModify(@RequestBody Map<String, String> requestData,@PathVariable Long id, @PathVariable Long userId){
+    @PostMapping ("/reviewModify/{userId}/{forumId}/{temp}")
+    public ResponseEntity<String> reviewModify(@RequestBody Map<String, String> requestData,@PathVariable Long forumId, @PathVariable Long userId, @PathVariable Boolean temp){
         System.out.println("리뷰 수정하기");
-        System.out.println("id : "+id);
+        System.out.println("id : "+forumId);
         String content=requestData.get("content");
         String title=requestData.get("title");
 
@@ -86,7 +86,7 @@ public class ReviewController {
             Map<String,String> res=new HashMap<>();
             res.put("title",title);
             res.put("content",content);
-            forumService.reviewModify(res,id,userId);
+            forumService.reviewModify(res,forumId,userId,temp);
             return new ResponseEntity<>("리뷰 수정 완료",HttpStatus.OK);
         }catch (Exception e){
             e.printStackTrace();
