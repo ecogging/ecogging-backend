@@ -8,7 +8,6 @@ import com.pickupluck.ecogging.domain.forum.repository.ForumFileRepository;
 import com.pickupluck.ecogging.domain.forum.repository.ForumRepository;
 import com.pickupluck.ecogging.domain.plogging.dto.ReviewDTO;
 import com.pickupluck.ecogging.domain.plogging.repository.AccompanyRepository;
-import com.pickupluck.ecogging.domain.scrap.entity.ForumScrap;
 import com.pickupluck.ecogging.domain.scrap.repository.ForumscrapRepository;
 import com.pickupluck.ecogging.domain.user.entity.User;
 import com.pickupluck.ecogging.domain.user.repository.UserRepository;
@@ -52,8 +51,7 @@ public class ForumServiceImpl implements ForumService{
     public Map<String, Object> getReviews(Pageable pageable) throws Exception {
         // 조건에 맞는 데이터 확보 ( 조건: 5개, 최신순 )
         String thisType = "후기";
-//            Page<Forum> routesEntity = forumRepository.findAllByType(thisType,pageable);
-        Page<Forum> reviewEntity = forumRepository.findByType(thisType,pageable);
+        Page<Forum> reviewEntity = forumRepository.findAllByType(thisType,pageable);
         System.out.println(reviewEntity);
         long count = reviewEntity.getTotalElements();
 
@@ -123,6 +121,7 @@ public class ForumServiceImpl implements ForumService{
         String title=res.get("title");
         String content=res.get("content");
         String routeLocation=res.get("routeLocation");
+        String routeLocationDetail=res.get("routeLocationDetail");
 
         Forum routeEntity= Forum.builder()
                 .title(title)
@@ -130,6 +129,7 @@ public class ForumServiceImpl implements ForumService{
                 .type("경로")
                 .writer((userRepository.findById(userId).get()))
                 .routeLocation(routeLocation)
+                .routeLocationDetail(routeLocationDetail)
                 .isTemporary(temp)
                 .views(0)
                 .build();
@@ -161,6 +161,8 @@ public class ForumServiceImpl implements ForumService{
                 .routeLocation(route.getRouteLocation())
                 .routeLocationDetail(route.getRouteLocationDetail())
                 .writerId(writer.getId())
+                .createdAt(route.getCreatedAt())
+                .updatedAt(route.getUpdatedAt())
                 .writerNickname(writer.getNickname())
                 .writerPic(writer.getProfileImageUrl())
                 .build();
@@ -173,9 +175,11 @@ public class ForumServiceImpl implements ForumService{
         System.out.println(forumDTO);
         System.out.println("userId : "+userId);
         System.out.println("id : "+id);
+        Optional<Forum> forum=forumRepository.findById(id);
         User user = userRepository.findById(userId).get();
         Forum routeEntity= Forum.builder()
                 .id(forumDTO.getForumId())
+                .status(forum.get().getStatus())
                 .title(forumDTO.getTitle())
                 .content(forumDTO.getContent())
                 .type(forumDTO.getForumType())
@@ -198,8 +202,7 @@ public class ForumServiceImpl implements ForumService{
 
         // 조건에 맞는 데이터 확보 ( 조건: 5개, 최신순 )
         String thisType = "나눔";
-//            Page<Forum> routesEntity = forumRepository.findAllByType(thisType,pageable);
-        Page<Forum> sharesEntity = forumRepository.findByType(thisType,pageable);
+        Page<Forum> sharesEntity = forumRepository.findAllByType(thisType,pageable);
         System.out.println(sharesEntity);
         long count = sharesEntity.getTotalElements();
 
@@ -276,6 +279,10 @@ public class ForumServiceImpl implements ForumService{
                 .status(share.getStatus())
                 .isTemp(share.getIsTemporary())
                 .createdAt(share.getCreatedAt())
+                .updatedAt(share.getUpdatedAt())
+                .writerNickname(writer.getNickname())
+                .writerPic(writer.getProfileImageUrl())
+                .writerId(writer.getId())
                 .build();
 
         return getShare;
@@ -334,10 +341,9 @@ public class ForumServiceImpl implements ForumService{
     @Override
     public Map<String, Object> getRoutes(Pageable pageable) throws Exception {
 
-            // 조건에 맞는 데이터 확보 ( 조건: 5개, 최신순 )
-            String thisType = "경로";
-//            Page<Forum> routesEntity = forumRepository.findAllByType(thisType,pageable);
-        Page<Forum> routesEntity = forumRepository.findByType(thisType,pageable);
+        // 조건에 맞는 데이터 확보 ( 조건: 5개, 최신순 )
+        String thisType = "경로";
+        Page<Forum> routesEntity = forumRepository.findAllByType(thisType,pageable);
         System.out.println(routesEntity);
             long count = routesEntity.getTotalElements();
 
@@ -409,9 +415,10 @@ public class ForumServiceImpl implements ForumService{
                 .views(views+1)
                 .isTemp(review.getIsTemporary())
                 .createdAt(review.getCreatedAt())
-//                .writerNickname(String.valueOf(userRepository.findById(userId).get()))
                 .writerNickname(writer.getNickname())
-//                .writerPic(String.valueOf(userRepository.findById(userId).get()))
+                .writerPic(writer.getProfileImageUrl())
+                .updatedAt(review.getUpdatedAt())
+                .writerId(writer.getId())
                 .build();
         return getReview;
     }
@@ -471,27 +478,27 @@ public class ForumServiceImpl implements ForumService{
     }
 
     @Override
-    public void reviewModify(Map<String, String> res, Long id, Long userId) throws Exception{
+    public void reviewModify(Map<String, String> res, Long id, Long userId, Boolean temp) throws Exception{
         System.out.println("리뷰 수정 서비스");
 
         Forum review=forumRepository.findById(id).orElse(null);
         if(review==null){
             throw new EntityNotFoundException("해당 리뷰를 찾을 수 없음");
         }
-
         String title=res.get("title");
         String content=res.get("content");
 
-        review = Forum.builder()
+        Forum review1 = Forum.builder()
                 .id(id)
                 .title(title)
                 .content(content)
-                .type("후기")
+                .type(review.getType())
+                .thisAccompany(review.getThisAccompany())
                 .writer(userRepository.findById(userId).get())
-                .isTemporary(false)
-                .views(0)
+                .isTemporary(temp)
+                .views(review.getViews())
                 .build();
-        forumRepository.save(review);
+        forumRepository.save(review1);
     }
 
     @Override
